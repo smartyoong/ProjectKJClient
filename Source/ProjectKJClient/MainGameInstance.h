@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Networking.h"
+#include "ClientSocket.h"
 #include "MainGameInstance.generated.h"
 
 /**
@@ -14,12 +14,11 @@ UCLASS()
 class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
 private:
-	FSocket* LoginSocket;
-	FSocket* GameSocket;
+	ClientSocket Socket;
+
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
-	FSocket* GetLoginSocket() { return LoginSocket; }
 };
