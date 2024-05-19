@@ -13,5 +13,18 @@ UCLASS()
 class PROJECTKJCLIENT_API ALoginGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+private:
+	UPROPERTY()
+	class UMyUserWidget* LoginWidget;
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+public:
+	ALoginGameModeBase();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
 };

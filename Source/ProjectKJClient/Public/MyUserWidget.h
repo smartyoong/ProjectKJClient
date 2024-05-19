@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "MediaTexture.h"
+#include "MediaPlayer.h"
 #include "MyUserWidget.generated.h"
 
 /**
@@ -13,5 +15,47 @@ UCLASS()
 class PROJECTKJCLIENT_API UMyUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+private:
+	FString ID;
+	FString Password;
+	bool IsFirstTry = true;
+	bool IsFirstPWTry = true;
+	UPROPERTY()
+	UMediaTexture* MediaTexture = nullptr;
+	UPROPERTY()
+	UMediaPlayer* MediaPlayer = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "Media")
+	class UMediaSource* MediaSource = nullptr;
+protected:
+	virtual void NativeOnInitialized() override;
+
+	UFUNCTION()
+	void OnLoginButtonClicked();
+
+	UFUNCTION()
+	void OnRegistButtonClicked();
+
+	UFUNCTION()
+	void OnIDTextChanged(const FText& text);
+
+	UFUNCTION()
+	void OnPasswordTextChanged(const FText& text);
 	
+public:
+
+	UPROPERTY( meta = (BindWidget))
+	class UButton* LoginButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* RegistButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* IDTextBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* PasswordTextBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* MainImage;
 };
