@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "MediaTexture.h"
 #include "MediaPlayer.h"
+#include "MediaPlaylist.h"
+#include "MediaSoundComponent.h"
 #include "MyUserWidget.generated.h"
 
 /**
@@ -25,6 +27,10 @@ private:
 	UMediaTexture* MediaTexture = nullptr;
 	UPROPERTY()
 	UMediaPlayer* MediaPlayer = nullptr;
+	UPROPERTY()
+	UMediaPlaylist* Playlist = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "Media")
+	USoundBase* SoundToPlay = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "Media")
 	class UMediaSource* MediaSource = nullptr;
 protected:

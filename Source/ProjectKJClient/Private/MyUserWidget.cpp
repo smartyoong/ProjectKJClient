@@ -2,13 +2,15 @@
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Image.h"
-#include "MediaPlaylist.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMyUserWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	// 미디어 텍스처 (화면 캡처용)
 	MediaTexture = NewObject<UMediaTexture>();
 	MediaPlayer = NewObject<UMediaPlayer>();
+	// 버튼 설정
 	if(LoginButton != nullptr)
 		LoginButton->OnClicked.AddDynamic(this, &UMyUserWidget::OnLoginButtonClicked);
 	if (RegistButton != nullptr)
@@ -21,27 +23,28 @@ void UMyUserWidget::NativeOnInitialized()
 	{
 		PasswordTextBox->OnTextChanged.AddDynamic(this, &UMyUserWidget::OnPasswordTextChanged);
 	}
+	// 미디어 플레이어와 텍스처 연결
 	MediaTexture->SetMediaPlayer(MediaPlayer);
-	UMediaPlaylist* Playlist = NewObject<UMediaPlaylist>();
-	if (MediaSource != nullptr)
-	{
-		if (!MediaPlayer->OpenSource(MediaSource))
-		{
-			UE_LOG(LogTemp, Error, TEXT("Cannot Open Media Source"));
-		}
-		else
-		{
-			MediaPlayer->SetLooping(true);
-			Playlist->Add(MediaSource);
-			MediaPlayer->OpenPlaylist(Playlist);
-			MediaPlayer->Play();
-		}
-	}
+	MediaTexture->UpdateResource();
 	if (MainImage != nullptr)
 	{
 		FSlateBrush Brush;
 		Brush.SetResourceObject(MediaTexture);
 		MainImage->SetBrush(Brush);
+	}
+
+	// 미디어 플레이어와 플레이리스트 연결
+	Playlist = NewObject<UMediaPlaylist>();
+	if (MediaSource != nullptr)
+	{
+		MediaPlayer->SetLooping(true);
+		MediaPlayer->SetNativeVolume(1.0f);
+		Playlist->Add(MediaSource);
+		MediaPlayer->OpenPlaylist(Playlist);
+		MediaPlayer->Play();
+		// 미디어 플레이어와 사운드 연결
+		if (SoundToPlay != nullptr)
+			UGameplayStatics::PlaySound2D(this, SoundToPlay);
 	}
 }
 
