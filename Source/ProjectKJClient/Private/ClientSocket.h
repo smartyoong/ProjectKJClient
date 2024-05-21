@@ -11,17 +11,16 @@
 class ClientSocket
 {
 private:
-	FSocket* LoginSocket;
-	FSocket* GameSocket;
+	FSocket* Socket;
+
 	bool IsConnected = false;
 
 public:
 	ClientSocket();
 	~ClientSocket();
 	bool ConnectToLoginServer();
-	void DisconnectFromLoginServer();
-	void StartRecvFromLoginServer();
-	void SendToLoginServer(const uint8* Data, int32 BytesToSend);
-	FSocket* GetLoginSocket() { return LoginSocket; }
-	FSocket* GetGameSocket() { return GameSocket; }
+	void DisconnectFromServer();
+	uint8* StartRecvFromServer();
+	void SendToServer(const uint8* Data, int32 BytesToSend);
+	FSocket* GetSocket() { return Socket; }
 };

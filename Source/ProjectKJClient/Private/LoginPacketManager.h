@@ -42,9 +42,14 @@ struct RegistAccountResponsePacket
  */
 
 
-class LoginPacketManager
+class PacketDispatcher
 {
+private:
+	TQueue<uint8*>* PacketQueue;
+	TQueue<uint8*> LoginPacketQueue;
+	TQueue<uint8*> GamePacketQueue;
+
 public:
-	LoginPacketManager();
-	~LoginPacketManager();
+    PacketDispatcher(TQueue<uint8*>* Queue);
+    ~PacketDispatcher() = default;
 };

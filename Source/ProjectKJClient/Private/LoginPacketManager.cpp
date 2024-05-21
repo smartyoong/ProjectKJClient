@@ -3,10 +3,8 @@
 
 #include "LoginPacketManager.h"
 
-LoginPacketManager::LoginPacketManager()
+PacketDispatcher::PacketDispatcher(TQueue<uint8*>* Queue) : PacketQueue(Queue)
 {
 }
 
-LoginPacketManager::~LoginPacketManager()
-{
-}
+

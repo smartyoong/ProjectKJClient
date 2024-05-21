@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "ClientSocket.h"
+#include "ClientSocketThread.h"
 #include "MainGameInstance.generated.h"
 
 /**
@@ -16,9 +16,14 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 private:
-	ClientSocket Socket;
+	SocketThread* LoginSockRun;
+	FRunnableThread* LoginThread;
+	TQueue<uint8*> PacketQueue;
 
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
+
+	template <typename T>
+	void SendPacketToLoginServer(LoginPacketListID ID, T Packet);
 };

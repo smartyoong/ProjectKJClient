@@ -5,22 +5,20 @@
 
 ClientSocket::ClientSocket()
 {
-	LoginSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("LoginSocket"), false);
-	GameSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("GameSocket"), false);
+	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("ClientSocket"), false);
 }
 
 ClientSocket::~ClientSocket()
 {
-	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(LoginSocket);
-	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(GameSocket);
+	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
 }
 
 bool ClientSocket::ConnectToLoginServer()
 {
-	LoginSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("LoginSocket"), false);
+	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("ClientSocket"), false);
 	FIPv4Address Addr;
 	FString IP;
-	int32 Port;
+	int32 Port = 0;
 	// INI에서 IP를 읽어옵니다.
 	if (!GConfig->GetString(TEXT("Network"), TEXT("LOGIN_IP"), IP, FPaths::ProjectConfigDir() / TEXT("Connect.ini")) or
 		!GConfig->GetInt(TEXT("Network"), TEXT("LOGIN_PORT"), Port, FPaths::ProjectConfigDir() / TEXT("Connect.ini")))
@@ -33,7 +31,7 @@ bool ClientSocket::ConnectToLoginServer()
 	InternetAddr->SetIp(Addr.Value);
 	InternetAddr->SetPort(Port);
 	// 연결
-	IsConnected = LoginSocket->Connect(*InternetAddr);
+	IsConnected = Socket->Connect(*InternetAddr);
 	if (!IsConnected)
 	{
 		// 추후 추가할것
@@ -47,36 +45,55 @@ bool ClientSocket::ConnectToLoginServer()
 	}
 }
 
-void ClientSocket::DisconnectFromLoginServer()
+void ClientSocket::DisconnectFromServer()
 {
-	LoginSocket->Close();
+	Socket->Close();
 }
 
-void ClientSocket::StartRecvFromLoginServer()
+uint8* ClientSocket::StartRecvFromServer()
 {
 	uint32 Size;
-	while (LoginSocket->HasPendingData(Size))
+	while (Socket->HasPendingData(Size))
 	{
+		// 사이즈를 구해서 해당 사이즈만큼 데이터를 받는다.
 		int32 ReadSize = 0;
 		uint8 Data[sizeof(int32)];
-		LoginSocket->Recv(Data, sizeof(Data), ReadSize);
+		Socket->Recv(Data, sizeof(Data), ReadSize);
 		if (ReadSize <= 0)
 			break;
-		int32 PacketSize = *(int32*)Data;
+		int32 PacketSize = 0;
+		FMemory::Memcpy(&PacketSize, Data, sizeof(int32));
 		if (PacketSize <= 0)
 			break;
 		uint8* PacketData = new uint8[PacketSize];
-		LoginSocket->Recv(PacketData, PacketSize, ReadSize);
+		Socket->Recv(PacketData, PacketSize, ReadSize);
 		if (ReadSize <= 0)
+		{
+			delete[] PacketData;
 			break;
+		}
+		return PacketData;
+		// 반드시 Delete 시킬 것
 	}
+	return nullptr;
 }
 
-void ClientSocket::SendToLoginServer(const uint8* Data, int32 BytesToSend)
+void ClientSocket::SendToServer(const uint8* Data, int32 BytesToSend)
 {
-	// 사이즈를 구해서 패킷에 추가로 붙이는거 구현해야함
-	if (!LoginSocket->Send(Data, sizeof(Data), BytesToSend))
+	// 패킷 사이즈를 앞에 붙여서 보냅니다.
+	int32 SendSize = 0;
+
+	TArray<uint8> PacketArray;
+	PacketArray.AddUninitialized(sizeof(int32));
+	FMemory::Memcpy(PacketArray.GetData(), &BytesToSend, sizeof(int32));
+	PacketArray.Append(Data, BytesToSend);
+
+	if (!Socket->Send(PacketArray.GetData(), PacketArray.Num(), SendSize))
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to Send to Login server"));
+	}
+	else if (SendSize <= 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to Send to Login server2"));
 	}
 }
