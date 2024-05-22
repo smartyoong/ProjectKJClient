@@ -20,7 +20,7 @@ public:
 	~ClientSocket();
 	bool ConnectToLoginServer();
 	void DisconnectFromServer();
-	uint8* StartRecvFromServer();
+	TSharedPtr<TArray<uint8>> StartRecvFromServer();
 	void SendToServer(const uint8* Data, int32 BytesToSend);
 	FSocket* GetSocket() { return Socket; }
 };

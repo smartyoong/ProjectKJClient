@@ -3,8 +3,4 @@
 
 #include "LoginPacketManager.h"
 
-PacketDispatcher::PacketDispatcher(TQueue<uint8*>* Queue) : PacketQueue(Queue)
-{
-}
-
 

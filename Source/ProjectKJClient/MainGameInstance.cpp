@@ -6,7 +6,8 @@
 void UMainGameInstance::Init()
 {
 	Super::Init();
-	LoginSockRun = new SocketThread(LOGIN_MODE,&PacketQueue);
+	PacketQueue = new TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>();
+	LoginSockRun = new SocketThread(LOGIN_MODE,PacketQueue);
 	LoginThread = FRunnableThread::Create(LoginSockRun, TEXT("LoginSocketThread"));
 	if (!LoginSockRun -> GetInitSuccess())
 	{
@@ -17,13 +18,25 @@ void UMainGameInstance::Init()
 		// 게임 종료
 		FGenericPlatformMisc::RequestExit(false);
 	}
+	Dispatcher = new PacketDispatcher(PacketQueue);
+	DispatcherThread = FRunnableThread::Create(Dispatcher, TEXT("PacketDispatcherThread"));
 }
 
 void UMainGameInstance::Shutdown()
 {
 	Super::Shutdown();
+
 	LoginThread->Kill(true);
 	delete LoginThread;
+
+	DispatcherThread->Kill(true);
+	delete DispatcherThread;
+
+	if (!PacketQueue->IsEmpty())
+	{
+		PacketQueue->Empty();
+	}
+	delete PacketQueue;
 }
 
 template<typename T>

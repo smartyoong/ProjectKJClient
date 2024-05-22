@@ -50,7 +50,7 @@ void ClientSocket::DisconnectFromServer()
 	Socket->Close();
 }
 
-uint8* ClientSocket::StartRecvFromServer()
+TSharedPtr<TArray<uint8>> ClientSocket::StartRecvFromServer()
 {
 	uint32 Size;
 	while (Socket->HasPendingData(Size))
@@ -72,8 +72,7 @@ uint8* ClientSocket::StartRecvFromServer()
 			delete[] PacketData;
 			break;
 		}
-		return PacketData;
-		// 반드시 Delete 시킬 것
+		return MakeShareable(new TArray<uint8>(PacketData, PacketSize));
 	}
 	return nullptr;
 }

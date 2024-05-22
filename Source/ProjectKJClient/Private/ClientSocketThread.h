@@ -15,7 +15,7 @@ const int GAME_MODE = 1;
 class SocketThread : public FRunnable
 {
 public:
-	SocketThread(int mode ,TQueue<uint8*>* InPacketQueue);
+	SocketThread(int mode ,TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* InPacketQueue);
 
     virtual bool Init() override;
 
@@ -35,5 +35,5 @@ private:
     FThreadSafeCounter StopTaskCounter;
     ClientSocket Socket;
     bool InitSuccess = false;
-	TQueue<uint8*>* PacketQueue;
+    TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* PacketQueue;
 };

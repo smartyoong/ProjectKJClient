@@ -3,7 +3,7 @@
 
 #include "ClientSocketThread.h"
 
-SocketThread::SocketThread(int mode, TQueue<uint8*>* InPacketQueue) : Mode(mode), PacketQueue(InPacketQueue)
+SocketThread::SocketThread(int mode, TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* InPacketQueue) : Mode(mode), PacketQueue(InPacketQueue)
 {
 }
 
@@ -42,6 +42,9 @@ uint32 SocketThread::Run()
 		auto PacketData = Socket.StartRecvFromServer();
 		if (PacketQueue != nullptr)
 		{
+			if (!PacketData.IsValid())
+				continue;
+
 			PacketQueue->Enqueue(PacketData);
 		}
     }

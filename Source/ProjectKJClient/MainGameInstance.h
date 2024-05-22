@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "ClientSocketThread.h"
+#include "PacketDispatcher.h"
 #include "MainGameInstance.generated.h"
 
 /**
@@ -18,7 +19,9 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 private:
 	SocketThread* LoginSockRun;
 	FRunnableThread* LoginThread;
-	TQueue<uint8*> PacketQueue;
+	PacketDispatcher* Dispatcher;
+	FRunnableThread* DispatcherThread;
+	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* PacketQueue;
 
 public:
 	virtual void Init() override;
