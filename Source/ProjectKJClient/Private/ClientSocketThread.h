@@ -32,7 +32,7 @@ public:
 
 private:
     int Mode = 0;
-    FThreadSafeCounter StopTaskCounter;
+    FThreadSafeCounter StopTaskCounter=0;
     ClientSocket Socket;
     bool InitSuccess = false;
     TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* PacketQueue;

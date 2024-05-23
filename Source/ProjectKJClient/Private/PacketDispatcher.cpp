@@ -11,13 +11,18 @@ int32 PacketDispatcher::GetIDFromPacket(TSharedPtr<TArray<uint8>> PacketData)
 	return PacketID;
 }
 
-PacketDispatcher::PacketDispatcher(TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* Queue) : PacketQueue(Queue)
+PacketDispatcher::PacketDispatcher(TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* Queue, 
+	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* Dest) : PacketQueue(Queue), DestinationQueue(Dest)
 {
 }
 
 bool PacketDispatcher::Init()
 {
-	return false;
+	if (PacketQueue == nullptr or DestinationQueue == nullptr)
+	{
+		return false;
+	}
+	return true;
 }
 
 uint32 PacketDispatcher::Run()
@@ -34,6 +39,8 @@ uint32 PacketDispatcher::Run()
 
 			int32 PacketID = GetIDFromPacket(PacketData);
 			// 이제 로그인 큐 혹은 게임 큐에 넣자
+			TSharedPtr<TPair<int32, TArray<uint8>>> PacketPair = MakeShareable(new TPair<int32, TArray<uint8>>(PacketID, *PacketData));
+			DestinationQueue->Enqueue(PacketPair);
 		}
 	}
 	return 0;

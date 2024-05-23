@@ -17,11 +17,13 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 private:
+	// 로그인 관련 변수
 	SocketThread* LoginSockRun;
 	FRunnableThread* LoginThread;
-	PacketDispatcher* Dispatcher;
-	FRunnableThread* DispatcherThread;
-	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* PacketQueue;
+	PacketDispatcher* LoginDispatcher;
+	FRunnableThread* LoginDispatcherThread;
+	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* LoginPacketQueue;
+	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* LoginDestinationPacketQueue;
 
 public:
 	virtual void Init() override;

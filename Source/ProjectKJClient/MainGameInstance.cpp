@@ -6,8 +6,9 @@
 void UMainGameInstance::Init()
 {
 	Super::Init();
-	PacketQueue = new TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>();
-	LoginSockRun = new SocketThread(LOGIN_MODE,PacketQueue);
+	LoginPacketQueue = new TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>();
+	LoginDestinationPacketQueue = new TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>();
+	LoginSockRun = new SocketThread(LOGIN_MODE,LoginPacketQueue);
 	LoginThread = FRunnableThread::Create(LoginSockRun, TEXT("LoginSocketThread"));
 	if (!LoginSockRun -> GetInitSuccess())
 	{
@@ -18,8 +19,8 @@ void UMainGameInstance::Init()
 		// 게임 종료
 		FGenericPlatformMisc::RequestExit(false);
 	}
-	Dispatcher = new PacketDispatcher(PacketQueue);
-	DispatcherThread = FRunnableThread::Create(Dispatcher, TEXT("PacketDispatcherThread"));
+	LoginDispatcher = new PacketDispatcher(LoginPacketQueue,LoginDestinationPacketQueue);
+	LoginDispatcherThread = FRunnableThread::Create(LoginDispatcher, TEXT("PacketDispatcherThread"));
 }
 
 void UMainGameInstance::Shutdown()
@@ -29,18 +30,35 @@ void UMainGameInstance::Shutdown()
 	LoginThread->Kill(true);
 	delete LoginThread;
 
-	DispatcherThread->Kill(true);
-	delete DispatcherThread;
+	LoginDispatcherThread->Kill(true);
+	delete LoginDispatcherThread;
 
-	if (!PacketQueue->IsEmpty())
+	if (!LoginPacketQueue->IsEmpty())
 	{
-		PacketQueue->Empty();
+		LoginPacketQueue->Empty();
 	}
-	delete PacketQueue;
+	delete LoginPacketQueue;
+
+	if (!LoginDestinationPacketQueue->IsEmpty())
+	{
+		LoginDestinationPacketQueue->Empty();
+	}
+	delete LoginDestinationPacketQueue;
 }
 
 template<typename T>
 void UMainGameInstance::SendPacketToLoginServer(LoginPacketListID ID, T Packet)
 {
 	LoginSockRun->SendPacket<T>(ID, Packet);
+    // 추후 아래 코드로 전송시 직렬화 생각해볼것 JsonString -> uint8
+	//int32 Utf8Length = FTCHARToUTF8_Convert::ConvertedLength(*ContentString, ContentString.Len());
+	//TArray<uint8> Buffer;
+	//Buffer.SetNumUninitialized(Utf8Length);
+	//FTCHARToUTF8_Convert::Convert((UTF8CHAR*)Buffer.GetData(), Buffer.Num(), *ContentString, ContentString.Len());
+	//int32 StringToBytes
+	//(
+	//	const FString & String,
+	//	uint8 * OutBytes,
+	//	int32 MaxBufferSize
+	//) UnrealString.h
 }

@@ -3,7 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LoginPacketManager.generated.h"
 
+
+enum class PacketProcessorMode
+{
+	LOGIN = 0,
+	INGAME = 1
+};
 
 enum class LoginPacketListID
 {
@@ -13,27 +20,45 @@ enum class LoginPacketListID
     REGIST_ACCOUNT_RESPONESE = 3
 };
 
-struct LoginRequestPacket
+USTRUCT()
+struct FLoginRequestPacket
 {
+    GENERATED_BODY()
+
+    UPROPERTY()
     FString AccountID;
+    UPROPERTY()
     FString Password;
 };
 
-struct LoginResponsePacket
+USTRUCT()
+struct FLoginResponsePacket
 {
+    GENERATED_BODY()
+
+    UPROPERTY()
     FString NickName;
+    UPROPERTY()
     int32 ErrorCode;
 };
-
-struct RegistAccountRequestPacket
+USTRUCT()
+struct FRegistAccountRequestPacket
 {
+    GENERATED_BODY()
+
+    UPROPERTY()
     FString AccountID;
+    UPROPERTY()
     FString Password;
 };
-
-struct RegistAccountResponsePacket
+USTRUCT()
+struct FRegistAccountResponsePacket
 {
+    GENERATED_BODY()
+
+    UPROPERTY()
     bool IsSuccess;
+    UPROPERTY()
     int32 ErrorCode;
 };
 
