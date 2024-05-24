@@ -20,6 +20,22 @@ enum class LoginPacketListID
     REGIST_ACCOUNT_RESPONESE = 3
 };
 
+UENUM()
+enum class ErrorCodePacket
+{
+	IS_NOT_USTRUCT = 0,
+	FAIL_TO_DESERIALIZE = 1
+};
+
+USTRUCT()
+struct FErrorPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    ErrorCodePacket ErrorCode;
+};
+
 USTRUCT()
 struct FLoginRequestPacket
 {

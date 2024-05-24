@@ -9,13 +9,14 @@
 /**
  * 
  */
-class PacketProcessor : FRunnable
+class PacketProcessor : public FRunnable
 {
 private:
 	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* PacketQueue;
-	//ACommonGameModeBase* GameMode;
+	ACommonGameModeBase* GameMode = nullptr;
+	PacketProcessorMode ProcessMode;
 	FThreadSafeCounter StopTaskCounter;
-	PacketProcessorMode Mode;
+	FEvent* GameModeEvent;
 public:
 	PacketProcessor(TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* Queue, PacketProcessorMode mode);
 	~PacketProcessor();
@@ -31,6 +32,10 @@ public:
 	void ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData);
 
 	void ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData);
+
+	void SetGameMode(ACommonGameModeBase* Mode);
+
+	void RemoveGameMode();
 
 	template <typename T>
 	T PacketToStruct(const TArray<uint8>& Data);

@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "CommonGameModeBase.h"
 #include "LoginGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTKJCLIENT_API ALoginGameModeBase : public AGameModeBase
+class PROJECTKJCLIENT_API ALoginGameModeBase : public ACommonGameModeBase
 {
 	GENERATED_BODY()
 

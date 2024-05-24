@@ -5,7 +5,7 @@
 #include "JsonUtilities.h"
 
 PacketProcessor::PacketProcessor(TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* Queue, 
-	PacketProcessorMode mode) : PacketQueue(Queue), Mode(mode), StopTaskCounter(0)
+	PacketProcessorMode mode) : PacketQueue(Queue), ProcessMode(mode), StopTaskCounter(0)
 {
 }
 
@@ -17,6 +17,7 @@ bool PacketProcessor::Init()
 {
 	if(PacketQueue == nullptr)
 		return false;
+	GameModeEvent = FPlatformProcess::GetSynchEventFromPool();
 	return true;
 }
 
@@ -24,13 +25,15 @@ uint32 PacketProcessor::Run()
 {
 	while(!StopTaskCounter.GetValue())
 	{
+		GameModeEvent->Wait();
+
 		TSharedPtr<TPair<int32, TArray<uint8>>> PacketData;
 		if (PacketQueue->Dequeue(PacketData))
 		{
 			if (!PacketData.IsValid())
 				continue;
 			// 패킷 처리
-			switch (Mode)
+			switch (ProcessMode)
 			{
 				case PacketProcessorMode::LOGIN:
 					ProcessLoginPacket(PacketData);
@@ -49,10 +52,22 @@ uint32 PacketProcessor::Run()
 template <typename T>
 T PacketProcessor::PacketToStruct(const TArray<uint8>& Data)
 {
-	FString String = BytesToString(Data);
-	T PacketStruckt;
-	FJsonObjectConverter::JsonObjectStringToUStruct(String, &PacketStruckt, 0, 0);
-	return PacketStruckt;
+	FString String = BytesToString(Data.GetData(), Data.Num());
+	if (!T::StaticClass()->IsChildOf(UStruct::StaticClass()))
+	{
+		FErrorPacket Err;
+		Err.ErrorCode = ErrorCodePacket::IS_NOT_USTRUCT;
+		return Err;
+	}
+	T PacketStruct;
+	if (FJsonObjectConverter::JsonObjectStringToUStruct(String, &PacketStruct, 0, 0))
+		return PacketStruct;
+	else
+	{
+		FErrorPacket Err;
+		Err.ErrorCode = ErrorCodePacket::FAIL_TO_DESERIALIZE;
+		return Err;
+	}
 }
 
 void PacketProcessor::Stop()
@@ -62,6 +77,7 @@ void PacketProcessor::Stop()
 
 void PacketProcessor::Exit()
 {
+	FPlatformProcess::ReturnSynchEventToPool(GameModeEvent);
 }
 
 void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData)
@@ -87,4 +103,22 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData)
 {
 
+}
+
+void PacketProcessor::SetGameMode(ACommonGameModeBase* Mode)
+{
+	FCriticalSection Lock;
+	Lock.Lock();
+	this->GameMode = Mode;
+	GameModeEvent->Trigger();
+	Lock.Unlock();
+}
+
+void PacketProcessor::RemoveGameMode()
+{
+	FCriticalSection Lock;
+	Lock.Lock();
+	GameMode = nullptr;
+	GameModeEvent->Reset();
+	Lock.Unlock();
 }

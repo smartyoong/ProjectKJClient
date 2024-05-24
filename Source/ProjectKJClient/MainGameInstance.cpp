@@ -21,6 +21,10 @@ void UMainGameInstance::Init()
 	}
 	LoginDispatcher = new PacketDispatcher(LoginPacketQueue,LoginDestinationPacketQueue);
 	LoginDispatcherThread = FRunnableThread::Create(LoginDispatcher, TEXT("PacketDispatcherThread"));
+
+	LoginPacketProcessor = new PacketProcessor(LoginDestinationPacketQueue, PacketProcessorMode::LOGIN);
+	LoginPacketProcessorThread = FRunnableThread::Create(LoginPacketProcessor, TEXT("PacketProcessorThread"));
+
 }
 
 void UMainGameInstance::Shutdown()
@@ -32,6 +36,9 @@ void UMainGameInstance::Shutdown()
 
 	LoginDispatcherThread->Kill(true);
 	delete LoginDispatcherThread;
+
+	LoginPacketProcessorThread->Kill(true);
+	delete LoginPacketProcessorThread;
 
 	if (!LoginPacketQueue->IsEmpty())
 	{
@@ -46,19 +53,18 @@ void UMainGameInstance::Shutdown()
 	delete LoginDestinationPacketQueue;
 }
 
+void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode)
+{
+
+}
+
+void UMainGameInstance::UnRegistGameModeFromPacketQueue(ACommonGameModeBase* GameMode)
+{
+
+}
+
 template<typename T>
 void UMainGameInstance::SendPacketToLoginServer(LoginPacketListID ID, T Packet)
 {
 	LoginSockRun->SendPacket<T>(ID, Packet);
-    // 추후 아래 코드로 전송시 직렬화 생각해볼것 JsonString -> uint8
-	//int32 Utf8Length = FTCHARToUTF8_Convert::ConvertedLength(*ContentString, ContentString.Len());
-	//TArray<uint8> Buffer;
-	//Buffer.SetNumUninitialized(Utf8Length);
-	//FTCHARToUTF8_Convert::Convert((UTF8CHAR*)Buffer.GetData(), Buffer.Num(), *ContentString, ContentString.Len());
-	//int32 StringToBytes
-	//(
-	//	const FString & String,
-	//	uint8 * OutBytes,
-	//	int32 MaxBufferSize
-	//) UnrealString.h
 }

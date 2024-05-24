@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "LoginPacketManager.h"
 #include "CommonGameModeBase.generated.h"
 
 /**
@@ -15,8 +16,5 @@ class ACommonGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 public:
 	virtual ~ACommonGameModeBase() = default;
-	// 인스턴스에 현재 사용할 게임모드를 설정합니다. 이는 패킷을 받아오기에 매우 중요합니다.
-	virtual void RegistGameMode() {};
-	// 패킷을 받아오는 함수입니다.
-	virtual void GetPacketFromQueue() {};
+	// 앞으로 로직 함수를 여기서 선언하자
 };
