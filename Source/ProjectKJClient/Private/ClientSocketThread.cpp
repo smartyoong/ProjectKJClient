@@ -20,18 +20,18 @@ bool SocketThread::Init()
 		if (!Socket.ConnectToLoginServer())
 		{
 			InitSuccess = false;
-			return true;
+			return false;
 		}
 		else
 		{
 			InitSuccess = true;
-			return false;
+			return true;
 		}
 	}
 	else
 	{
 		// 임시
-		return false;
+		return true;
 	}
 }
 

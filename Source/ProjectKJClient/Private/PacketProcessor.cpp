@@ -22,9 +22,10 @@ bool PacketProcessor::Init()
 
 uint32 PacketProcessor::Run()
 {
+	GameModeEvent->Wait();
+
 	while(!StopTaskCounter.GetValue())
 	{
-		GameModeEvent->Wait();
 
 		TSharedPtr<TPair<int32, TArray<uint8>>> PacketData;
 		if (PacketQueue->Dequeue(PacketData))
@@ -52,6 +53,7 @@ uint32 PacketProcessor::Run()
 void PacketProcessor::Stop()
 {
 	StopTaskCounter.Increment();
+	GameModeEvent->Trigger();
 }
 
 void PacketProcessor::Exit()
@@ -91,14 +93,5 @@ void PacketProcessor::SetGameMode(ACommonGameModeBase* Mode)
 	Lock.Lock();
 	this->GameMode = Mode;
 	GameModeEvent->Trigger();
-	Lock.Unlock();
-}
-
-void PacketProcessor::RemoveGameMode()
-{
-	FCriticalSection Lock;
-	Lock.Lock();
-	GameMode = nullptr;
-	GameModeEvent->Reset();
 	Lock.Unlock();
 }

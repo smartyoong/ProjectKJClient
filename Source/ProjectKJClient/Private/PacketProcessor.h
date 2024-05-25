@@ -7,6 +7,7 @@
 #include "LoginPacketManager.h"
 #include "JsonUtilities.h"
 
+
 /**
  * 
  */
@@ -35,15 +36,24 @@ public:
 	void ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData);
 
 	void SetGameMode(ACommonGameModeBase* Mode);
-
-	void RemoveGameMode();
 	
 	template <typename T>
 	inline T PacketToStruct(const TArray<uint8>& Data)
 	{
-		FString String = BytesToString(Data.GetData(), Data.Num());
+		//FString String = BytesToString(Data.GetData(), Data.Num());
+		FString Result;
+		int32 Count = Data.Num();
+		Result.Empty(Count);
+		const uint8* In = Data.GetData();
+		while (Count)
+		{
+			int16 Value = *In;
+			Result += FString::ElementType(Value);
+			++In;
+			Count--;
+		}
 		T PacketStruct;
-		if (FJsonObjectConverter::JsonObjectStringToUStruct(String, &PacketStruct, 0, 0))
+		if (FJsonObjectConverter::JsonObjectStringToUStruct(Result, &PacketStruct, 0, 0))
 			return PacketStruct;
 		else
 		{

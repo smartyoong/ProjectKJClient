@@ -36,8 +36,6 @@ public:
 
 	// 인스턴스에 현재 사용할 게임모드를 설정합니다. 이는 패킷을 받아오기에 매우 중요합니다.
 	void RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode);
-	// 패킷을 받아오는 함수입니다.
-	void UnRegistGameModeFromPacketQueue();
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)

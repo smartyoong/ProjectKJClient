@@ -15,8 +15,11 @@ void ULoginResultWidget::NativeOnInitialized()
 
 void ULoginResultWidget::OnOkButtonClicked()
 {
-	RemoveFromParent();
-	Destruct();
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RemoveFromParent();
+			Destruct();
+		});
 }
 
 void ULoginResultWidget::SetLoginSuceess()

@@ -15,14 +15,14 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 {
 	switch (Packet.ErrorCode)
 	{
-	case 0:
-		UE_LOG(LogTemp, Warning, TEXT("No Account"));
+	case 0: // 계정 없음
+		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		break;
-	case 1:
-		UE_LOG(LogTemp, Warning, TEXT("Password Failed"));
+	case 1: // 비번 불일치
+		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		break;
-	case 2:
-		UE_LOG(LogTemp, Warning, TEXT("Login Success"));
+	case 2: // 성공
+		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		break;
 	default:
 		break;
@@ -53,5 +53,4 @@ void ALoginGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 	LoginWidget->RemoveFromParent();
 	LoginWidget->Destruct();
-	GetWorld()->GetGameInstance<UMainGameInstance>()->UnRegistGameModeFromPacketQueue();
 }

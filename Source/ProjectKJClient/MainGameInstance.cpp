@@ -37,7 +37,8 @@ void UMainGameInstance::Shutdown()
 	LoginDispatcherThread->Kill(true);
 	delete LoginDispatcherThread;
 
-	LoginPacketProcessorThread->Kill(true);
+	LoginPacketProcessor->Stop();
+	LoginPacketProcessorThread->Kill(false);
 	delete LoginPacketProcessorThread;
 
 	if (!LoginPacketQueue->IsEmpty())
@@ -56,9 +57,4 @@ void UMainGameInstance::Shutdown()
 void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode)
 {
 	LoginPacketProcessor->SetGameMode(GameMode);
-}
-
-void UMainGameInstance::UnRegistGameModeFromPacketQueue()
-{
-	LoginPacketProcessor->RemoveGameMode();
 }

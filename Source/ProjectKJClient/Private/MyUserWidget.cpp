@@ -90,24 +90,27 @@ void UMyUserWidget::OnPasswordTextChanged(const FText& text)
 
 void UMyUserWidget::ShowLoginResultWidget(int Mode)
 {
-	LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
-	if (LoginResultWidget != nullptr)
-	{
-		switch (Mode)
+	AsyncTask(ENamedThreads::GameThread, [this, Mode]()
 		{
-		case 0:
-			LoginResultWidget->SetNoAccount();
-			break;
-		case 1:
-			LoginResultWidget->SetPasswordFail();
-			break;
-		case 2:
-			LoginResultWidget->SetLoginSuceess();
-			break;
-		default:
-			break;
-		}
-		LoginResultWidget->AddToViewport();
-	}
+			LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
+			if (LoginResultWidget != nullptr)
+			{
+				switch (Mode)
+				{
+				case 0:
+					LoginResultWidget->SetNoAccount();
+					break;
+				case 1:
+					LoginResultWidget->SetPasswordFail();
+					break;
+				case 2:
+					LoginResultWidget->SetLoginSuceess();
+					break;
+				default:
+					break;
+				}
+				LoginResultWidget->AddToViewport();
+			}
+		});
 }
 
