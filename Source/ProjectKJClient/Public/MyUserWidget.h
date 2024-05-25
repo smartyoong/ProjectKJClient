@@ -33,6 +33,9 @@ private:
 	USoundBase* SoundToPlay = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "Media")
 	class UMediaSource* MediaSource = nullptr;
+
+	UPROPERTY()
+	class ULoginResultWidget* LoginResultWidget;
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -64,4 +67,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MainImage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ULoginResultWidget> LoginResultWidgetClass;
+
+	void ShowLoginResultWidget(int Mode);
 };

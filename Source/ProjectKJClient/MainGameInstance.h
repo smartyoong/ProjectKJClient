@@ -8,8 +8,9 @@
 #include "PacketDispatcher.h"
 #include "CommonGameModeBase.h"
 #include "PacketProcessor.h"
+#include "LoginPacketManager.h"
+#include "JsonUtilities.h"
 #include "MainGameInstance.generated.h"
-
 /**
  * 
  */
@@ -36,8 +37,18 @@ public:
 	// 인스턴스에 현재 사용할 게임모드를 설정합니다. 이는 패킷을 받아오기에 매우 중요합니다.
 	void RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode);
 	// 패킷을 받아오는 함수입니다.
-	void UnRegistGameModeFromPacketQueue(ACommonGameModeBase* GameMode);
+	void UnRegistGameModeFromPacketQueue();
 
 	template <typename T>
-	void SendPacketToLoginServer(LoginPacketListID ID, T Packet);
+	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
+	{
+		// 직렬화해서 Send 시키자 
+		// ID 직렬화
+		TArray<uint8> PacketData;
+		PacketData.AddUninitialized(sizeof(int32));
+		FMemory::Memcpy(PacketData.GetData(), &ID, sizeof(int32));
+		FString JSonString;
+		FJsonObjectConverter::UStructToJsonObjectString(Packet, JSonString);
+		LoginSockRun->SendPacket(JSonString, PacketData);
+	}
 };

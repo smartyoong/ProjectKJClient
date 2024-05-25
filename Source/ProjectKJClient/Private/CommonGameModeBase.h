@@ -17,4 +17,5 @@ class ACommonGameModeBase : public AGameModeBase
 public:
 	virtual ~ACommonGameModeBase() = default;
 	// 앞으로 로직 함수를 여기서 선언하자
+	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) {};
 };

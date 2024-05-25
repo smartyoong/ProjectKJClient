@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class ProjectKJClient : ModuleRules
 {
@@ -10,6 +11,6 @@ public class ProjectKJClient : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "Networking", "Sockets",
 
-        "MediaAssets","AudioExtensions","UMG","Slate","SlateCore"});
+        "MediaAssets","AudioExtensions","UMG","Slate","SlateCore","Json","JsonUtilities"});
     }
 }

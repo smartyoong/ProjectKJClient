@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommonGameModeBase.h"
 #include "LoginPacketManager.h"
+#include "JsonUtilities.h"
 
 /**
  * 
@@ -36,7 +37,18 @@ public:
 	void SetGameMode(ACommonGameModeBase* Mode);
 
 	void RemoveGameMode();
-
+	
 	template <typename T>
-	T PacketToStruct(const TArray<uint8>& Data);
+	inline T PacketToStruct(const TArray<uint8>& Data)
+	{
+		FString String = BytesToString(Data.GetData(), Data.Num());
+		T PacketStruct;
+		if (FJsonObjectConverter::JsonObjectStringToUStruct(String, &PacketStruct, 0, 0))
+			return PacketStruct;
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Fail to Deserialize Packet"));
+			return PacketStruct;
+		}
+	}
 };

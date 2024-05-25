@@ -2,7 +2,6 @@
 
 
 #include "PacketProcessor.h"
-#include "JsonUtilities.h"
 
 PacketProcessor::PacketProcessor(TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* Queue, 
 	PacketProcessorMode mode) : PacketQueue(Queue), ProcessMode(mode), StopTaskCounter(0)
@@ -49,26 +48,6 @@ uint32 PacketProcessor::Run()
 	}
 	return 0;
 }
-template <typename T>
-T PacketProcessor::PacketToStruct(const TArray<uint8>& Data)
-{
-	FString String = BytesToString(Data.GetData(), Data.Num());
-	if (!T::StaticClass()->IsChildOf(UStruct::StaticClass()))
-	{
-		FErrorPacket Err;
-		Err.ErrorCode = ErrorCodePacket::IS_NOT_USTRUCT;
-		return Err;
-	}
-	T PacketStruct;
-	if (FJsonObjectConverter::JsonObjectStringToUStruct(String, &PacketStruct, 0, 0))
-		return PacketStruct;
-	else
-	{
-		FErrorPacket Err;
-		Err.ErrorCode = ErrorCodePacket::FAIL_TO_DESERIALIZE;
-		return Err;
-	}
-}
 
 void PacketProcessor::Stop()
 {
@@ -88,6 +67,7 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 		case LoginPacketListID::LOGIN_REQUEST:
 			break;
 		case LoginPacketListID::LOGIN_RESPONESE:
+			GameMode->OnLoginResponsePacketReceived(PacketToStruct<FLoginResponsePacket>(PacketData->Value));
 			break;
 		case LoginPacketListID::REGIST_ACCOUNT_REQUEST:
 			break;

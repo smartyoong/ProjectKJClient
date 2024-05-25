@@ -55,16 +55,10 @@ void UMainGameInstance::Shutdown()
 
 void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode)
 {
-
+	LoginPacketProcessor->SetGameMode(GameMode);
 }
 
-void UMainGameInstance::UnRegistGameModeFromPacketQueue(ACommonGameModeBase* GameMode)
+void UMainGameInstance::UnRegistGameModeFromPacketQueue()
 {
-
-}
-
-template<typename T>
-void UMainGameInstance::SendPacketToLoginServer(LoginPacketListID ID, T Packet)
-{
-	LoginSockRun->SendPacket<T>(ID, Packet);
+	LoginPacketProcessor->RemoveGameMode();
 }

@@ -3,6 +3,9 @@
 #include "Components/EditableTextBox.h"
 #include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
+#include "LoginPacketManager.h"
+#include "ProjectKJClient/MainGameInstance.h"
+#include "LoginResultWidget.h"
 
 void UMyUserWidget::NativeOnInitialized()
 {
@@ -51,7 +54,11 @@ void UMyUserWidget::NativeOnInitialized()
 void UMyUserWidget::OnLoginButtonClicked()
 {
 	// 패킷 송수신하도록 작업하고 여기에 추가하자
-	UE_LOG(LogTemp, Warning, TEXT("Login Button Clicked"));
+	FLoginRequestPacket LoginPacket;
+	LoginPacket.AccountID = ID;
+	LoginPacket.Password = Password;
+	LoginPacketListID PacketID = LoginPacketListID::LOGIN_REQUEST;
+	GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToLoginServer<FLoginRequestPacket>(PacketID,LoginPacket);
 }
 
 void UMyUserWidget::OnRegistButtonClicked()
@@ -79,5 +86,28 @@ void UMyUserWidget::OnPasswordTextChanged(const FText& text)
 		PasswordTextBox->SetIsPassword(true);
 	}
 	Password = text.ToString();
+}
+
+void UMyUserWidget::ShowLoginResultWidget(int Mode)
+{
+	LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
+	if (LoginResultWidget != nullptr)
+	{
+		switch (Mode)
+		{
+		case 0:
+			LoginResultWidget->SetNoAccount();
+			break;
+		case 1:
+			LoginResultWidget->SetPasswordFail();
+			break;
+		case 2:
+			LoginResultWidget->SetLoginSuceess();
+			break;
+		default:
+			break;
+		}
+		LoginResultWidget->AddToViewport();
+	}
 }
 

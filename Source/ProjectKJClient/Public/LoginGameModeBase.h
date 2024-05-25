@@ -28,4 +28,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
+
+	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) override;
 };
