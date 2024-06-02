@@ -41,7 +41,6 @@ public:
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
 	{
 		// 직렬화해서 Send 시키자 
-		// ID 직렬화
 		TArray<uint8> PacketData;
 		PacketData.AddUninitialized(sizeof(int32));
 		FMemory::Memcpy(PacketData.GetData(), &ID, sizeof(int32));

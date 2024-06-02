@@ -17,7 +17,9 @@ enum class LoginPacketListID
     LOGIN_REQUEST = 0,
     LOGIN_RESPONESE = 1,
     REGIST_ACCOUNT_REQUEST = 2,
-    REGIST_ACCOUNT_RESPONESE = 3
+    REGIST_ACCOUNT_RESPONESE = 3,
+    ID_UNIQUE_CHECK_REQUEST = 4,
+    ID_UNIQUE_CHECK_RESPONESE = 5
 };
 
 UENUM()
@@ -76,6 +78,24 @@ struct FRegistAccountResponsePacket
     bool IsSuccess;
     UPROPERTY()
     int32 ErrorCode;
+};
+
+USTRUCT()
+struct FIDUniqueCheckRequestPacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString AccountID;
+};
+
+USTRUCT()
+struct FIDUniqueCheckResponsePacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	bool IsUnique;
 };
 
 /**
