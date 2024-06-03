@@ -21,8 +21,6 @@ class PROJECTKJCLIENT_API UMyUserWidget : public UUserWidget
 private:
 	FString ID;
 	FString Password;
-	bool IsFirstTry = true;
-	bool IsFirstPWTry = true;
 	UPROPERTY()
 	UMediaTexture* MediaTexture = nullptr;
 	UPROPERTY()
@@ -36,6 +34,8 @@ private:
 
 	UPROPERTY()
 	class ULoginResultWidget* LoginResultWidget;
+	UPROPERTY()
+	class URegistAccountUserWidget* RegistAccountWidget;
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -46,10 +46,10 @@ protected:
 	void OnRegistButtonClicked();
 
 	UFUNCTION()
-	void OnIDTextChanged(const FText& text);
+	void OnIDTextCommitted(const FText& text, ETextCommit::Type TextType);
 
 	UFUNCTION()
-	void OnPasswordTextChanged(const FText& text);
+	void OnPasswordTextCommitted(const FText& text, ETextCommit::Type TextType);
 	
 public:
 
@@ -71,5 +71,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ULoginResultWidget> LoginResultWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class URegistAccountUserWidget> RegistAccountWidgetClass;
+
 	void ShowLoginResultWidget(int Mode);
+
+	void ShowRegistAccountWidget();
+
+	void ShowWidgetItems();
 };

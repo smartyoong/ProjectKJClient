@@ -34,13 +34,39 @@ bool ClientSocket::ConnectToLoginServer()
 	IsConnected = Socket->Connect(*InternetAddr);
 	if (!IsConnected)
 	{
-		// 추후 추가할것
-		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to Login server"));
 		return false;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Connected to Login server"));
+		return true;
+	}
+}
+
+bool ClientSocket::ConnectToGameServer()
+{
+	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("ClientSocket"), false);
+	FIPv4Address Addr;
+	FString IP;
+	int32 Port = 0;
+	// INI에서 IP를 읽어옵니다.
+	if (!GConfig->GetString(TEXT("Network"), TEXT("GAME_IP"), IP, FPaths::ProjectConfigDir() / TEXT("Connect.ini")) or
+		!GConfig->GetInt(TEXT("Network"), TEXT("GAME_PORT"), Port, FPaths::ProjectConfigDir() / TEXT("Connect.ini")))
+	{
+		return false;
+	}
+	// 주소 설정
+	FIPv4Address::Parse(IP, Addr);
+	TSharedRef<FInternetAddr> InternetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	InternetAddr->SetIp(Addr.Value);
+	InternetAddr->SetPort(Port);
+	// 연결
+	IsConnected = Socket->Connect(*InternetAddr);
+	if (!IsConnected)
+	{
+		return false;
+	}
+	else
+	{
 		return true;
 	}
 }

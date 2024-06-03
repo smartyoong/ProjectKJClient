@@ -6,6 +6,7 @@
 #include "LoginPacketManager.h"
 #include "ProjectKJClient/MainGameInstance.h"
 #include "LoginResultWidget.h"
+#include "RegistAccountUserWidget.h"
 
 void UMyUserWidget::NativeOnInitialized()
 {
@@ -20,11 +21,13 @@ void UMyUserWidget::NativeOnInitialized()
 		RegistButton->OnClicked.AddDynamic(this, &UMyUserWidget::OnRegistButtonClicked);
 	if (IDTextBox != nullptr)
 	{
-		IDTextBox->OnTextChanged.AddDynamic(this, &UMyUserWidget::OnIDTextChanged);
+		IDTextBox->OnTextCommitted.AddDynamic(this, &UMyUserWidget::OnIDTextCommitted);
+		IDTextBox->SetSelectAllTextWhenFocused(true);
 	}
 	if (PasswordTextBox != nullptr)
 	{
-		PasswordTextBox->OnTextChanged.AddDynamic(this, &UMyUserWidget::OnPasswordTextChanged);
+		PasswordTextBox->OnTextCommitted.AddDynamic(this, &UMyUserWidget::OnPasswordTextCommitted);
+		PasswordTextBox->SetSelectAllTextWhenFocused(true);
 	}
 	// 미디어 플레이어와 텍스처 연결
 	MediaTexture->SetMediaPlayer(MediaPlayer);
@@ -63,28 +66,16 @@ void UMyUserWidget::OnLoginButtonClicked()
 
 void UMyUserWidget::OnRegistButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Regist Button Clicked"));
-	// 나중에 회원가입도 만들자
+	ShowRegistAccountWidget();
 }
 
-void UMyUserWidget::OnIDTextChanged(const FText& text)
+void UMyUserWidget::OnIDTextCommitted(const FText& text, ETextCommit::Type TextType)
 {
-	if (IsFirstTry)
-	{
-		IDTextBox->SetText(FText::GetEmpty());
-		IsFirstTry = false;
-	}
 	ID = text.ToString();
 }
 
-void UMyUserWidget::OnPasswordTextChanged(const FText& text)
+void UMyUserWidget::OnPasswordTextCommitted(const FText& text, ETextCommit::Type TextType)
 {
-	if (IsFirstPWTry)
-	{
-		PasswordTextBox->SetText(FText::GetEmpty());
-		IsFirstPWTry = false;
-		PasswordTextBox->SetIsPassword(true);
-	}
 	Password = text.ToString();
 }
 
@@ -111,6 +102,34 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 				}
 				LoginResultWidget->AddToViewport();
 			}
+		});
+}
+
+void UMyUserWidget::ShowRegistAccountWidget()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RegistAccountWidget = CreateWidget<URegistAccountUserWidget>(GetWorld(), RegistAccountWidgetClass);
+			if (RegistAccountWidget != nullptr)
+			{
+				RegistAccountWidget->SetParentWidget(this);
+				RegistAccountWidget->AddToViewport();
+			}
+			IDTextBox->SetVisibility(ESlateVisibility::Hidden);
+			PasswordTextBox->SetVisibility(ESlateVisibility::Hidden);
+			LoginButton->SetVisibility(ESlateVisibility::Hidden);
+			RegistButton->SetVisibility(ESlateVisibility::Hidden);
+		});
+}
+
+void UMyUserWidget::ShowWidgetItems()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			IDTextBox->SetVisibility(ESlateVisibility::Visible);
+			PasswordTextBox->SetVisibility(ESlateVisibility::Visible);
+			LoginButton->SetVisibility(ESlateVisibility::Visible);
+			RegistButton->SetVisibility(ESlateVisibility::Visible);
 		});
 }
 

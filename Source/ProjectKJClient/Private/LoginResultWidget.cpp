@@ -39,3 +39,55 @@ void ULoginResultWidget::SetPasswordFail()
 	if (ResultTextBlock != nullptr)
 		ResultTextBlock->SetText(FText::FromString(TEXT("비밀번호가 틀렸습니다.")));
 }
+
+void ULoginResultWidget::SetIDIsEmpty()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("ID를 입력해주세요.")));
+}
+
+void ULoginResultWidget::SetIDUniqueCheckFail()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("사용중인 ID")));
+}
+
+void ULoginResultWidget::SetIDUniqueCheckSuccess()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("사용가능한 ID")));
+}
+
+void ULoginResultWidget::SetPasswordIsEmpty()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("비밀번호를 입력해주세요.")));
+}
+
+void ULoginResultWidget::SetRegistSuccess()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("회원가입 성공")));
+}
+
+void ULoginResultWidget::SetRegistFail_IDNotUnique()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("사용중인 ID")));
+}
+
+void ULoginResultWidget::SetRegistFail_PasswordNotMatch()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("비밀번호가 일치하지 않습니다.")));
+}
+
+void ULoginResultWidget::SetRegistFail_Unknown()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("알 수 없는 오류")));
+}
+
+
+
+

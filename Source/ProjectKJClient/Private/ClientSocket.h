@@ -19,6 +19,7 @@ public:
 	ClientSocket();
 	~ClientSocket();
 	bool ConnectToLoginServer();
+	bool ConnectToGameServer();
 	void DisconnectFromServer();
 	TSharedPtr<TArray<uint8>> StartRecvFromServer();
 	void SendToServer(const uint8* Data, int32 BytesToSend);

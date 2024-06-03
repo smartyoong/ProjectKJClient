@@ -30,6 +30,16 @@ private:
 	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* LoginPacketQueue;
 	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* LoginDestinationPacketQueue;
 
+	// 게임 관련 변수
+	SocketThread* GameSockRun;
+	FRunnableThread* GameThread;
+	PacketDispatcher* GameDispatcher;
+	FRunnableThread* GameDispatcherThread;
+	PacketProcessor* GamePacketProcessor;
+	FRunnableThread* GamePacketProcessorThread;
+	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* GamePacketQueue;
+	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* GameDestinationPacketQueue;
+
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "LoginPacketManager.generated.h"
 
+const int ERR_SQL_RETURN_ERROR = 999999;
 
 enum class PacketProcessorMode
 {
@@ -74,8 +75,6 @@ struct FRegistAccountResponsePacket
 {
     GENERATED_BODY()
 
-    UPROPERTY()
-    bool IsSuccess;
     UPROPERTY()
     int32 ErrorCode;
 };

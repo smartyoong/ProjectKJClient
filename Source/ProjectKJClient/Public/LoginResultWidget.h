@@ -28,4 +28,12 @@ public:
 	void SetLoginSuceess();
 	void SetNoAccount();
 	void SetPasswordFail();
+	void SetIDIsEmpty();
+	void SetIDUniqueCheckFail();
+	void SetIDUniqueCheckSuccess();
+	void SetPasswordIsEmpty();
+	void SetRegistSuccess();
+	void SetRegistFail_IDNotUnique();
+	void SetRegistFail_PasswordNotMatch();
+	void SetRegistFail_Unknown();
 };
