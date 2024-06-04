@@ -74,6 +74,12 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 		case LoginPacketListID::REGIST_ACCOUNT_REQUEST:
 			break;
 		case LoginPacketListID::REGIST_ACCOUNT_RESPONESE:
+			GameMode->OnRegistAccountResponsePacketReceived(PacketToStruct<FRegistAccountResponsePacket>(PacketData->Value));
+			break;
+		case LoginPacketListID::ID_UNIQUE_CHECK_REQUEST:
+			break;
+		case LoginPacketListID::ID_UNIQUE_CHECK_RESPONESE:
+			GameMode->OnIDUnqiueCheckResponsePacketReceived(PacketToStruct<FIDUniqueCheckResponsePacket>(PacketData->Value));
 			break;
 		default:
 			break;

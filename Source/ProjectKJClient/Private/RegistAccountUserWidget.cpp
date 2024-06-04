@@ -36,14 +36,20 @@ void URegistAccountUserWidget::NativeOnInitialized()
 
 void URegistAccountUserWidget::OnIDUniqueCheckButtonClicked()
 {
+	if(RegistAccountResultWidgetClass == nullptr)
+		return;
+
 	if (ID.IsEmpty())
 	{
 		AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+			if(RegistAccountResultWidget != nullptr)
 			{
-				RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
 				RegistAccountResultWidget->SetIDIsEmpty();
 				RegistAccountResultWidget->AddToViewport();
-			});
+			}
+		});
 	}
 	else
 	{
@@ -57,34 +63,46 @@ void URegistAccountUserWidget::OnIDUniqueCheckButtonClicked()
 
 void URegistAccountUserWidget::OnRegistButtonClicked()
 {
+	if(RegistAccountResultWidgetClass == nullptr)
+		return;
+
 	if (!IsIDUnique)
 	{
 		AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+			if(RegistAccountResultWidget != nullptr)
 			{
-				RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
 				RegistAccountResultWidget->SetIDUniqueCheckFail();
 				RegistAccountResultWidget->AddToViewport();
-			});
+			}
+		});
 		return;
 	}
 	if (Password.IsEmpty())
 	{
 		AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+			if(RegistAccountResultWidget != nullptr)
 			{
-				RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
 				RegistAccountResultWidget-> SetPasswordIsEmpty();
 				RegistAccountResultWidget->AddToViewport();
-			});
+			}
+		});
 		return;
 	}
 	if (Password != PasswordCheck)
 	{
 		AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+			if(RegistAccountResultWidget != nullptr)
 			{
-				RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
 				RegistAccountResultWidget->SetRegistFail_PasswordNotMatch();
 				RegistAccountResultWidget->AddToViewport();
-			});
+			}
+		});
 		return;
 	}
 
@@ -125,13 +143,43 @@ void URegistAccountUserWidget::OnCancelButtonClicked()
 	}
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
-		{
-			RemoveFromParent();
-			Destruct();
-		});
+	{
+		RemoveFromParent();
+		Destruct();
+	});
 }
 
-void URegistAccountUserWidget::RegistSuccess()
+void URegistAccountUserWidget::ShowIDIsNotUnique()
+{
+	if(RegistAccountResultWidgetClass == nullptr)
+		return;
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+		if(RegistAccountResultWidget != nullptr)
+		{
+			RegistAccountResultWidget->SetIDUniqueCheckFail();
+			RegistAccountResultWidget->AddToViewport();
+		}
+	});
+}
+
+void URegistAccountUserWidget::ShowIDIsUnique()
+{
+	if(RegistAccountResultWidgetClass == nullptr)
+		return;
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+		if(RegistAccountResultWidget != nullptr)
+		{
+			RegistAccountResultWidget->SetIDUniqueCheckSuccess();
+			RegistAccountResultWidget->AddToViewport();
+		}
+	});
+}
+
+void URegistAccountUserWidget::ShowRegistSuccess()
 {
 	// 성공시에는 해당 창을 그냥 닫는다.
 	// 팝업 메세지는 부모가 띄운다.
@@ -142,23 +190,31 @@ void URegistAccountUserWidget::RegistSuccess()
 		});
 }
 
-void URegistAccountUserWidget::RegistFail(int Mode)
+void URegistAccountUserWidget::ShowRegistFail(int Mode)
 {
 	// 실패시에는 실패 메세지를 띄운다.
+	const int ID_IS_NOT_UNIQUE = -1;
+	const int UNKNOW_ERROR = -2;
+	if(RegistAccountResultWidgetClass == nullptr)
+		return;
+
 	AsyncTask(ENamedThreads::GameThread, [this, Mode]()
+	{
+		RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
+		switch (Mode)
 		{
-			RegistAccountResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), RegistAccountResultWidgetClass);
-			switch (Mode)
-			{
-			case -1:
+		case ID_IS_NOT_UNIQUE:
+			if(RegistAccountResultWidget != nullptr)
 				RegistAccountResultWidget->SetRegistFail_IDNotUnique();
-				break;
-			case -2:
+			break;
+		case UNKNOW_ERROR:
+			if(RegistAccountResultWidget != nullptr)
 				RegistAccountResultWidget->SetRegistFail_Unknown();
-				break;
-			default:
-				break;
-			}
+			break;
+		default:
+			break;
+		}
+		if(RegistAccountResultWidget != nullptr)
 			RegistAccountResultWidget->AddToViewport();
-		});
+	});
 }

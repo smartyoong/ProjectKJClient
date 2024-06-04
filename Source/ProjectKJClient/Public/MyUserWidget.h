@@ -79,4 +79,8 @@ public:
 	void ShowRegistAccountWidget();
 
 	void ShowWidgetItems();
+
+	void ShowRegistSuccessPopUp();
+
+	class URegistAccountUserWidget GetRegistAccountWidget() {return RegistAccountWidget;}
 };

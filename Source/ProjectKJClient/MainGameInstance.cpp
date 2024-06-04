@@ -20,10 +20,31 @@ void UMainGameInstance::Init()
 		FGenericPlatformMisc::RequestExit(false);
 	}
 	LoginDispatcher = new PacketDispatcher(LoginPacketQueue,LoginDestinationPacketQueue);
-	LoginDispatcherThread = FRunnableThread::Create(LoginDispatcher, TEXT("PacketDispatcherThread"));
+	LoginDispatcherThread = FRunnableThread::Create(LoginDispatcher, TEXT("LoginPacketDispatcherThread"));
 
 	LoginPacketProcessor = new PacketProcessor(LoginDestinationPacketQueue, PacketProcessorMode::LOGIN);
-	LoginPacketProcessorThread = FRunnableThread::Create(LoginPacketProcessor, TEXT("PacketProcessorThread"));
+	LoginPacketProcessorThread = FRunnableThread::Create(LoginPacketProcessor, TEXT("LoginPacketProcessorThread"));
+
+
+	///////////////////////////////////// 게임 서버와 연결 /////////////////////////////////////
+	GamePacketQueue = new TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>();
+	GameDestinationPacketQueue = new TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>();
+	GameSockRun = new SocketThread(GAME_MODE,GamePacketQueue);
+	GameThread = FRunnableThread::Create(GameSockRun, TEXT("GameSocketThread"));
+	if (!GameSockRun -> GetInitSuccess())
+	{
+		FText Message = FText::FromString(TEXT("게임 서버와 연결을 실패하였습니다.\n서버 점검중인지 홈페이지를 확인해주세요"));
+		FText Title = FText::FromString(TEXT("연결 실패"));
+		// 메시지 박스 출력
+		FMessageDialog::Open(EAppMsgType::Ok,Message,Title);
+		// 게임 종료
+		FGenericPlatformMisc::RequestExit(false);
+	}
+	GameDispatcher = new PacketDispatcher(GamePacketQueue,GameDestinationPacketQueue);
+	GameDispatcherThread = FRunnableThread::Create(GameDispatcher, TEXT("GamePacketDispatcherThread"));
+
+	GamePacketProcessor = new PacketProcessor(GameDestinationPacketQueue, PacketProcessorMode::INGAME);
+	GamePacketProcessorThread = FRunnableThread::Create(GamePacketProcessor, TEXT("GamePacketProcessorThread"));
 
 }
 
@@ -52,6 +73,31 @@ void UMainGameInstance::Shutdown()
 		LoginDestinationPacketQueue->Empty();
 	}
 	delete LoginDestinationPacketQueue;
+
+	/////////////////////////////////////////////////
+
+
+	GameThread->Kill(true);
+	delete GameThread;
+
+	GameDispatcherThread->Kill(true);
+	delete GameDispatcherThread;
+
+	GamePacketProcessor->Stop();
+	GamePacketProcessorThread->Kill(false);
+	delete GamePacketProcessorThread;
+
+	if (!GamePacketQueue->IsEmpty())
+	{
+		GamePacketQueue->Empty();
+	}
+	delete GamePacketQueue;
+
+	if (!GameDestinationPacketQueue->IsEmpty())
+	{
+		GameDestinationPacketQueue->Empty();
+	}
+	delete GameDestinationPacketQueue;
 }
 
 void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode)

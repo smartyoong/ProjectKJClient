@@ -23,9 +23,49 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		break;
 	case 2: // 성공
 		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
+
+		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
+		// 맵을 이동하는 것을 구현하도록 하자
+
 		break;
 	default:
 		break;
+	}
+}
+
+void ALoginGameModeBase::OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet)
+{
+	if(LoginWidget == nullptr)
+		return;
+
+	if(Packet.IsUnique)
+	{
+		if(LoginWidget->GetRegistAccountWidget() != nullptr)
+			LoginWidget->GetRegistAccountWidget()->ShowIDIsUnique();
+	}
+	else
+	{
+		if(LoginWidget->GetRegistAccountWidget() != nullptr)
+			LoginWidget->GetRegistAccountWidget()->ShowIDIsNotUnique();
+	}
+
+}
+
+void ALoginGameModeBase::OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket Packet)
+{
+	if(LoginWidget == nullptr)
+		return;
+
+	if(LoginWidget->GetRegistAccountWidget() == nullptr)
+		return;
+
+	if(Packet.ErrorCode)
+		LoginWidget->GetRegistAccountWidget()->ShowRegistFail(Packet.ErrorCode);
+	else
+	{
+		LoginWidget->ShowWidgetItems();
+		LoginWidget->GetRegistAccountWidget()->ShowRegistSuccess();
+		LoginWidget->ShowRegistSuccessPopUp();
 	}
 }
 

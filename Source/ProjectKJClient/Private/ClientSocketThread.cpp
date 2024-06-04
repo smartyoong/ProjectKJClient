@@ -30,8 +30,16 @@ bool SocketThread::Init()
 	}
 	else
 	{
-		// 임시
-		return true;
+		if (!Socket.ConnectToGameServer())
+		{
+			InitSuccess = false;
+			return false;
+		}
+		else
+		{
+			InitSuccess = true;
+			return true;
+		}
 	}
 }
 

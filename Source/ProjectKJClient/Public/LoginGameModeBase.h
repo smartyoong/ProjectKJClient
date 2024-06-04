@@ -30,4 +30,6 @@ public:
 	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
 
 	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) override;
+	virtual void OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet) override;
+	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket Packet) override;
 };

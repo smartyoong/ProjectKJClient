@@ -71,6 +71,8 @@ public :
 
 	void SetParentWidget(UMyUserWidget* Parent) { ParentWidget = Parent; }
 
-	void RegistSuccess();
-	void RegistFail(int Mode);
+	void ShowIDIsNotUnique();
+	void ShowIDIsUnique();
+	void ShowRegistSuccess();
+	void ShowRegistFail(int Mode);
 };

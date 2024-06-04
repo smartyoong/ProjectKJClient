@@ -81,6 +81,8 @@ void UMyUserWidget::OnPasswordTextCommitted(const FText& text, ETextCommit::Type
 
 void UMyUserWidget::ShowLoginResultWidget(int Mode)
 {
+	if(LoginResultWidgetClass == nullptr)
+		return;
 	AsyncTask(ENamedThreads::GameThread, [this, Mode]()
 		{
 			LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
@@ -131,5 +133,20 @@ void UMyUserWidget::ShowWidgetItems()
 			LoginButton->SetVisibility(ESlateVisibility::Visible);
 			RegistButton->SetVisibility(ESlateVisibility::Visible);
 		});
+}
+
+void UMyUserWidget::ShowRegistSuccessPopUp()
+{
+	if(LoginResultWidgetClass == nullptr)
+		return;
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
+		if(LoginResultWidget != nullptr)
+		{
+			LoginResultWidget->SetRegistSuccess();
+			LoginResultWidget->AddToViewport();
+		}
+	});
 }
 
