@@ -79,7 +79,7 @@ void ULoginResultWidget::SetRegistFail_IDNotUnique()
 void ULoginResultWidget::SetRegistFail_PasswordNotMatch()
 {
 	if (ResultTextBlock != nullptr)
-		ResultTextBlock->SetText(FText::FromString(TEXT("비밀번호가 일치하지 않습니다.")));
+		ResultTextBlock->SetText(FText::FromString(TEXT("비밀번호 불일치")));
 }
 
 void ULoginResultWidget::SetRegistFail_Unknown()

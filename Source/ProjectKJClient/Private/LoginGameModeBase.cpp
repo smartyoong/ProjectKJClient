@@ -4,6 +4,7 @@
 #include "LoginGameModeBase.h"
 #include "MyUserWidget.h"
 #include "ProjectKJClient/MainGameInstance.h"
+#include "RegistAccountUserWidget.h"
 
 ALoginGameModeBase::ALoginGameModeBase()
 {

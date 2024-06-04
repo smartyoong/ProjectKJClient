@@ -46,6 +46,12 @@ protected:
 
 	UFUNCTION()
 	void OnCancelButtonClicked();
+
+	UFUNCTION()
+	void OnPasswordChanged(const FText& text);
+
+	UFUNCTION()
+	void OnPasswordCheckChanged(const FText& text);
 public :
 
 	UPROPERTY(EditDefaultsOnly, Category = "ResultWidget")
@@ -58,7 +64,7 @@ public :
 	class UButton* RegistButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* CancleButton;
+	class UButton* CancelButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* IDTextBox;

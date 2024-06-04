@@ -50,6 +50,9 @@ protected:
 
 	UFUNCTION()
 	void OnPasswordTextCommitted(const FText& text, ETextCommit::Type TextType);
+
+	UFUNCTION()
+	void OnPasswordChanged(const FText& text);
 	
 public:
 
@@ -82,5 +85,5 @@ public:
 
 	void ShowRegistSuccessPopUp();
 
-	class URegistAccountUserWidget GetRegistAccountWidget() {return RegistAccountWidget;}
+	class URegistAccountUserWidget* GetRegistAccountWidget();
 };

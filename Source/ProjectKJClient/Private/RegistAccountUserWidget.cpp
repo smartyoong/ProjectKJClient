@@ -26,12 +26,16 @@ void URegistAccountUserWidget::NativeOnInitialized()
 	{
 		PWTextBox->OnTextCommitted.AddDynamic(this, &URegistAccountUserWidget::OnPasswordTextCommitted);
 		PWTextBox->SetSelectAllTextWhenFocused(true);
+		PWTextBox->OnTextChanged.AddDynamic(this, &URegistAccountUserWidget::OnPasswordChanged);
 	}
 	if (PWCheckTextBox != nullptr)
 	{
 		PWCheckTextBox->OnTextCommitted.AddDynamic(this, &URegistAccountUserWidget::OnPasswordCheckTextCommitted);
 		PWCheckTextBox->SetSelectAllTextWhenFocused(true);
+		PWCheckTextBox->OnTextChanged.AddDynamic(this, &URegistAccountUserWidget::OnPasswordCheckChanged);
 	}
+	if (CancelButton != nullptr)
+		CancelButton->OnClicked.AddDynamic(this, &URegistAccountUserWidget::OnCancelButtonClicked);
 }
 
 void URegistAccountUserWidget::OnIDUniqueCheckButtonClicked()
@@ -149,6 +153,16 @@ void URegistAccountUserWidget::OnCancelButtonClicked()
 	});
 }
 
+void URegistAccountUserWidget::OnPasswordChanged(const FText& text)
+{
+	PWTextBox->SetIsPassword(true);
+}
+
+void URegistAccountUserWidget::OnPasswordCheckChanged(const FText& text)
+{
+	PWCheckTextBox->SetIsPassword(true);
+}
+
 void URegistAccountUserWidget::ShowIDIsNotUnique()
 {
 	if(RegistAccountResultWidgetClass == nullptr)
@@ -166,6 +180,8 @@ void URegistAccountUserWidget::ShowIDIsNotUnique()
 
 void URegistAccountUserWidget::ShowIDIsUnique()
 {
+	IsIDUnique = true;
+
 	if(RegistAccountResultWidgetClass == nullptr)
 		return;
 	AsyncTask(ENamedThreads::GameThread, [this]()

@@ -27,6 +27,7 @@ void UMyUserWidget::NativeOnInitialized()
 	if (PasswordTextBox != nullptr)
 	{
 		PasswordTextBox->OnTextCommitted.AddDynamic(this, &UMyUserWidget::OnPasswordTextCommitted);
+		PasswordTextBox->OnTextChanged.AddDynamic(this, &UMyUserWidget::OnPasswordChanged);
 		PasswordTextBox->SetSelectAllTextWhenFocused(true);
 	}
 	// 미디어 플레이어와 텍스처 연결
@@ -77,6 +78,11 @@ void UMyUserWidget::OnIDTextCommitted(const FText& text, ETextCommit::Type TextT
 void UMyUserWidget::OnPasswordTextCommitted(const FText& text, ETextCommit::Type TextType)
 {
 	Password = text.ToString();
+}
+
+void UMyUserWidget::OnPasswordChanged(const FText& text)
+{
+	PasswordTextBox->SetIsPassword(true);
 }
 
 void UMyUserWidget::ShowLoginResultWidget(int Mode)
@@ -148,5 +154,10 @@ void UMyUserWidget::ShowRegistSuccessPopUp()
 			LoginResultWidget->AddToViewport();
 		}
 	});
+}
+
+URegistAccountUserWidget* UMyUserWidget::GetRegistAccountWidget()
+{
+	return RegistAccountWidget;
 }
 
