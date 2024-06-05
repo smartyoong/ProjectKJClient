@@ -22,6 +22,7 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 
 private:
 
+	FString AccountID;
 	FString NickName;
 	FString AuthHashCode;
 
@@ -53,6 +54,8 @@ public:
 	void RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode);
 	void SetNickName(FString NewNickName) {NickName = NewNickName;}
 	void SetUserAuthHashCode(FString Code) {AuthHashCode = Code;}
+	void SetAccountID(FString ID) { AccountID = ID; }
+	FString GetAccountID() { return AccountID; }
 	FString GetNickName() {return NickName;}
 	FString GetUserAuthHashCode() {return AuthHashCode;}
 

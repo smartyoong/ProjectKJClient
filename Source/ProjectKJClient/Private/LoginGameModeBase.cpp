@@ -28,7 +28,8 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetNickName(Packet.NickName);
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetUserAuthHashCode(Packet.HashValue);
 		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
-		
+		UE_LOG(LogTemp, Warning, TEXT("%s %s"),*GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), *Packet.HashValue);
+		// 일단 게임서버에 인증 요청 하는것부터 시작하자
 		// 맵을 이동하는 것을 구현하도록 하자
 		break;
 		// 로그인은 성공했으나 Hash값 생성 실패

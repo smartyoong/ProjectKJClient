@@ -61,6 +61,7 @@ void UMyUserWidget::OnLoginButtonClicked()
 	FLoginRequestPacket LoginPacket;
 	LoginPacket.AccountID = ID;
 	LoginPacket.Password = Password;
+	GetWorld()->GetGameInstance<UMainGameInstance>()->SetAccountID(ID);
 	LoginPacketListID PacketID = LoginPacketListID::LOGIN_REQUEST;
 	GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToLoginServer<FLoginRequestPacket>(PacketID,LoginPacket);
 }
