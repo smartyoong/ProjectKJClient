@@ -6,6 +6,7 @@
 #include "CommonGameModeBase.h"
 #include "LoginPacketManager.h"
 #include "JsonUtilities.h"
+#include "GamePacketList.h"
 
 
 /**

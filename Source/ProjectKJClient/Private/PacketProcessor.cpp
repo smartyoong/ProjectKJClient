@@ -90,6 +90,18 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 
 void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData)
 {
+	GamePacketListID ID = static_cast<GamePacketListID>(PacketData->Key);
+	switch (ID)
+	{
+	case GamePacketListID::REQUEST_HASH_AUTH_CHECK:
+		break;
+	case GamePacketListID::RESPONSE_HASH_AUTH_CHECK:
+		break;
+	case GamePacketListID::KICK_CLIENT:
+		break;
+	default:
+		break;
+	}
 
 }
 
