@@ -36,4 +36,5 @@ public:
 	void SetRegistFail_IDNotUnique();
 	void SetRegistFail_PasswordNotMatch();
 	void SetRegistFail_Unknown();
+	void SetTryLoginLater();
 };

@@ -88,6 +88,14 @@ void ULoginResultWidget::SetRegistFail_Unknown()
 		ResultTextBlock->SetText(FText::FromString(TEXT("알 수 없는 오류")));
 }
 
+void ULoginResultWidget::SetTryLoginLater()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("잠시 후 다시 시도해주세요.")));
+}
+
+
+
 
 
 

@@ -106,6 +106,7 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 					LoginResultWidget->SetLoginSuceess();
 					break;
 				default:
+					LoginResultWidget->SetTryLoginLater();
 					break;
 				}
 				LoginResultWidget->AddToViewport();
