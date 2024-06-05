@@ -14,20 +14,30 @@ ALoginGameModeBase::ALoginGameModeBase()
 
 void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Packet)
 {
+	enum LoginResponseErrCode {NO_ACCOUNT =0, PASSWORD_NOT_MATCH =1, LOGIN_SUCCESS=2, HASH_CODE_CREATE_FAIL=3, ERR_AUTH_FAIL =5, ERR_AUTH_RETRY=6}
 	switch (Packet.ErrorCode)
 	{
-	case 0: // 계정 없음
+	case NO_ACCOUNT: // 계정 없음
 		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		break;
-	case 1: // 비번 불일치
+	case PASSWORD_NOT_MATCH: // 비번 불일치
 		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		break;
-	case 2: // 성공
+	case LOGIN_SUCCESS: // 성공
 		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
-
+		GetWorld()->GetGameInstance<UMainGameInstance>()->SetNickName(Packet.NickName);
+		GetWorld()->GetGameInstance<UMainGameInstance>()->SetUserAuthHashCode(Packet.AuthHashCode);
 		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
 		// 맵을 이동하는 것을 구현하도록 하자
-
+		break;
+	// 로그인은 성공했으나 Hash값 생성 실패
+	case HASH_CODE_CREATE_FAIL:
+		break;
+	// 게임서버가 해시값을 생성 못해서 로그인 서버가 해시값 재생성 시도했으나 실패
+	case ERR_AUTH_FAIL:
+		break;
+	// 게임서버가 해시값을 생성 못해서 로그인 서버가 해시값을 재생성해서 전송함
+	case ERR_AUTH_RETRY:
 		break;
 	default:
 		break;

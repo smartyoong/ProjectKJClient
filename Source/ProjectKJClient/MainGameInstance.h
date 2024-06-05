@@ -20,6 +20,10 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 private:
+
+	FString NickName;
+	FString AuthHashCode;
+
 	// 로그인 관련 변수
 	SocketThread* LoginSockRun;
 	FRunnableThread* LoginThread;
@@ -46,6 +50,10 @@ public:
 
 	// 인스턴스에 현재 사용할 게임모드를 설정합니다. 이는 패킷을 받아오기에 매우 중요합니다.
 	void RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode);
+	void SetNickName(FString NewNickName) {NickName = NewNickName;}
+	void SetUserAuthHashCode(FString Code) {AuthHashCode = Code;}
+	FString GetNickName() {return NickName;}
+	FString GetUserAuthHashCode() {return AuthHashCode;}
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
