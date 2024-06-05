@@ -89,29 +89,30 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 {
 	if(LoginResultWidgetClass == nullptr)
 		return;
-	AsyncTask(ENamedThreads::GameThread, [this, Mode]()
+
+	LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
+	if (LoginResultWidget != nullptr)
+	{
+		switch (Mode)
 		{
-			LoginResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), LoginResultWidgetClass);
-			if (LoginResultWidget != nullptr)
+		case 0:
+			LoginResultWidget->SetNoAccount();
+			break;
+		case 1:
+			LoginResultWidget->SetPasswordFail();
+			break;
+		case 2:
+			LoginResultWidget->SetLoginSuceess();
+			break;
+		default:
+			LoginResultWidget->SetTryLoginLater();
+			break;
+		}
+		AsyncTask(ENamedThreads::GameThread, [this, Mode]()
 			{
-				switch (Mode)
-				{
-				case 0:
-					LoginResultWidget->SetNoAccount();
-					break;
-				case 1:
-					LoginResultWidget->SetPasswordFail();
-					break;
-				case 2:
-					LoginResultWidget->SetLoginSuceess();
-					break;
-				default:
-					LoginResultWidget->SetTryLoginLater();
-					break;
-				}
 				LoginResultWidget->AddToViewport();
-			}
-		});
+			});
+	}
 }
 
 void UMyUserWidget::ShowRegistAccountWidget()

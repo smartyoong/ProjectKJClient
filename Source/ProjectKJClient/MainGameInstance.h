@@ -10,6 +10,7 @@
 #include "PacketProcessor.h"
 #include "LoginPacketManager.h"
 #include "JsonUtilities.h"
+#include "Public/GamePacketList.h"
 #include "MainGameInstance.generated.h"
 /**
  * 
@@ -65,5 +66,16 @@ public:
 		FString JSonString;
 		FJsonObjectConverter::UStructToJsonObjectString(Packet, JSonString);
 		LoginSockRun->SendPacket(JSonString, PacketData);
+	}
+	template <typename T>
+	inline void SendPacketToGameServer(GamePacketListID ID, T Packet)
+	{
+		// 직렬화해서 Send 시키자 
+		TArray<uint8> PacketData;
+		PacketData.AddUninitialized(sizeof(int32));
+		FMemory::Memcpy(PacketData.GetData(), &ID, sizeof(int32));
+		FString JSonString;
+		FJsonObjectConverter::UStructToJsonObjectString(Packet, JSonString);
+		GameSockRun->SendPacket(JSonString, PacketData);
 	}
 };
