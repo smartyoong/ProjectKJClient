@@ -58,6 +58,8 @@ struct FLoginResponsePacket
     UPROPERTY()
     FString NickName;
     UPROPERTY()
+    FString HashValue;
+    UPROPERTY()
     int32 ErrorCode;
 };
 USTRUCT()
