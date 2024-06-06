@@ -19,7 +19,7 @@ private:
 	ACommonGameModeBase* GameMode = nullptr;
 	PacketProcessorMode ProcessMode;
 	FThreadSafeCounter StopTaskCounter;
-	FEvent* GameModeEvent;
+	FEvent* GameModeEvent = nullptr;
 public:
 	PacketProcessor(TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* Queue, PacketProcessorMode mode);
 	~PacketProcessor();

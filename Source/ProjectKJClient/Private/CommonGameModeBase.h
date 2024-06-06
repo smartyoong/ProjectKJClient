@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "LoginPacketManager.h"
+#include "GamePacketList.h"
 #include "CommonGameModeBase.generated.h"
 
 /**
@@ -24,5 +25,9 @@ public:
 	virtual void OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet) {};
 	// 회원 가입 응답 함수
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket) {};
+	// 해시 인증 응답 함수
+	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet) {};
+	// 강제 추방 함수
+	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) {};
 
 };

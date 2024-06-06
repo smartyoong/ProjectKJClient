@@ -103,4 +103,5 @@ void UMainGameInstance::Shutdown()
 void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode)
 {
 	LoginPacketProcessor->SetGameMode(GameMode);
+	GamePacketProcessor->SetGameMode(GameMode);
 }

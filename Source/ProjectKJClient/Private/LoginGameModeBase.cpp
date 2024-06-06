@@ -5,6 +5,7 @@
 #include "MyUserWidget.h"
 #include "ProjectKJClient/MainGameInstance.h"
 #include "RegistAccountUserWidget.h"
+#include "GamePacketList.h"
 
 ALoginGameModeBase::ALoginGameModeBase()
 {
@@ -30,6 +31,9 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
 		UE_LOG(LogTemp, Warning, TEXT("%s %s"),*GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), *Packet.HashValue);
 		// 일단 게임서버에 인증 요청 하는것부터 시작하자
+		GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer(GamePacketListID::REQUEST_HASH_AUTH_CHECK,
+			FRequestHashAuthCheckPacket{GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), Packet.HashValue});
+
 		// 맵을 이동하는 것을 구현하도록 하자
 		break;
 		// 로그인은 성공했으나 Hash값 생성 실패
@@ -83,6 +87,33 @@ void ALoginGameModeBase::OnRegistAccountResponsePacketReceived(FRegistAccountRes
 		LoginWidget->GetRegistAccountWidget()->ShowRegistSuccess();
 		LoginWidget->ShowRegistSuccessPopUp();
 	}
+}
+
+void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet)
+{
+	// 이제 여기에 맞게 적절한 처리를 해야함
+	switch (Packet.ErrorCode)
+	{
+	case 2: // 게임 서버에 아직 등록 안됨
+		UE_LOG(LogTemp, Warning, TEXT("게임 서버에 아직 등록 안됨"));
+		// 지금 이때 몇초 Sleep후 Check만 다시 보내도록 해야함, Login버튼을 다시 누르도록하니 버그 발생
+		// 근데 일단 게임서버와 통신 성공만으로 대박!
+		break;
+	case 4: // 인증 성공
+		UE_LOG(LogTemp, Warning, TEXT("인증 성공"));
+		break;
+	case 5: // 인증 실패
+		UE_LOG(LogTemp, Warning, TEXT("인증 실패"));
+		break;
+	default:
+		break;
+	}
+}
+
+void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet)
+{
+	// 팝업을 띄우자
+	UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
 }
 
 void ALoginGameModeBase::BeginPlay()

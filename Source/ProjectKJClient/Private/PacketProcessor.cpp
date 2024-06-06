@@ -91,13 +91,17 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> PacketData)
 {
 	GamePacketListID ID = static_cast<GamePacketListID>(PacketData->Key);
+	UE_LOG(LogTemp, Warning, TEXT("GamePacketListID : %d"), ID);
 	switch (ID)
 	{
 	case GamePacketListID::REQUEST_HASH_AUTH_CHECK:
 		break;
 	case GamePacketListID::RESPONSE_HASH_AUTH_CHECK:
+		UE_LOG(LogTemp, Warning, TEXT("RESPONSE_HASH_AUTH_CHECK"));
+		GameMode->OnHashAuthCheckResponsePacketReceived(PacketToStruct<FResponseHashAuthCheckPacket>(PacketData->Value));
 		break;
 	case GamePacketListID::KICK_CLIENT:
+		GameMode->OnKickClientPacketReceived(PacketToStruct<FSendKickClientPacket>(PacketData->Value));
 		break;
 	default:
 		break;
