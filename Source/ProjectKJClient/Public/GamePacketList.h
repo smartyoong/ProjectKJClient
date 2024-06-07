@@ -51,5 +51,5 @@ struct FSendKickClientPacket
     GENERATED_BODY()
 
     UPROPERTY()
-    int Reason;
+    int32 Reason;
 };

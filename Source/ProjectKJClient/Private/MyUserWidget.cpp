@@ -103,7 +103,7 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 			LoginResultWidget->SetPasswordFail();
 			break;
 		case 2:
-			LoginResultWidget->SetLoginSuceess();
+			LoginResultWidget->SetLoginConnect();
 			break;
 		default:
 			LoginResultWidget->SetTryLoginLater();
@@ -157,6 +157,32 @@ void UMyUserWidget::ShowRegistSuccessPopUp()
 			LoginResultWidget->AddToViewport();
 		}
 	});
+}
+
+void UMyUserWidget::ShowLoginSuccess()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			LoginResultWidget->SetLoginSuceess();
+		});
+}
+
+void UMyUserWidget::ShowLoginFail()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			LoginResultWidget->SetTryLoginLater();
+		});
+}
+
+void UMyUserWidget::ShowKickClient(int Reason)
+{
+	AsyncTask(ENamedThreads::GameThread, [this, Reason]()
+	{
+		LoginResultWidget->ShowKickMessage(Reason);
+		LoginResultWidget->AddToViewport();
+	});
+
 }
 
 URegistAccountUserWidget* UMyUserWidget::GetRegistAccountWidget()

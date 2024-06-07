@@ -25,6 +25,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ResultTextBlock;
 
+	UPROPERTY(meta = (BindWidget))
+	class UThrobber* ConnectThrobber;
+
 	void SetLoginSuceess();
 	void SetNoAccount();
 	void SetPasswordFail();
@@ -37,4 +40,6 @@ public:
 	void SetRegistFail_PasswordNotMatch();
 	void SetRegistFail_Unknown();
 	void SetTryLoginLater();
+	void SetLoginConnect();
+	void ShowKickMessage(int Reason);
 };

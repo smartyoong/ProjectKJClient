@@ -13,6 +13,12 @@ ALoginGameModeBase::ALoginGameModeBase()
 	DefaultPawnClass = nullptr;
 }
 
+void ALoginGameModeBase::SendHashAuthCheckPacket()
+{
+	GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer(GamePacketListID::REQUEST_HASH_AUTH_CHECK,
+		FRequestHashAuthCheckPacket{ GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), GetWorld()->GetGameInstance<UMainGameInstance>()->GetUserAuthHashCode()});
+}
+
 void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Packet)
 {
 	enum LoginResponseErrCode { NO_ACCOUNT = 0, PASSWORD_NOT_MATCH = 1, LOGIN_SUCCESS = 2, HASH_CODE_CREATE_FAIL = 3, ERR_AUTH_FAIL = 5, ERR_AUTH_RETRY = 6 };
@@ -91,28 +97,41 @@ void ALoginGameModeBase::OnRegistAccountResponsePacketReceived(FRegistAccountRes
 
 void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet)
 {
-	// 이제 여기에 맞게 적절한 처리를 해야함
-	switch (Packet.ErrorCode)
-	{
-	case 2: // 게임 서버에 아직 등록 안됨
-		UE_LOG(LogTemp, Warning, TEXT("게임 서버에 아직 등록 안됨"));
-		// 지금 이때 몇초 Sleep후 Check만 다시 보내도록 해야함, Login버튼을 다시 누르도록하니 버그 발생
-		// 근데 일단 게임서버와 통신 성공만으로 대박!
-		break;
-	case 4: // 인증 성공
-		UE_LOG(LogTemp, Warning, TEXT("인증 성공"));
-		break;
-	case 5: // 인증 실패
-		UE_LOG(LogTemp, Warning, TEXT("인증 실패"));
-		break;
-	default:
-		break;
-	}
+	AsyncTask(ENamedThreads::GameThread, [this, Packet]()
+		{
+			FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+			FTimerHandle UnusedHandle;
+
+			switch (Packet.ErrorCode)
+			{
+			case 2: // 게임 서버에 아직 등록 안됨
+				UE_LOG(LogTemp, Warning, TEXT("게임 서버에 아직 등록 안됨"));
+				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
+				break;
+			case 4: // 인증 성공
+				UE_LOG(LogTemp, Warning, TEXT("인증 성공"));
+				if (LoginWidget != nullptr)
+					LoginWidget->ShowLoginSuccess();
+				break;
+			case 5: // 인증 실패
+				UE_LOG(LogTemp, Warning, TEXT("인증 실패"));
+				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도
+				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
+				//if (LoginWidget != nullptr)
+				//	LoginWidget->ShowLoginFail();
+				break;
+			default:
+				break;
+			}
+		});
 }
 
 void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet)
 {
 	// 팝업을 띄우자
+	if(LoginWidget != nullptr)
+		LoginWidget->ShowKickClient(Packet.Reason);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), Packet.Reason);
 	UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
 }
 

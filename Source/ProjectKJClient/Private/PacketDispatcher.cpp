@@ -32,7 +32,7 @@ uint32 PacketDispatcher::Run()
 	while (!StopTaskCounter.GetValue())
 	{
 		TSharedPtr<TArray<uint8>> PacketData;
-		if (PacketQueue->Dequeue(PacketData))
+		if (PacketQueue != nullptr && PacketQueue->Dequeue(PacketData))
 		{
 			if (!PacketData.IsValid())
 				continue;

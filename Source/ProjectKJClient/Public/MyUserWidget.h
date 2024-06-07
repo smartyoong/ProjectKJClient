@@ -85,5 +85,11 @@ public:
 
 	void ShowRegistSuccessPopUp();
 
+	void ShowLoginSuccess();
+
+	void ShowLoginFail();
+
+	void ShowKickClient(int Reason);
+
 	class URegistAccountUserWidget* GetRegistAccountWidget();
 };

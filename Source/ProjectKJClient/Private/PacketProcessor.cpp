@@ -28,7 +28,7 @@ uint32 PacketProcessor::Run()
 	{
 
 		TSharedPtr<TPair<int32, TArray<uint8>>> PacketData;
-		if (PacketQueue->Dequeue(PacketData))
+		if (PacketQueue != nullptr && PacketQueue->Dequeue(PacketData))
 		{
 			if (!PacketData.IsValid())
 				continue;

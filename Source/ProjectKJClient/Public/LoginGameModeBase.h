@@ -29,6 +29,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
 
+	void SendHashAuthCheckPacket();
+
 	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) override;
 	virtual void OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet) override;
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket Packet) override;
