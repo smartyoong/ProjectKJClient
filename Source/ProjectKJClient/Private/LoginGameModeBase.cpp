@@ -6,6 +6,7 @@
 #include "ProjectKJClient/MainGameInstance.h"
 #include "RegistAccountUserWidget.h"
 #include "GamePacketList.h"
+#include "Kismet/GameplayStatics.h"
 
 ALoginGameModeBase::ALoginGameModeBase()
 {
@@ -35,7 +36,7 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetNickName(Packet.NickName);
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetUserAuthHashCode(Packet.HashValue);
 		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
-		UE_LOG(LogTemp, Warning, TEXT("%s %s"),*GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), *Packet.HashValue);
+		//UE_LOG(LogTemp, Warning, TEXT("%s %s"),*GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), *Packet.HashValue);
 		// 일단 게임서버에 인증 요청 하는것부터 시작하자
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer(GamePacketListID::REQUEST_HASH_AUTH_CHECK,
 			FRequestHashAuthCheckPacket{GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), Packet.HashValue});
@@ -105,16 +106,14 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 			switch (Packet.ErrorCode)
 			{
 			case 2: // 게임 서버에 아직 등록 안됨
-				UE_LOG(LogTemp, Warning, TEXT("게임 서버에 아직 등록 안됨"));
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				break;
 			case 4: // 인증 성공
-				UE_LOG(LogTemp, Warning, TEXT("인증 성공"));
 				if (LoginWidget != nullptr)
 					LoginWidget->ShowLoginSuccess();
+				UGameplayStatics::OpenLevel(this, TEXT("D:/ProjectKJ/GameClient/ProjectKJClient/Content/TopDown/Maps/TopDownMap.umap"), true);
 				break;
 			case 5: // 인증 실패
-				UE_LOG(LogTemp, Warning, TEXT("인증 실패"));
 				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				//if (LoginWidget != nullptr)
@@ -131,8 +130,8 @@ void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet
 	// 팝업을 띄우자
 	if(LoginWidget != nullptr)
 		LoginWidget->ShowKickClient(Packet.Reason);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), Packet.Reason);
-	UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), Packet.Reason);
+	//UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
 }
 
 void ALoginGameModeBase::BeginPlay()
