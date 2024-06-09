@@ -18,6 +18,7 @@ void AStartMapGameModeBase::BeginPlay()
 	}
 
 	WorldInfoToJson::SaveWorldInfoToJson(GetWorld(), 0);
+	WorldInfoToJson::SaveWorldPortalInfoToJson(GetWorld(), 0);
 }
 
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

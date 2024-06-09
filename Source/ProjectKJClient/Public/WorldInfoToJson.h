@@ -13,4 +13,5 @@ public:
 	WorldInfoToJson();
 	~WorldInfoToJson();
 	static void SaveWorldInfoToJson(UWorld* World, int MapID);
+	static void SaveWorldPortalInfoToJson(UWorld* World, int MapID);
 };

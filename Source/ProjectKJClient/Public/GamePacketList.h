@@ -53,3 +53,59 @@ struct FSendKickClientPacket
     UPROPERTY()
     int32 Reason;
 };
+
+USTRUCT()
+struct FRequestCharBaseInfoPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    FString HashCode;
+};
+
+USTRUCT()
+struct FResponseCharBaseInfoPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    int32 Level;
+    UPROPERTY()
+    int32 Exp;
+    UPROPERTY()
+    int32 Job;
+    UPROPERTY()
+    int32 JobLevel;
+    UPROPERTY()
+    int32 LastMapID;
+    UPROPERTY()
+    int32 LastMapX;
+    UPROPERTY()
+    int32 LastMapY;
+};
+
+USTRUCT()
+struct FResponseNeedToMakeCharcterPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    int32 ErrorCode;
+};
+
+USTRUCT()
+struct FRequestCreateCharacter
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    FString HashCode;
+    UPROPERTY()
+    FString NickName;
+    UPROPERTY()
+    int32 Gender;
+};
