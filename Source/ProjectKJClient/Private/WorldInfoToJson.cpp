@@ -85,7 +85,7 @@ void WorldInfoToJson::SaveWorldPortalInfoToJson(UWorld* World, int MapID)
         PortalActor->GetPortalBoxExtent(BoxComponentSize);
         int32 TargetMapID = PortalActor->GetTargetMapID();
 
-        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"BoxSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"LinkMapID\": \"%d\"},\n"),
+        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"BoxSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"LinkMapID\": %d},\n"),
             Location.X, Location.Y, Location.Z, Scale.X, Scale.Y, Scale.Z, BoxComponentSize.X, BoxComponentSize.Y, BoxComponentSize.Z, TargetMapID);
     }
     OutputString.RemoveFromEnd(",\n");
