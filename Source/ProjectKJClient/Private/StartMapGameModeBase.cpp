@@ -17,8 +17,10 @@ void AStartMapGameModeBase::BeginPlay()
 		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
 	}
 
-	WorldInfoToJson::SaveWorldInfoToJson(GetWorld(), 0);
-	WorldInfoToJson::SaveWorldPortalInfoToJson(GetWorld(), 0);
+	
+	// 맵 정보 읽어올때 사용
+	//WorldInfoToJson::SaveWorldInfoToJson(GetWorld(), 0);
+	//WorldInfoToJson::SaveWorldPortalInfoToJson(GetWorld(), 0);
 }
 
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -22,6 +22,8 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 
 private:
 
+	int32 UUID = -1;
+
 	FString AccountID;
 	FString NickName;
 	FString AuthHashCode;
@@ -47,6 +49,7 @@ private:
 	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* GameDestinationPacketQueue;
 
 public:
+
 	virtual void Init() override;
 	virtual void Shutdown() override;
 

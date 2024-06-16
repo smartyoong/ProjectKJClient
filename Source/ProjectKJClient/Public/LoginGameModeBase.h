@@ -18,6 +18,8 @@ class PROJECTKJCLIENT_API ALoginGameModeBase : public ACommonGameModeBase
 private:
 	UPROPERTY()
 	class UMyUserWidget* LoginWidget;
+	UPROPERTY()
+	class ULoadingScreenWidget* LoadingWidget;
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,8 +28,13 @@ protected:
 public:
 	ALoginGameModeBase();
 
-	UPROPERTY(EditDefaultsOnly)
+	void ShowLoadingScreen();
+	void HideLoadingScreen();
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
 
 	void SendHashAuthCheckPacket();
 

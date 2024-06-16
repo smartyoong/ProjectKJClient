@@ -7,11 +7,35 @@
 #include "RegistAccountUserWidget.h"
 #include "GamePacketList.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/Engine.h"
+#include "LoadingScreenWidget.h"
 
 ALoginGameModeBase::ALoginGameModeBase()
 {
 	LoginWidget = nullptr;
 	DefaultPawnClass = nullptr;
+}
+
+void ALoginGameModeBase::ShowLoadingScreen()
+{
+	if (LoadingWidget != nullptr)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				LoadingWidget->AddToViewport();
+			});
+	}
+}
+
+void ALoginGameModeBase::HideLoadingScreen()
+{
+	if (LoadingWidget != nullptr)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				LoadingWidget->RemoveFromParent();
+			});
+	}
 }
 
 void ALoginGameModeBase::SendHashAuthCheckPacket()
@@ -109,8 +133,8 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				break;
 			case 4: // 인증 성공
-				if (LoginWidget != nullptr)
-					LoginWidget->ShowLoginSuccess();
+				ShowLoadingScreen();
+				//여기 하드코딩된거 빼자
 				UGameplayStatics::OpenLevel(this, TEXT("D:/ProjectKJ/GameClient/ProjectKJClient/Content/TopDown/Maps/TopDownMap.umap"), true);
 				break;
 			case 5: // 인증 실패
@@ -151,6 +175,8 @@ void ALoginGameModeBase::BeginPlay()
 	{
 		LoginWidget->AddToViewport();
 	}
+
+	LoadingWidget = CreateWidget<ULoadingScreenWidget>(GetWorld(), LoadingWidgetClass);
 }
 
 void ALoginGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

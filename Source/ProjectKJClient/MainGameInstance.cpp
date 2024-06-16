@@ -45,7 +45,6 @@ void UMainGameInstance::Init()
 
 	GamePacketProcessor = new PacketProcessor(GameDestinationPacketQueue, PacketProcessorMode::INGAME);
 	GamePacketProcessorThread = FRunnableThread::Create(GamePacketProcessor, TEXT("GamePacketProcessorThread"));
-
 }
 
 void UMainGameInstance::Shutdown()

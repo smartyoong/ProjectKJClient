@@ -15,8 +15,10 @@ UCLASS()
 class ACommonGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
 public:
 	virtual ~ACommonGameModeBase() = default;
+
 	// 앞으로 로직 함수를 여기서 선언하자
 
 	// 로그인 응답 함수
