@@ -22,8 +22,6 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 
 private:
 
-	int32 UUID = -1;
-
 	FString AccountID;
 	FString NickName;
 	FString AuthHashCode;

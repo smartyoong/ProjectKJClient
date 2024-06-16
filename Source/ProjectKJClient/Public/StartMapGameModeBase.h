@@ -15,7 +15,16 @@ class PROJECTKJCLIENT_API AStartMapGameModeBase : public ACommonGameModeBase
 {
 	GENERATED_BODY()
 
-	public:
+private:
+	UPROPERTY()
+	class ULoadingScreenWidget* LoadingWidget;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
+
+	void ShowLoadingScreen();
+	void HideLoadingScreen();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

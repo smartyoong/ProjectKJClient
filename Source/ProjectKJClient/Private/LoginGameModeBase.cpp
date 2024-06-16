@@ -122,6 +122,9 @@ void ALoginGameModeBase::OnRegistAccountResponsePacketReceived(FRegistAccountRes
 
 void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet)
 {
+	const int REGIST_NOT_YET = 2;
+	const int AUTH_SUCCESS = 4;
+	const int AUTH_FAIL = 5;
 	AsyncTask(ENamedThreads::GameThread, [this, Packet]()
 		{
 			FTimerManager& TimerManager = GetWorld()->GetTimerManager();
@@ -129,15 +132,15 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 
 			switch (Packet.ErrorCode)
 			{
-			case 2: // 게임 서버에 아직 등록 안됨
+			case REGIST_NOT_YET: // 게임 서버에 아직 등록 안됨
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				break;
-			case 4: // 인증 성공
+			case AUTH_SUCCESS: // 인증 성공
 				ShowLoadingScreen();
 				//여기 하드코딩된거 빼자
 				UGameplayStatics::OpenLevel(this, TEXT("D:/ProjectKJ/GameClient/ProjectKJClient/Content/TopDown/Maps/TopDownMap.umap"), true);
 				break;
-			case 5: // 인증 실패
+			case AUTH_FAIL: // 인증 실패
 				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				//if (LoginWidget != nullptr)
