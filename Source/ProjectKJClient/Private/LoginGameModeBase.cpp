@@ -138,7 +138,7 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 			case AUTH_SUCCESS: // 인증 성공
 				ShowLoadingScreen();
 				//여기 하드코딩된거 빼자
-				UGameplayStatics::OpenLevel(this, TEXT("D:/ProjectKJ/GameClient/ProjectKJClient/Content/TopDown/Maps/TopDownMap.umap"), true);
+				UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
 				break;
 			case AUTH_FAIL: // 인증 실패
 				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도

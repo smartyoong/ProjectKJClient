@@ -22,7 +22,13 @@ public:
 	class UButton* GenderButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* NickNameTextBox;
+	class UTextBlock* GenderTextBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* NickNameEditTextBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* BackgroundImage;
 
 	// 메타 휴먼 적용해보자
 };
