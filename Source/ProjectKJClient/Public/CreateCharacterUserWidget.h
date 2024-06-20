@@ -30,5 +30,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* BackgroundImage;
 
+	UPROPERTY(meta = (BindWidget))
+	class UListView* CharacterPresetListView;
+
 	// 메타 휴먼 적용해보자
 };
