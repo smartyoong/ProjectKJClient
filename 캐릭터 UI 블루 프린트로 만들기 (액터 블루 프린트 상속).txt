@@ -1,0 +1,44 @@
+
+블루 프린트로 만들기 (액터 블루 프린트 상속)
+SCENE (씬) 추가
+씬 하위 항목에 STATIC_MESH (캐릭터) 배치
+SCENE CAPTURE COMPONENT 2D 컴포넌트 추가
+CAPTURE 2D COMPONENT의 텍스처에서 RENDER TARGET 항목 설정
+그리고 해당 BP 저장
+(만약 SHOW ONLY COMPONENT가 필요할 경우 해당 메서드 사용, 캐릭터 메시로 지정)
+
+그리고 저장한 BP를 우클릭하면 MAKE MATERIAL 클릭
+그리고 MATERIAL BP에서 위에서 만든 BP항목을 클릭하면 MATERIAL DOMAIN 항목이 존재함 해당 항목을 USER_INTEFACE로 변경
+그리고 BLENDMODE를 TRANSLUCENT로 변경
+그리고 TEXTURE SAMPLE의 RGB를 BP의 FINAL COLOR랑 연결
+TEXTURE SAMPLE의 ALPHA를 ONE MINUS (새로운 노드)로 한후 BP의 OPACITY에 연결
+
+그리고 우리가 만든 UMG로 돌아가서
+FIMAGE의 텍스처를 위에서 만든 MATERIAL로 설정
+
+
+-------------------------------------------------------
+
+리스트 뷰로 캐릭터 프리셋 목록 만드는 법
+
+1. 준비물 화면에 출력할 데이터 (위의 2D SCENCE COMPONENT 혹은 Material로 설정하자) 단, TEXTURE는 반드시 항목이 존재해야함
+2. ListViewEntry IUserObjectListEntry를 상속 받는 UserWidget 클래스
+3. ListViewEntry에는 UImage와 UText가 설정되어 있어야한다 (위젯에 이미지 출력용)
+4. ListViewEntry에는 NativeOnListItemObjectSet(UObject* obj) override 메서드가 존재해야함
+5. 위의 메서드에서 #include 그 캐릭터 아이템 헤더파일을 추가해주고, UImage에 해당 아이템으로 Cast에서 SetBrushFromTexture 해준다. UText도 이건 선택
+5-1. 만약 NativeOnItemSelectionChanged 메서드를 활용하면 아이템이 클릭됐을때 클릭 효과를 줄 수 있다.
+6. ListViewEntry Widget을 블루프린트로 UI를 만든다.
+7. 그러면 이제 프리셋 UI인 UserWidget에서 TArray로 Entry에 추가할 데이터를 가지고 있는다.
+8. NativeOnConstruct 혹은 NativeOnInitialize등 함수에서 TArray에 데이터를 채운다.
+9. 그리고 해당 위젯어 BindWiget 속성으로 선언된 ListView 아이템 변수를 추가한다.
+10.그 후 ListView에 SetListItems메서드로 데이터가 저장되어 있는 TArray를 매개변수로 전달한다,.
+11.또한 리스트 뷰 변수에 ->OnItemDoubleClicked().AddUObject(this, 델리게이트 void(UObject *)) 델리게이트를 추가해준다.
+12.위의 델리게이트는 리스트뷰 아이템이 더블 클릭되었을때 해당 아이템이 어떤건지 알려준다. 여기서 UObject*로 전달되는건 Entry위젯이 아니라 데이터 그 자체이다.
+
+
+
+-----------------------------------------------------
+
+즉, 우선 메타 휴먼을 만들고
+해당 휴먼의 Texture (초상화)를 만들고
+2D SCENCE COMPONENT를 하나의 데이터로 만드는걸 먼저 작업하자
