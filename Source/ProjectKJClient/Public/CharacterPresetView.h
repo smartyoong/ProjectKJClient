@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SceneComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "CharacterPresetView.generated.h"
 
 UCLASS()
@@ -23,4 +26,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	USceneComponent* DefaultSceneComponent;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* SceneComponent;
+
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModel;
+	UPROPERTY(EditAnywhere, Category = "PresetModelView")
+	USceneCaptureComponent2D* PresetModelView;
 };

@@ -138,6 +138,7 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 			case AUTH_SUCCESS: // 인증 성공
 				ShowLoadingScreen();
 				//여기 하드코딩된거 빼자
+				//여기서 이제 서버한테 캐릭터 정보 요청 보내야함
 				UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
 				break;
 			case AUTH_FAIL: // 인증 실패
