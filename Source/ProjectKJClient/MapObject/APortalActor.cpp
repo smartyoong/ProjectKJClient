@@ -3,7 +3,7 @@
 
 #include "APortalActor.h"
 #include "Components/BoxComponent.h"
-#include "ProjectKJClient/MainGameInstance.h"
+#include "MainGameInstance.h"
 
 // Sets default values
 AAPortalActor::AAPortalActor()

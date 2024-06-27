@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "LoginPacketManager.h"
+#include "LoginPacketList.h"
 #include "GamePacketList.h"
 #include "CommonGameModeBase.generated.h"
 

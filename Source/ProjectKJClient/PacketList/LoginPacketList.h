@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LoginPacketManager.generated.h"
+#include "LoginPacketList.generated.h"
 
 const int ERR_SQL_RETURN_ERROR = 999999;
 

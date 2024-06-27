@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ClientSocket.h"
-#include "LoginPacketManager.h"
+#include "LoginPacketList.h"
 
 /**
  * 

@@ -3,7 +3,7 @@
 
 #include "StartMapGameModeBase.h"
 #include "WorldInfoToJson.h"
-#include "ProjectKJClient/MainGameInstance.h"
+#include "MainGameInstance.h"
 #include "LoadingScreenWidget.h"
 
 void AStartMapGameModeBase::ShowLoadingScreen()

@@ -3,7 +3,7 @@
 
 #include "LoginGameModeBase.h"
 #include "MyUserWidget.h"
-#include "ProjectKJClient/MainGameInstance.h"
+#include "MainGameInstance.h"
 #include "RegistAccountUserWidget.h"
 #include "GamePacketList.h"
 #include "Kismet/GameplayStatics.h"

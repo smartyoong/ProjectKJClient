@@ -3,8 +3,8 @@
 #include "Components/EditableTextBox.h"
 #include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
-#include "LoginPacketManager.h"
-#include "ProjectKJClient/MainGameInstance.h"
+#include "LoginPacketList.h"
+#include "MainGameInstance.h"
 #include "LoginResultWidget.h"
 #include "RegistAccountUserWidget.h"
 

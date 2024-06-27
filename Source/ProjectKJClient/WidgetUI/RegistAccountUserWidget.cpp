@@ -5,8 +5,8 @@
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "MyUserWidget.h"
-#include "LoginPacketManager.h"
-#include "ProjectKJClient/MainGameInstance.h"
+#include "LoginPacketList.h"
+#include "MainGameInstance.h"
 
 void URegistAccountUserWidget::NativeOnInitialized()
 {

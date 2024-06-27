@@ -8,9 +8,9 @@
 #include "PacketDispatcher.h"
 #include "CommonGameModeBase.h"
 #include "PacketProcessor.h"
-#include "LoginPacketManager.h"
+#include "LoginPacketList.h"
 #include "JsonUtilities.h"
-#include "Public/GamePacketList.h"
+#include "GamePacketList.h"
 #include "MainGameInstance.generated.h"
 /**
  * 
