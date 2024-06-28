@@ -10,10 +10,14 @@ ACharacterPresetView::ACharacterPresetView()
 	PrimaryActorTick.bCanEverTick = true;
 	DefaultSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
 	RootComponent = DefaultSceneComponent;
-	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
-	PresetModel = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModel"));
-	PresetModel->SetupAttachment(SceneComponent);
 	PresetModelView = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PresetModelView"));
+
+	if(PresetModelClass)
+		PresetModel = PresetModelClass->GetDefaultObject<AActor>();
+	if (PresetModel)
+	{
+		PresetModel->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 }
 
 // Called when the game starts or when spawned

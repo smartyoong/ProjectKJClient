@@ -7,6 +7,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "GameFramework/Actor.h"
 #include "CharacterPresetView.generated.h"
 
 UCLASS()
@@ -17,6 +18,10 @@ class PROJECTKJCLIENT_API ACharacterPresetView : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACharacterPresetView();
+
+private:
+	UPROPERTY()
+	AActor* PresetModel;
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,11 +34,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneComponent;
 
-	UPROPERTY(EditAnywhere)
-	USceneComponent* SceneComponent;
-
-	UPROPERTY(EditAnywhere, Category = "PresetModel")
-	USkeletalMeshComponent* PresetModel;
 	UPROPERTY(EditAnywhere, Category = "PresetModelView")
 	USceneCaptureComponent2D* PresetModelView;
+	UPROPERTY(EditDefaultsOnly, Category = "PresetModel")
+	TSubclassOf<AActor> PresetModelClass;
 };
