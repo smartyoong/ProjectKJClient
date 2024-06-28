@@ -11,13 +11,7 @@ ACharacterPresetView::ACharacterPresetView()
 	DefaultSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
 	RootComponent = DefaultSceneComponent;
 	PresetModelView = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PresetModelView"));
-
-	if(PresetModelClass)
-		PresetModel = PresetModelClass->GetDefaultObject<AActor>();
-	if (PresetModel)
-	{
-		PresetModel->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	}
+	PresetModel->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

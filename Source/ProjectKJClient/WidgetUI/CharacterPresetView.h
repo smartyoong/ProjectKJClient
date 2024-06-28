@@ -20,8 +20,6 @@ public:
 	ACharacterPresetView();
 
 private:
-	UPROPERTY()
-	AActor* PresetModel;
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,6 +34,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "PresetModelView")
 	USceneCaptureComponent2D* PresetModelView;
-	UPROPERTY(EditDefaultsOnly, Category = "PresetModel")
-	TSubclassOf<AActor> PresetModelClass;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModel;
 };
