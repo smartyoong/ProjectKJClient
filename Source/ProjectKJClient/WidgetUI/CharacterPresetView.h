@@ -7,6 +7,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "GroomComponent.h"
 #include "GameFramework/Actor.h"
 #include "CharacterPresetView.generated.h"
 
@@ -20,6 +21,7 @@ public:
 	ACharacterPresetView();
 
 private:
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,5 +37,26 @@ public:
 	UPROPERTY(EditAnywhere, Category = "PresetModelView")
 	USceneCaptureComponent2D* PresetModelView;
 	UPROPERTY(EditAnywhere, Category = "PresetModel")
-	USkeletalMeshComponent* PresetModel;
+	USkeletalMeshComponent* PresetModelBody;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModelFeet;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModelLegs;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModelTorso;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	USkeletalMeshComponent* PresetModelFace;
+
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelHair;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelBeard;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelEyebrows;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelEyelashes;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelFuzz;
+	UPROPERTY(EditAnywhere, Category = "PresetModel")
+	UGroomComponent* PresetModelMustache;
 };

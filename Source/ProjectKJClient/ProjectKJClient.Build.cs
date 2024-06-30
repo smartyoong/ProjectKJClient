@@ -11,7 +11,7 @@ public class ProjectKJClient : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "Networking", "Sockets",
 
-        "MediaAssets","AudioExtensions","UMG","Slate","SlateCore","Json","JsonUtilities"});
+        "MediaAssets","AudioExtensions","UMG","Slate","SlateCore","Json","JsonUtilities","HairStrandsCore","Niagara"});
 
         PrivateIncludePaths.Add("ProjectKJClient");
         PrivateIncludePaths.Add("ProjectKJClient/SocketCore");
