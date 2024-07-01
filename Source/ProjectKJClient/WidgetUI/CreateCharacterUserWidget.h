@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GlobalVariable.h"
 #include "CreateCharacterUserWidget.generated.h"
 
 /**
@@ -32,6 +33,14 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UListView* CharacterPresetListView;
+
+	TArray<UCreateCharacterPresetData> PresetDataList;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UMaterialInterface*> PresetImageMaterialList;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FString> PresetNameList;
 
 	// 메타 휴먼 적용해보자
 };

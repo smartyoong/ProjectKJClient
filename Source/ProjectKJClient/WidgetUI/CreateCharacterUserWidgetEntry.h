@@ -5,14 +5,27 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
+#include "GlobalVariable.h"
 #include "CreateCharacterUserWidgetEntry.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTKJCLIENT_API UCreateCharacterUserWidgetEntry : public UUserWidget//, IUserObjectListEntry
+class PROJECTKJCLIENT_API UCreateCharacterUserWidgetEntry : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UImage* PresetImage;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* NameTextBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* BackgroundImage;
+
+	virtual void NativeOnListItemObjectSet(UObject* Obj) override;
+	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 };
