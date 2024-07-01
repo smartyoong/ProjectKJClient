@@ -32,9 +32,12 @@ public:
 	class UImage* BackgroundImage;
 
 	UPROPERTY(meta = (BindWidget))
+	class UImage* CharacterImage;
+
+	UPROPERTY(meta = (BindWidget))
 	class UListView* CharacterPresetListView;
 
-	TArray<UCreateCharacterPresetData> PresetDataList;
+	TArray<UCreateCharacterPresetData*> PresetDataList;
 
 	UPROPERTY(EditAnywhere)
 	TArray<UMaterialInterface*> PresetImageMaterialList;
@@ -42,5 +45,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FString> PresetNameList;
 
-	// 메타 휴먼 적용해보자
+	virtual void NativeOnInitialized() override;
+	void OnListItemClick(UObject* Obj);
 };

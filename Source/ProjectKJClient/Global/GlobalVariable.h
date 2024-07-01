@@ -10,7 +10,6 @@
 class UCreateCharacterPresetData : public UObject
 {
 public:
-	UPROPERTY()
-	class UMaterialInterface* PresetImageMaterial;
+	TSharedPtr<UMaterialInterface> PresetImageMaterial;
 	FString PresetName;
 };
