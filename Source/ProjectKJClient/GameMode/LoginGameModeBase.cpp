@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
 #include "LoadingScreenWidget.h"
+#include "CreateCharacterUserWidget.h"
 
 ALoginGameModeBase::ALoginGameModeBase()
 {
@@ -139,7 +140,9 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 				ShowLoadingScreen();
 				//여기 하드코딩된거 빼자
 				//여기서 이제 서버한테 캐릭터 정보 요청 보내야함
-				UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
+				//UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
+				HideLoadingScreen();
+				ShowCreateCharacterWidget();
 				break;
 			case AUTH_FAIL: // 인증 실패
 				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도
@@ -160,6 +163,18 @@ void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet
 		LoginWidget->ShowKickClient(Packet.Reason);
 	//UE_LOG(LogTemp, Warning, TEXT("%d"), Packet.Reason);
 	//UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
+}
+
+void ALoginGameModeBase::ShowCreateCharacterWidget()
+{
+	CreateCharacterWidget = CreateWidget<UCreateCharacterUserWidget>(GetWorld(), CreateCharacterWidgetClass);
+	if (CreateCharacterWidget != nullptr)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				CreateCharacterWidget->AddToViewport();
+			});
+	}
 }
 
 void ALoginGameModeBase::BeginPlay()

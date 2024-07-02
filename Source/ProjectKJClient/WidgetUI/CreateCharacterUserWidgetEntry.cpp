@@ -12,7 +12,7 @@ void UCreateCharacterUserWidgetEntry::NativeOnListItemObjectSet(UObject* Obj)
 	UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
 	if (PresetData)
 	{
-		PresetImage->SetBrushFromMaterial(PresetData->PresetImageMaterial.Get());
+		PresetImage->SetBrushFromMaterial(PresetData->PresetImageMaterial);
 		NameTextBlock->SetText(FText::FromString(PresetData->PresetName));
 	}
 }

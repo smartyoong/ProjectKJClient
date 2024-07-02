@@ -20,6 +20,9 @@ private:
 	class UMyUserWidget* LoginWidget;
 	UPROPERTY()
 	class ULoadingScreenWidget* LoadingWidget;
+	UPROPERTY()
+	class UCreateCharacterUserWidget* CreateCharacterWidget;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,13 +31,15 @@ protected:
 public:
 	ALoginGameModeBase();
 
-	void ShowLoadingScreen();
-	void HideLoadingScreen();
+	virtual void ShowLoadingScreen() override;
+	virtual void HideLoadingScreen() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UMyUserWidget> LoginWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UCreateCharacterUserWidget> CreateCharacterWidgetClass;
 
 	void SendHashAuthCheckPacket();
 
@@ -43,4 +48,6 @@ public:
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket Packet) override;
 	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet) override;
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) override;
+
+	void ShowCreateCharacterWidget();
 };

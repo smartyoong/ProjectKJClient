@@ -15,11 +15,45 @@ UCLASS()
 class ACommonGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+private:
+	void CloseGameWithErrorMsgBox()
+	{
+
+		// 메시지 박스 표시
+		FText Title = FText::FromString(TEXT("가상 메서드를 구현하십쇼"));
+		FText Content = FText::FromString(TEXT("ACommonGameModeBase에 메서드 중에서\n CloseGameWithErrorMsgBox를 호출하는 메서드들을\n 반드시 전부 재정의 하십시오."));
+		EAppReturnType::Type ReturnType = FMessageDialog::Open(EAppMsgType::OkCancel, Content, &Title);
+
+		// 사용자의 응답에 따라 처리
+		if (ReturnType == EAppReturnType::Ok)
+		{
+			// 프로그램 종료
+			FGenericPlatformMisc::RequestExit(false);
+		}
+		else
+		{
+			// 프로그램 종료
+			FGenericPlatformMisc::RequestExit(false);
+		}
+	}
 
 public:
 	virtual ~ACommonGameModeBase() = default;
 
 	// 앞으로 로직 함수를 여기서 선언하자
+	virtual void ShowLoadingScreen()
+	{
+		CloseGameWithErrorMsgBox();
+	};
+	virtual void HideLoadingScreen() 
+	{
+		CloseGameWithErrorMsgBox();
+	};
+	// 해시 인증 응답 함수  ---> 이건 모든 게임 모드에서 구현하도록 해야함
+	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet)
+	{
+		CloseGameWithErrorMsgBox();
+	};
 
 	// 로그인 응답 함수
 	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) {};
@@ -27,8 +61,6 @@ public:
 	virtual void OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet) {};
 	// 회원 가입 응답 함수
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket) {};
-	// 해시 인증 응답 함수
-	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet) {};
 	// 강제 추방 함수
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) {};
 

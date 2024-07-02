@@ -14,7 +14,10 @@ UCLASS()
 class PROJECTKJCLIENT_API UCreateCharacterUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+private:
+	bool IsKoreanOrAlphaNumeric(TCHAR Char);
+	bool IsNickNameValid(const FString& InputString);
+	bool IsMale = true;
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* OKButton;
@@ -39,12 +42,14 @@ public:
 
 	TArray<UCreateCharacterPresetData*> PresetDataList;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<UMaterialInterface*> PresetImageMaterialList;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<FString> PresetNameList;
 
 	virtual void NativeOnInitialized() override;
 	void OnListItemClick(UObject* Obj);
+	void OnGenderButtonClick();
+	void OnOKButtonClick();
 };
