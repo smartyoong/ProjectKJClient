@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
-#include "GlobalVariable.h"
+#include "UCreateCharacterPresetData.h"
 #include "CreateCharacterUserWidgetEntry.generated.h"
 
 /**
@@ -26,6 +26,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* BackgroundImage;
 
+	virtual void NativeOnInitialized() override;
 	virtual void NativeOnListItemObjectSet(UObject* Obj) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 };

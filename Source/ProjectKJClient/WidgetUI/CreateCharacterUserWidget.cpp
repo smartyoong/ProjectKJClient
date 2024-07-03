@@ -68,14 +68,17 @@ void UCreateCharacterUserWidget::NativeOnInitialized()
 	}
 	if (CharacterPresetListView)
 	{
+		CharacterPresetListView->SetSelectionMode(ESelectionMode::Single);
+		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView SetSelectionMode"));
 		CharacterPresetListView->OnItemClicked().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
+		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView OnItemClicked"));
 		for(int i = 0 ; i < PresetImageMaterialList.Num(); ++i)
 		{
 			if (PresetImageMaterialList[i])
 			{
 				UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
 				PresetData->PresetName = PresetNameList[i];
-				PresetData->PresetImageMaterial = PresetImageMaterialList[i];
+				PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
 				PresetDataList.Add(PresetData);
 			}
 		}
@@ -89,19 +92,28 @@ void UCreateCharacterUserWidget::NativeOnInitialized()
 
 void UCreateCharacterUserWidget::OnListItemClick(UObject* Obj)
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Start"));
 	//여기서 Obj가 위에 SetListItems에서 넣은 데이터중 1개임
-	if(CharacterImage)
+	if (CharacterImage)
+	{
 		CharacterImage->SetVisibility(ESlateVisibility::Hidden);
+		UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Image Hidden"));
+	}
 
 	UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
 	if (PresetData)
 	{
+		FSlateBrush MyBrush;
+		UE_LOG(LogTemp, Warning, TEXT("OnListItem Cast Success"));
 		if (CharacterImage)
 		{
-			CharacterImage->SetBrushFromMaterial(PresetData->PresetImageMaterial);
+			MyBrush.SetResourceObject(PresetData->PresetImage2DTexture);
+			CharacterImage->SetBrush(MyBrush);
 			CharacterImage->SetVisibility(ESlateVisibility::Visible);
+			UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Image Visible"));
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Finish"));
 }
 
 void UCreateCharacterUserWidget::OnGenderButtonClick()

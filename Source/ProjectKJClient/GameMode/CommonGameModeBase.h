@@ -22,7 +22,7 @@ private:
 		// 메시지 박스 표시
 		FText Title = FText::FromString(TEXT("가상 메서드를 구현하십쇼"));
 		FText Content = FText::FromString(TEXT("ACommonGameModeBase에 메서드 중에서\n CloseGameWithErrorMsgBox를 호출하는 메서드들을\n 반드시 전부 재정의 하십시오."));
-		EAppReturnType::Type ReturnType = FMessageDialog::Open(EAppMsgType::OkCancel, Content, &Title);
+		EAppReturnType::Type ReturnType = FMessageDialog::Open(EAppMsgType::OkCancel, Content, Title);
 
 		// 사용자의 응답에 따라 처리
 		if (ReturnType == EAppReturnType::Ok)

@@ -20,10 +20,10 @@ ACharacterPresetView::ACharacterPresetView()
 	PresetModelFace = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelFace"));
 
 	PresetModelBody->SetupAttachment(RootComponent);
-	PresetModelFace->AttachToComponent(PresetModelBody, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelFeet->AttachToComponent(PresetModelBody, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelLegs->AttachToComponent(PresetModelBody, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelTorso->AttachToComponent(PresetModelBody, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	PresetModelFace->SetupAttachment(PresetModelBody);
+	PresetModelFeet->SetupAttachment(PresetModelBody);
+	PresetModelLegs->SetupAttachment(PresetModelBody);
+	PresetModelTorso->SetupAttachment(PresetModelBody);
 
 	PresetModelHair = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelHair"));
 	PresetModelBeard = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelBeard"));
@@ -32,12 +32,12 @@ ACharacterPresetView::ACharacterPresetView()
 	PresetModelFuzz = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelFuzz"));
 	PresetModelMustache = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelMustache"));
 
-	PresetModelBeard->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelEyebrows->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelEyelashes->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelFuzz->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelMustache->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	PresetModelHair->AttachToComponent(PresetModelFace, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	PresetModelBeard->SetupAttachment(PresetModelFace);
+	PresetModelEyebrows->SetupAttachment(PresetModelFace);
+	PresetModelEyelashes->SetupAttachment(PresetModelFace);
+	PresetModelFuzz->SetupAttachment(PresetModelFace);
+	PresetModelMustache->SetupAttachment(PresetModelFace);
+	PresetModelHair->SetupAttachment(PresetModelFace);
 }
 
 // Called when the game starts or when spawned

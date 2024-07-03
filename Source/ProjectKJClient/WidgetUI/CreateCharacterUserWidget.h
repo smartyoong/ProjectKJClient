@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GlobalVariable.h"
+#include "UCreateCharacterPresetData.h"
 #include "CreateCharacterUserWidget.generated.h"
 
 /**
@@ -43,13 +43,15 @@ public:
 	TArray<UCreateCharacterPresetData*> PresetDataList;
 
 	UPROPERTY(EditAnywhere, Category = "Entry")
-	TArray<UMaterialInterface*> PresetImageMaterialList;
+	TArray<UTexture2D*> PresetImageMaterialList;
 
 	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<FString> PresetNameList;
 
 	virtual void NativeOnInitialized() override;
 	void OnListItemClick(UObject* Obj);
+	UFUNCTION()
 	void OnGenderButtonClick();
+	UFUNCTION()
 	void OnOKButtonClick();
 };

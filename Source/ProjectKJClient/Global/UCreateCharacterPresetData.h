@@ -3,14 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UCreateCharacterPresetData.generated.h"
 
 /**
  * 
  */
+UCLASS()
 class UCreateCharacterPresetData : public UObject
 {
+	GENERATED_BODY()
 public:
 	UPROPERTY()
-	UMaterialInterface * PresetImageMaterial;
-	FString PresetName;
+	UTexture2D * PresetImage2DTexture = nullptr;
+	FString PresetName = "Sample";
 };
