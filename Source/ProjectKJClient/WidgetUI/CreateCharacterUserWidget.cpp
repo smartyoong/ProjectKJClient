@@ -71,16 +71,15 @@ void UCreateCharacterUserWidget::NativeOnInitialized()
 		CharacterPresetListView->SetSelectionMode(ESelectionMode::Single);
 		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView SetSelectionMode"));
 		CharacterPresetListView->OnItemClicked().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
+		// 둘중 하나라도 될려나...
+		CharacterPresetListView->OnItemSelectionChanged().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
 		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView OnItemClicked"));
 		for(int i = 0 ; i < PresetImageMaterialList.Num(); ++i)
 		{
-			if (PresetImageMaterialList[i])
-			{
-				UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
-				PresetData->PresetName = PresetNameList[i];
-				PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
-				PresetDataList.Add(PresetData);
-			}
+			UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
+			PresetData->PresetName = PresetNameList[i];
+			PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
+			PresetDataList.Add(PresetData);
 		}
 		CharacterPresetListView->SetListItems(PresetDataList);
 	}
