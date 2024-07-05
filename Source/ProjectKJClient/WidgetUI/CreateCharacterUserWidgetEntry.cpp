@@ -9,31 +9,29 @@
 void UCreateCharacterUserWidgetEntry::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	UE_LOG(LogTemp, Warning, TEXT("Entry Initialized"));
+	BackgroundImage->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UCreateCharacterUserWidgetEntry::NativeOnListItemObjectSet(UObject* Obj)
 {
-	IUserObjectListEntry::NativeOnListItemObjectSet(Obj);
 	//이거 나중에 위젯에서 데이터 정리해야함
 	UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
-	BackgroundImage->SetVisibility(ESlateVisibility::Hidden);
-	FSlateBrush MyBrush;
-	if (PresetData)
+	if (IsValid(PresetData))
 	{
-		MyBrush.SetResourceObject(PresetData->PresetImage2DTexture);
-		PresetImage->SetBrush(MyBrush);
 		NameTextBlock->SetText(FText::FromString(PresetData->PresetName));
+		if(IsValid(PresetData->PresetImage2DTexture))
+			PresetImage->SetBrushFromTexture(PresetData->PresetImage2DTexture);
+		else
+			UE_LOG(LogTemp, Error, TEXT("Preset Image is not valid"));
 		PresetImage->SetVisibility(ESlateVisibility::Visible);
-		UE_LOG(LogTemp, Warning, TEXT("Entry Image Visible"));
+		UE_LOG(LogTemp, Warning, TEXT("Entry Set Success"));
 	}
 	else
-		UE_LOG(LogTemp, Error, TEXT("Entry Image Hidden"));
+		UE_LOG(LogTemp, Error, TEXT("Entry Set Fail"));
 }
 
 void UCreateCharacterUserWidgetEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 {
-	IUserObjectListEntry::NativeOnItemSelectionChanged(bIsSelected);
 	// 형광 연두색으로 설정하기 위한 FLinearColor 생성
 	FLinearColor FluorescentGreenColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
 

@@ -48,7 +48,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<FString> PresetNameList;
 
-	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 	void OnListItemClick(UObject* Obj);
 	UFUNCTION()
 	void OnGenderButtonClick();

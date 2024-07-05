@@ -51,9 +51,10 @@ bool UCreateCharacterUserWidget::IsNickNameValid(const FString& InputString)
 	return true;
 }
 
-void UCreateCharacterUserWidget::NativeOnInitialized()
+void UCreateCharacterUserWidget::NativeConstruct()
 {
-	Super::NativeOnInitialized();
+	Super::NativeConstruct();
+
 	if (OKButton)
 	{
 		OKButton->OnClicked.AddDynamic(this, &UCreateCharacterUserWidget::OnOKButtonClick);
@@ -69,12 +70,7 @@ void UCreateCharacterUserWidget::NativeOnInitialized()
 	if (CharacterPresetListView)
 	{
 		CharacterPresetListView->SetSelectionMode(ESelectionMode::Single);
-		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView SetSelectionMode"));
-		CharacterPresetListView->OnItemClicked().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
-		// 둘중 하나라도 될려나...
-		CharacterPresetListView->OnItemSelectionChanged().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
-		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView OnItemClicked"));
-		for(int i = 0 ; i < PresetImageMaterialList.Num(); ++i)
+		for (int i = 0; i < PresetImageMaterialList.Num(); ++i)
 		{
 			UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
 			PresetData->PresetName = PresetNameList[i];
@@ -82,10 +78,12 @@ void UCreateCharacterUserWidget::NativeOnInitialized()
 			PresetDataList.Add(PresetData);
 		}
 		CharacterPresetListView->SetListItems(PresetDataList);
+		CharacterPresetListView->OnItemClicked().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
+		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView OnItemClicked"));
 	}
 	if (CharacterImage)
 	{
-		CharacterImage->SetVisibility(ESlateVisibility::Hidden);
+		CharacterImage->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
