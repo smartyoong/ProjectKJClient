@@ -14,20 +14,31 @@ void UCreateCharacterUserWidgetEntry::NativeOnInitialized()
 
 void UCreateCharacterUserWidgetEntry::NativeOnListItemObjectSet(UObject* Obj)
 {
-	//이거 나중에 위젯에서 데이터 정리해야함
-	UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
-	if (IsValid(PresetData))
-	{
-		NameTextBlock->SetText(FText::FromString(PresetData->PresetName));
-		if(IsValid(PresetData->PresetImage2DTexture))
-			PresetImage->SetBrushFromTexture(PresetData->PresetImage2DTexture);
-		else
-			UE_LOG(LogTemp, Error, TEXT("Preset Image is not valid"));
-		PresetImage->SetVisibility(ESlateVisibility::Visible);
-		UE_LOG(LogTemp, Warning, TEXT("Entry Set Success"));
-	}
-	else
-		UE_LOG(LogTemp, Error, TEXT("Entry Set Fail"));
+    UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
+    if (IsValid(PresetData))
+    {
+        NameTextBlock->SetText(FText::FromString(PresetData->PresetName));
+
+        if (IsValid(PresetData->PresetImage2DTexture))
+        {
+            PresetImage->SetBrushFromTexture(PresetData->PresetImage2DTexture);
+            PresetImage->SetVisibility(ESlateVisibility::Visible);
+            UE_LOG(LogTemp, Warning, TEXT("Texture set successfully. Texture size: %d x %d"),
+                PresetData->PresetImage2DTexture->GetSizeX(),
+                PresetData->PresetImage2DTexture->GetSizeY());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Preset Image texture is not valid"));
+            PresetImage->SetVisibility(ESlateVisibility::Hidden);
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("Entry Set Success for Preset: %s"), *PresetData->PresetName);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Entry Set Fail: Invalid PresetData"));
+    }
 }
 
 void UCreateCharacterUserWidgetEntry::NativeOnItemSelectionChanged(bool bIsSelected)
