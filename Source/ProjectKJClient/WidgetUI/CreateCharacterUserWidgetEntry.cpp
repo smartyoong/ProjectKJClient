@@ -21,7 +21,11 @@ void UCreateCharacterUserWidgetEntry::NativeOnListItemObjectSet(UObject* Obj)
 
         if (IsValid(PresetData->PresetImage2DTexture))
         {
-            PresetImage->SetBrushFromTexture(PresetData->PresetImage2DTexture);
+            FSlateBrush MyBrush;
+            PresetData->PresetImage2DTexture->UpdateResource();
+            MyBrush.SetResourceObject(PresetData->PresetImage2DTexture);
+            PresetImage->SetBrush(MyBrush);
+            //PresetImage->SetBrushFromTexture(PresetData->PresetImage2DTexture);
             PresetImage->SetVisibility(ESlateVisibility::Visible);
             UE_LOG(LogTemp, Warning, TEXT("Texture set successfully. Texture size: %d x %d"),
                 PresetData->PresetImage2DTexture->GetSizeX(),

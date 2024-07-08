@@ -7,6 +7,7 @@
 #include "Components/EditableTextBox.h"
 #include "Components/ListView.h"
 #include "Components/TextBlock.h"
+#include "CreateCharacterUserWidgetEntry.h"
 
 bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 {

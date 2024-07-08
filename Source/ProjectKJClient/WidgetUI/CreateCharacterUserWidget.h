@@ -49,6 +49,7 @@ public:
 	TArray<FString> PresetNameList;
 
 	virtual void NativeConstruct() override;
+	UFUNCTION()
 	void OnListItemClick(UObject* Obj);
 	UFUNCTION()
 	void OnGenderButtonClick();

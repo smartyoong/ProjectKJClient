@@ -137,11 +137,11 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				break;
 			case AUTH_SUCCESS: // 인증 성공
-				ShowLoadingScreen();
+				//ShowLoadingScreen();
 				//여기 하드코딩된거 빼자
 				//여기서 이제 서버한테 캐릭터 정보 요청 보내야함
 				//UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
-				HideLoadingScreen();
+				//HideLoadingScreen();
 				ShowCreateCharacterWidget();
 				break;
 			case AUTH_FAIL: // 인증 실패
@@ -161,8 +161,6 @@ void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet
 	// 팝업을 띄우자
 	if(LoginWidget != nullptr)
 		LoginWidget->ShowKickClient(Packet.Reason);
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), Packet.Reason);
-	//UE_LOG(LogTemp, Warning, TEXT("강제 추방 당함"));
 }
 
 void ALoginGameModeBase::ShowCreateCharacterWidget()
