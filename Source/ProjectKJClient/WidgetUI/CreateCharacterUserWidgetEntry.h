@@ -26,7 +26,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* BackgroundImage;
 
-	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 	virtual void NativeOnListItemObjectSet(UObject* Obj) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
+
+	void UpdateEntry(UTexture2D* ImageData, FString TextData);
 };

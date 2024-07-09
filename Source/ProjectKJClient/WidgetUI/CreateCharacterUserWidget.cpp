@@ -71,16 +71,7 @@ void UCreateCharacterUserWidget::NativeConstruct()
 	if (CharacterPresetListView)
 	{
 		CharacterPresetListView->SetSelectionMode(ESelectionMode::Single);
-		for (int i = 0; i < PresetImageMaterialList.Num(); ++i)
-		{
-			UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
-			PresetData->PresetName = PresetNameList[i];
-			PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
-			PresetDataList.Add(PresetData);
-		}
-		CharacterPresetListView->SetListItems(PresetDataList);
 		CharacterPresetListView->OnItemClicked().AddUObject(this, &UCreateCharacterUserWidget::OnListItemClick);
-		UE_LOG(LogTemp, Warning, TEXT("CharacterPresetListView OnItemClicked"));
 	}
 	if (CharacterImage)
 	{
@@ -90,28 +81,14 @@ void UCreateCharacterUserWidget::NativeConstruct()
 
 void UCreateCharacterUserWidget::OnListItemClick(UObject* Obj)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Start"));
-	//여기서 Obj가 위에 SetListItems에서 넣은 데이터중 1개임
-	if (CharacterImage)
+	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick"));
+	int32 Index = CharacterPresetListView->GetIndexForItem(Obj);
+	if (PresetImageMaterialList.IsValidIndex(Index))
 	{
-		CharacterImage->SetVisibility(ESlateVisibility::Hidden);
-		UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Image Hidden"));
+		PresetNameList[Index];
+		PresetImageMaterialList[Index]->UpdateResource();
+		UE_LOG(LogTemp, Warning, TEXT("PresetImageMaterialList[%d]"), Index);
 	}
-
-	UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
-	if (PresetData)
-	{
-		FSlateBrush MyBrush;
-		UE_LOG(LogTemp, Warning, TEXT("OnListItem Cast Success"));
-		if (CharacterImage)
-		{
-			MyBrush.SetResourceObject(PresetData->PresetImage2DTexture);
-			CharacterImage->SetBrush(MyBrush);
-			CharacterImage->SetVisibility(ESlateVisibility::Visible);
-			UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Image Visible"));
-		}
-	}
-	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick Finish"));
 }
 
 void UCreateCharacterUserWidget::OnGenderButtonClick()
@@ -140,5 +117,21 @@ void UCreateCharacterUserWidget::OnOKButtonClick()
 	{
 		// 닉네임이 유효하지 않습니다.
 		UE_LOG(LogTemp, Error, TEXT("닉네임이 유효하지 않습니다."));
+	}
+}
+
+
+void UCreateCharacterUserWidget::PopulateList()
+{
+	if (CharacterPresetListView)
+	{
+		CharacterPresetListView->ClearListItems();
+		for (int i = 0; i < PresetImageMaterialList.Num(); ++i)
+		{
+			UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
+			PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
+			PresetData->PresetName = PresetNameList[i];
+			CharacterPresetListView->AddItem(PresetData);
+		}
 	}
 }

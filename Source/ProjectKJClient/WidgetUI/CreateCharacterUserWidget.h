@@ -40,8 +40,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UListView* CharacterPresetListView;
 
-	TArray<UCreateCharacterPresetData*> PresetDataList;
-
 	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<UTexture2D*> PresetImageMaterialList;
 
@@ -55,4 +53,6 @@ public:
 	void OnGenderButtonClick();
 	UFUNCTION()
 	void OnOKButtonClick();
+	void PopulateList();
+
 };

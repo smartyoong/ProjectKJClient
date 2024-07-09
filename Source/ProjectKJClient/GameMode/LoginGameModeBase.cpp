@@ -171,6 +171,7 @@ void ALoginGameModeBase::ShowCreateCharacterWidget()
 		AsyncTask(ENamedThreads::GameThread, [this]()
 			{
 				CreateCharacterWidget->AddToViewport();
+				CreateCharacterWidget->PopulateList();
 			});
 	}
 }
