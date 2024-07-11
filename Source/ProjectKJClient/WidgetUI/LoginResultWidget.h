@@ -42,4 +42,5 @@ public:
 	void SetTryLoginLater();
 	void SetLoginConnect();
 	void ShowKickMessage(int Reason);
+	void SetInvalidNickname();
 };

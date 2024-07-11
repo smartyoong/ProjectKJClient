@@ -14,6 +14,6 @@ class UCreateCharacterPresetData : public UObject
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	UTexture2D* PresetImage2DTexture;
+	UMaterialInterface* PresetMaterial;
 	FString PresetName = "Sample";
 };

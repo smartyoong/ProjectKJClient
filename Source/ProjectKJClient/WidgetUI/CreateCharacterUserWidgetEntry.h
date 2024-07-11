@@ -30,5 +30,5 @@ public:
 	virtual void NativeOnListItemObjectSet(UObject* Obj) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 
-	void UpdateEntry(UTexture2D* ImageData, FString TextData);
+	void UpdateEntry(UMaterialInterface* ImageData, FString TextData);
 };

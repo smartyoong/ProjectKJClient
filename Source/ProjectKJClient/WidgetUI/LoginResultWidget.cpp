@@ -215,6 +215,19 @@ void ULoginResultWidget::ShowKickMessage(int Reason)
 	}
 }
 
+void ULoginResultWidget::SetInvalidNickname()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("사용할 수 없는 닉네임")));
+	if (ConnectThrobber != nullptr)
+		ConnectThrobber->SetVisibility(ESlateVisibility::Hidden);
+	if (OKButton != nullptr)
+	{
+		OKButton->SetIsEnabled(true);
+		OKButton->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 
 
 

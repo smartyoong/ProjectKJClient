@@ -13,7 +13,7 @@ void UCreateCharacterUserWidgetEntry::NativeOnListItemObjectSet(UObject* Obj)
     UCreateCharacterPresetData* PresetData = Cast<UCreateCharacterPresetData>(Obj);
     if (IsValid(PresetData))
     {
-		UpdateEntry(PresetData->PresetImage2DTexture, PresetData->PresetName);
+		UpdateEntry(PresetData->PresetMaterial, PresetData->PresetName);
     }
     else
     {
@@ -36,25 +36,19 @@ void UCreateCharacterUserWidgetEntry::NativeOnItemSelectionChanged(bool bIsSelec
 	// UImage 위젯의 ColorAndOpacity 속성 설정
 	BackgroundImage->SetColorAndOpacity(FluorescentGreenColor);
 	BackgroundImage->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-	UE_LOG(LogTemp, Warning, TEXT("Entry Selection Changed"));
 }
 
-void UCreateCharacterUserWidgetEntry::UpdateEntry(UTexture2D* ImageData, FString TextData)
+void UCreateCharacterUserWidgetEntry::UpdateEntry(UMaterialInterface* ImageData, FString TextData)
 {
 	NameTextBlock->SetText(FText::FromString(TextData));
 
 	if (IsValid(ImageData))
 	{
-		FSlateBrush MyBrush;
-		ImageData->UpdateResource();
-		MyBrush.SetResourceObject(ImageData);
-		PresetImage->SetBrush(MyBrush);
+		PresetImage->SetBrushFromMaterial(ImageData);
 		PresetImage->SetVisibility(ESlateVisibility::Visible);
-		UE_LOG(LogTemp, Warning, TEXT("Preset Image texture is valid"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Preset Image texture is not valid"));
 		PresetImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

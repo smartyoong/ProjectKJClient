@@ -18,6 +18,8 @@ private:
 	bool IsKoreanOrAlphaNumeric(TCHAR Char);
 	bool IsNickNameValid(const FString& InputString);
 	bool IsMale = true;
+	UPROPERTY()
+	class ULoginResultWidget* ResultWidget;
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* OKButton;
@@ -41,10 +43,13 @@ public:
 	class UListView* CharacterPresetListView;
 
 	UPROPERTY(EditAnywhere, Category = "Entry")
-	TArray<UTexture2D*> PresetImageMaterialList;
+	TArray<UMaterialInterface*> PresetImageMaterialList;
 
 	UPROPERTY(EditAnywhere, Category = "Entry")
 	TArray<FString> PresetNameList;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ResultUI")
+	TSubclassOf<class ULoginResultWidget> ResultWidgetClass;
 
 	virtual void NativeConstruct() override;
 	UFUNCTION()

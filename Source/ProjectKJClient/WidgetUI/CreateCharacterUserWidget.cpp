@@ -8,6 +8,7 @@
 #include "Components/ListView.h"
 #include "Components/TextBlock.h"
 #include "CreateCharacterUserWidgetEntry.h"
+#include "LoginResultWidget.h"
 
 bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 {
@@ -34,7 +35,7 @@ bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 bool UCreateCharacterUserWidget::IsNickNameValid(const FString& InputString)
 {
 	// 문자열 길이 체크
-	if (InputString.Len() >= 50)
+	if (InputString.Len() >= 50 || InputString.Len() <= 0)
 	{
 		return false;
 	}
@@ -75,19 +76,17 @@ void UCreateCharacterUserWidget::NativeConstruct()
 	}
 	if (CharacterImage)
 	{
-		CharacterImage->SetVisibility(ESlateVisibility::Visible);
+		CharacterImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
 void UCreateCharacterUserWidget::OnListItemClick(UObject* Obj)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnListItemClick"));
 	int32 Index = CharacterPresetListView->GetIndexForItem(Obj);
 	if (PresetImageMaterialList.IsValidIndex(Index))
 	{
-		PresetNameList[Index];
-		PresetImageMaterialList[Index]->UpdateResource();
-		UE_LOG(LogTemp, Warning, TEXT("PresetImageMaterialList[%d]"), Index);
+		CharacterImage->SetBrushFromMaterial(PresetImageMaterialList[Index]);
+		CharacterImage->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -115,8 +114,19 @@ void UCreateCharacterUserWidget::OnOKButtonClick()
 	}
 	else
 	{
-		// 닉네임이 유효하지 않습니다.
-		UE_LOG(LogTemp, Error, TEXT("닉네임이 유효하지 않습니다."));
+		// 닉네임이 유효하지 않음
+		if (ResultWidgetClass)
+		{
+			ResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), ResultWidgetClass);
+			if (ResultWidget)
+			{
+				ResultWidget->SetInvalidNickname();
+				AsyncTask(ENamedThreads::GameThread, [this]()
+					{
+						ResultWidget->AddToViewport();
+					});
+			}
+		}
 	}
 }
 
@@ -129,7 +139,7 @@ void UCreateCharacterUserWidget::PopulateList()
 		for (int i = 0; i < PresetImageMaterialList.Num(); ++i)
 		{
 			UCreateCharacterPresetData* PresetData = NewObject<UCreateCharacterPresetData>();
-			PresetData->PresetImage2DTexture = PresetImageMaterialList[i];
+			PresetData->PresetMaterial = PresetImageMaterialList[i];
 			PresetData->PresetName = PresetNameList[i];
 			CharacterPresetListView->AddItem(PresetData);
 		}
