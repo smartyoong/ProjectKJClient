@@ -103,6 +103,8 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 	case GamePacketListID::KICK_CLIENT:
 		GameMode->OnKickClientPacketReceived(PacketToStruct<FSendKickClientPacket>(PacketData->Value));
 		break;
+	case GamePacketListID::RESPONSE_NEED_TO_MAKE_CHARACTER:
+		GameMode->OnResponseNeedToMakeCharacter(PacketToStruct<FResponseNeedToMakeCharcterPacket>(PacketData->Value));
 	default:
 		break;
 	}

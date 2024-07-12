@@ -9,6 +9,8 @@
 #include "Components/TextBlock.h"
 #include "CreateCharacterUserWidgetEntry.h"
 #include "LoginResultWidget.h"
+#include "MainGameInstance.h"
+#include "GamePacketList.h"
 
 bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 {
@@ -111,6 +113,8 @@ void UCreateCharacterUserWidget::OnOKButtonClick()
 	if(IsNickNameValid(NickNameEditTextBox->GetText().ToString()))
 	{
 		// 서버로 닉네임 전송
+		// 성공하면 닉네임 반드시 GameInstance에 저장할 것
+		SendCreateCharacterInfo();
 	}
 	else
 	{
@@ -144,4 +148,17 @@ void UCreateCharacterUserWidget::PopulateList()
 			CharacterPresetListView->AddItem(PresetData);
 		}
 	}
+}
+
+void UCreateCharacterUserWidget::SendCreateCharacterInfo()
+{
+	const int MALE = 1;
+	const int FEMALE = 0;
+	FRequestCreateCharacter Packet;
+	Packet.NickName = NickNameEditTextBox->GetText().ToString();
+	Packet.Gender = IsMale ? MALE : FEMALE;
+	Packet.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
+	Packet.HashCode = Cast<UMainGameInstance>(GetGameInstance())->GetUserAuthHashCode();
+	Packet.PresetID = CharacterPresetListView->GetIndexForItem(CharacterPresetListView->GetSelectedItem());
+	Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer<FRequestCreateCharacter>(GamePacketListID::REQUEST_CREATE_CHARACTER, Packet);
 }

@@ -45,6 +45,24 @@ void ALoginGameModeBase::SendHashAuthCheckPacket()
 		FRequestHashAuthCheckPacket{ GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), GetWorld()->GetGameInstance<UMainGameInstance>()->GetUserAuthHashCode()});
 }
 
+void ALoginGameModeBase::SendRequestCharBaseInfoPacket()
+{
+	FRequestCharBaseInfoPacket RequestCharBaseInfoPacket;
+	if(!IsValid(GetWorld()->GetGameInstance<UMainGameInstance>()))
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameInstance is not valid send request char base info packet"));
+		return;
+	}
+	if(GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID().IsEmpty() || GetWorld()->GetGameInstance<UMainGameInstance>()->GetUserAuthHashCode().IsEmpty())
+	{
+		UE_LOG(LogTemp, Error, TEXT("AccountID or AuthHashCode is not valid send request char base info packet"));
+		return;
+	}
+	RequestCharBaseInfoPacket.AccountID = GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID();
+	RequestCharBaseInfoPacket.HashCode = GetWorld()->GetGameInstance<UMainGameInstance>()->GetUserAuthHashCode();
+	GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer<FRequestCharBaseInfoPacket>(GamePacketListID::REQUEST_CHAR_BASE_INFO, RequestCharBaseInfoPacket);
+}
+
 void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Packet)
 {
 	enum LoginResponseErrCode { NO_ACCOUNT = 0, PASSWORD_NOT_MATCH = 1, LOGIN_SUCCESS = 2, HASH_CODE_CREATE_FAIL = 3, ERR_AUTH_FAIL = 5, ERR_AUTH_RETRY = 6 };
@@ -60,9 +78,6 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		LoginWidget->ShowLoginResultWidget(Packet.ErrorCode);
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetNickName(Packet.NickName);
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetUserAuthHashCode(Packet.HashValue);
-		// 이제 게임서버와 Connect 시키는 거부터 작업하고 (GameInstance랑 ClientSocket, Packet Dispatcher랑 Processor 수정필요)
-		//UE_LOG(LogTemp, Warning, TEXT("%s %s"),*GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), *Packet.HashValue);
-		// 일단 게임서버에 인증 요청 하는것부터 시작하자
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer(GamePacketListID::REQUEST_HASH_AUTH_CHECK,
 			FRequestHashAuthCheckPacket{GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), Packet.HashValue});
 
@@ -137,18 +152,11 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
 				break;
 			case AUTH_SUCCESS: // 인증 성공
-				//ShowLoadingScreen();
-				//여기 하드코딩된거 빼자
-				//여기서 이제 서버한테 캐릭터 정보 요청 보내야함
-				//UGameplayStatics::OpenLevel(this, TEXT("TopDownMap"), true);
-				//HideLoadingScreen();
-				ShowCreateCharacterWidget();
+				SendRequestCharBaseInfoPacket();
 				break;
 			case AUTH_FAIL: // 인증 실패
 				// 이게 서버에서 이미 접속된 유저 삭제하는 것보다 새로 등록 요청 패킷이 먼저오면 인증 실패가 나옴 그래서 재시도
 				TimerManager.SetTimer(UnusedHandle, this, &ALoginGameModeBase::SendHashAuthCheckPacket, 2.0f, false);
-				//if (LoginWidget != nullptr)
-				//	LoginWidget->ShowLoginFail();
 				break;
 			default:
 				break;
@@ -161,6 +169,12 @@ void ALoginGameModeBase::OnKickClientPacketReceived(FSendKickClientPacket Packet
 	// 팝업을 띄우자
 	if(LoginWidget != nullptr)
 		LoginWidget->ShowKickClient(Packet.Reason);
+}
+
+void ALoginGameModeBase::OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet)
+{
+	// 캐릭터 생성 팝업을 띄우자
+	ShowCreateCharacterWidget();
 }
 
 void ALoginGameModeBase::ShowCreateCharacterWidget()

@@ -42,12 +42,14 @@ public:
 	TSubclassOf<class UCreateCharacterUserWidget> CreateCharacterWidgetClass;
 
 	void SendHashAuthCheckPacket();
+	void SendRequestCharBaseInfoPacket();
 
 	virtual void OnLoginResponsePacketReceived(FLoginResponsePacket Packet) override;
 	virtual void OnIDUnqiueCheckResponsePacketReceived(FIDUniqueCheckResponsePacket Packet) override;
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket Packet) override;
 	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet) override;
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) override;
+	virtual void OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet) override;
 
 	void ShowCreateCharacterWidget();
 };

@@ -63,5 +63,7 @@ public:
 	virtual void OnRegistAccountResponsePacketReceived(FRegistAccountResponsePacket) {};
 	// 강제 추방 함수
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) {};
+	// 새로 캐릭터를 만들어야함
+	virtual void OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet) {};
 
 };

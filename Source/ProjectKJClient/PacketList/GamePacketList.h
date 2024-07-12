@@ -112,4 +112,6 @@ struct FRequestCreateCharacter
     FString NickName;
     UPROPERTY()
     int32 Gender;
+    UPROPERTY()
+    int32 PresetID;
 };

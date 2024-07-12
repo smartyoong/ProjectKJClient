@@ -60,4 +60,6 @@ public:
 	void OnOKButtonClick();
 	void PopulateList();
 
+	void SendCreateCharacterInfo();
+
 };

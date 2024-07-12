@@ -88,6 +88,10 @@ void UMyUserWidget::OnPasswordChanged(const FText& text)
 
 void UMyUserWidget::ShowLoginResultWidget(int Mode)
 {
+	const int NO_ACCOUNT = 0;
+	const int PASSWORD_FAIL = 1;
+	const int TRY_LOGIN = 2;
+
 	if(LoginResultWidgetClass == nullptr)
 		return;
 
@@ -96,13 +100,13 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 	{
 		switch (Mode)
 		{
-		case 0:
+		case NO_ACCOUNT:
 			LoginResultWidget->SetNoAccount();
 			break;
-		case 1:
+		case PASSWORD_FAIL:
 			LoginResultWidget->SetPasswordFail();
 			break;
-		case 2:
+		case TRY_LOGIN:
 			LoginResultWidget->SetLoginConnect();
 			break;
 		default:
