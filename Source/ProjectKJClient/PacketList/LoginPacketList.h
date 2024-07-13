@@ -20,7 +20,9 @@ enum class LoginPacketListID
     REGIST_ACCOUNT_REQUEST = 2,
     REGIST_ACCOUNT_RESPONESE = 3,
     ID_UNIQUE_CHECK_REQUEST = 4,
-    ID_UNIQUE_CHECK_RESPONESE = 5
+    ID_UNIQUE_CHECK_RESPONESE = 5,
+    CREATE_NICKNAME_REQUEST = 6,
+    CREATE_NICKNAME_RESPONESE = 7
 };
 
 UENUM()
@@ -97,6 +99,27 @@ struct FIDUniqueCheckResponsePacket
 
 	UPROPERTY()
 	bool IsUnique;
+};
+
+USTRUCT()
+struct FCreateNickNameRequestPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString AccountID;
+
+	UPROPERTY()
+	FString NickName;
+};
+
+USTRUCT()
+struct FCreateNickNameResponsePacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 ErrorCode;
 };
 
 /**

@@ -11,6 +11,7 @@
 #include "LoginResultWidget.h"
 #include "MainGameInstance.h"
 #include "GamePacketList.h"
+#include "LoginPacketList.h"
 
 bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 {
@@ -37,7 +38,7 @@ bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
 bool UCreateCharacterUserWidget::IsNickNameValid(const FString& InputString)
 {
 	// 문자열 길이 체크
-	if (InputString.Len() >= 50 || InputString.Len() <= 0)
+	if (InputString.Len() >= 16 || InputString.Len() <= 0)
 	{
 		return false;
 	}
@@ -154,11 +155,16 @@ void UCreateCharacterUserWidget::SendCreateCharacterInfo()
 {
 	const int MALE = 1;
 	const int FEMALE = 0;
-	FRequestCreateCharacter Packet;
-	Packet.NickName = NickNameEditTextBox->GetText().ToString();
+	FRequestCreateCharacterPacket Packet;
 	Packet.Gender = IsMale ? MALE : FEMALE;
 	Packet.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
 	Packet.HashCode = Cast<UMainGameInstance>(GetGameInstance())->GetUserAuthHashCode();
 	Packet.PresetID = CharacterPresetListView->GetIndexForItem(CharacterPresetListView->GetSelectedItem());
-	Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer<FRequestCreateCharacter>(GamePacketListID::REQUEST_CREATE_CHARACTER, Packet);
+	Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer<FRequestCreateCharacterPacket>(GamePacketListID::REQUEST_CREATE_CHARACTER, Packet);
+	
+	// 이걸 지금 보내지말고, 위의 캐릭 생성 성공하면 보내자, 그러면, Auth체크도 자동으로 된다.
+	FCreateNickNameRequestPacket LoginPacket;
+	LoginPacket.NickName = NickNameEditTextBox->GetText().ToString();
+	LoginPacket.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
+
 }

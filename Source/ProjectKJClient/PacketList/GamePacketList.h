@@ -19,7 +19,8 @@ enum class GamePacketListID
     REQUEST_CHAR_BASE_INFO = 5,
     RESPONSE_NEED_TO_MAKE_CHARACTER = 6,
     RESPONSE_CHAR_BASE_INFO = 7,
-    REQUEST_CREATE_CHARACTER = 8
+    REQUEST_CREATE_CHARACTER = 8,
+    RESPONSE_CREATE_CHARACTER = 9
 };
 
 enum class KickReason
@@ -100,7 +101,7 @@ struct FResponseNeedToMakeCharcterPacket
 };
 
 USTRUCT()
-struct FRequestCreateCharacter
+struct FRequestCreateCharacterPacket
 {
     GENERATED_BODY()
 
@@ -109,9 +110,16 @@ struct FRequestCreateCharacter
     UPROPERTY()
     FString HashCode;
     UPROPERTY()
-    FString NickName;
-    UPROPERTY()
     int32 Gender;
     UPROPERTY()
     int32 PresetID;
+};
+
+USTRUCT()
+struct FResponseCreateCharacterPacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 ErrorCode;
 };
