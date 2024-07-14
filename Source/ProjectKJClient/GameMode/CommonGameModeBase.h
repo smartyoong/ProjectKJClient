@@ -65,5 +65,9 @@ public:
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) {};
 	// 새로 캐릭터를 만들어야함
 	virtual void OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet) {};
+	// 캐릭터 생성	응답 함수
+	virtual void OnResponseCreateCharacter(FResponseCreateCharacterPacket Packet) {};
+	// 닉네임 생성 응답 함수
+	virtual void OnResponseCreateNickName(FCreateNickNameResponsePacket Packet) {};
 
 };

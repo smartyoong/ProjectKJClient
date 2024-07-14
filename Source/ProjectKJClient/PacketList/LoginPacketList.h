@@ -110,7 +110,7 @@ struct FCreateNickNameRequestPacket
     FString AccountID;
 
 	UPROPERTY()
-	FString NickName;
+    FString NickName;
 };
 
 USTRUCT()
@@ -118,6 +118,8 @@ struct FCreateNickNameResponsePacket
 {
 	GENERATED_BODY()
 
+    UPROPERTY()
+    FString NickName;
 	UPROPERTY()
 	int32 ErrorCode;
 };

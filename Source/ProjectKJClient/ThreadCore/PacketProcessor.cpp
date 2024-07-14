@@ -81,6 +81,9 @@ void PacketProcessor::ProcessLoginPacket(TSharedPtr<TPair<int32, TArray<uint8>>>
 		case LoginPacketListID::ID_UNIQUE_CHECK_RESPONESE:
 			GameMode->OnIDUnqiueCheckResponsePacketReceived(PacketToStruct<FIDUniqueCheckResponsePacket>(PacketData->Value));
 			break;
+		case LoginPacketListID::CREATE_NICKNAME_RESPONESE:
+			GameMode->OnResponseCreateNickName(PacketToStruct<FCreateNickNameResponsePacket>(PacketData->Value));
+			break;
 		default:
 			break;
 			// 패킷을 진짜로 처리하고 GameModeBase를 장착시키고 인스턴스에서 이 스레드를 실행시키자
@@ -105,6 +108,10 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 		break;
 	case GamePacketListID::RESPONSE_NEED_TO_MAKE_CHARACTER:
 		GameMode->OnResponseNeedToMakeCharacter(PacketToStruct<FResponseNeedToMakeCharcterPacket>(PacketData->Value));
+		break;
+	case GamePacketListID::RESPONSE_CREATE_CHARACTER:
+		GameMode->OnResponseCreateCharacter(PacketToStruct<FResponseCreateCharacterPacket>(PacketData->Value));
+		break;
 	default:
 		break;
 	}

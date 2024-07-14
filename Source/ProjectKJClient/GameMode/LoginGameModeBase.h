@@ -50,6 +50,8 @@ public:
 	virtual void OnHashAuthCheckResponsePacketReceived(FResponseHashAuthCheckPacket Packet) override;
 	virtual void OnKickClientPacketReceived(FSendKickClientPacket Packet) override;
 	virtual void OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet) override;
+	virtual void OnResponseCreateCharacter(FResponseCreateCharacterPacket Packet) override;
+	virtual void OnResponseCreateNickName(FCreateNickNameResponsePacket Packet) override;
 
 	void ShowCreateCharacterWidget();
 };

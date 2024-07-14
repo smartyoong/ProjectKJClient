@@ -76,19 +76,25 @@ struct FResponseCharBaseInfoPacket
     GENERATED_BODY()
 
     UPROPERTY()
-    int32 Level;
+    FString AccountID;
     UPROPERTY()
-    int32 Exp;
+    int32 Gender;
+    UPROPERTY()
+    int32 PresetNumber;
     UPROPERTY()
     int32 Job;
     UPROPERTY()
     int32 JobLevel;
     UPROPERTY()
-    int32 LastMapID;
+    int32 MapID;
     UPROPERTY()
-    int32 LastMapX;
+    int32 X;
     UPROPERTY()
-    int32 LastMapY;
+    int32 Y;
+    UPROPERTY()
+    int32 Level;
+    UPROPERTY()
+    int32 EXP;
 };
 
 USTRUCT()

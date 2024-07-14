@@ -228,6 +228,19 @@ void ULoginResultWidget::SetInvalidNickname()
 	}
 }
 
+void ULoginResultWidget::SetCreateCharacterFail()
+{
+	if (ResultTextBlock != nullptr)
+		ResultTextBlock->SetText(FText::FromString(TEXT("캐릭터 생성 실패")));
+	if (ConnectThrobber != nullptr)
+		ConnectThrobber->SetVisibility(ESlateVisibility::Hidden);
+	if (OKButton != nullptr)
+	{
+		OKButton->SetIsEnabled(true);
+		OKButton->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 
 
 

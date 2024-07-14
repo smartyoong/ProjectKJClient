@@ -43,4 +43,5 @@ public:
 	void SetLoginConnect();
 	void ShowKickMessage(int Reason);
 	void SetInvalidNickname();
+	void SetCreateCharacterFail();
 };

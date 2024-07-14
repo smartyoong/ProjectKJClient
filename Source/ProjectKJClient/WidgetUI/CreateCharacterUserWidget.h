@@ -18,6 +18,8 @@ private:
 	bool IsKoreanOrAlphaNumeric(TCHAR Char);
 	bool IsNickNameValid(const FString& InputString);
 	bool IsMale = true;
+	bool IsCreateCharacterSucces = false;
+	FString NickName;
 	UPROPERTY()
 	class ULoginResultWidget* ResultWidget;
 public:
@@ -61,5 +63,11 @@ public:
 	void PopulateList();
 
 	void SendCreateCharacterInfo();
+	void SendNickNameInfo();
+	void CreateCharcterSuccess();
+	void CreateCharacterFail();
+	void CreateNickNameFail();
 
+	UFUNCTION()
+	void OnNickNameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 };

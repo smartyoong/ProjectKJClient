@@ -177,6 +177,45 @@ void ALoginGameModeBase::OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharct
 	ShowCreateCharacterWidget();
 }
 
+void ALoginGameModeBase::OnResponseCreateCharacter(FResponseCreateCharacterPacket Packet)
+{
+	// 여기까지는 다른 스레드에서 실행되지만, 밑에 메서드를 통해 MainThread에서 실행되도록 한다.
+	const int SUCCESS = 0;
+	if (Packet.ErrorCode == SUCCESS)
+	{
+		if (CreateCharacterWidget != nullptr)
+		{
+			CreateCharacterWidget->CreateCharcterSuccess();
+		}
+	}
+	else
+	{
+		if(CreateCharacterWidget != nullptr)
+		{
+			CreateCharacterWidget->CreateCharacterFail();
+		}
+	}
+}
+
+void ALoginGameModeBase::OnResponseCreateNickName(FCreateNickNameResponsePacket Packet)
+{
+	// 근데 캐릭 생성은 성공하고 닉네임은 실패하면 어카지?
+	// 그냥 넘길까? 일단 그냥 넘기자
+	// 여기까지는 다른 스레드에서 실행되지만, 밑에 메서드를 통해 MainThread에서 실행되도록 한다.
+	const int SUCCESS = 0;
+	if(Packet.ErrorCode != SUCCESS)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Create NickName Fail"));
+		Cast<UMainGameInstance>(GetGameInstance())->SetNickName("GUEST");
+	}
+
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			ShowLoadingScreen();
+			UGameplayStatics::OpenLevel(GetWorld(), TEXT("TopDownMap"));
+		});
+}
+
 void ALoginGameModeBase::ShowCreateCharacterWidget()
 {
 	CreateCharacterWidget = CreateWidget<UCreateCharacterUserWidget>(GetWorld(), CreateCharacterWidgetClass);

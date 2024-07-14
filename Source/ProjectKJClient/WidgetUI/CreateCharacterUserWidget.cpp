@@ -13,7 +13,7 @@
 #include "GamePacketList.h"
 #include "LoginPacketList.h"
 
-bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(TCHAR Char)
+bool UCreateCharacterUserWidget::IsKoreanOrAlphaNumeric(const TCHAR Char)
 {
 
 	// 영어 알파벳이나 숫자인지 체크
@@ -44,7 +44,7 @@ bool UCreateCharacterUserWidget::IsNickNameValid(const FString& InputString)
 	}
 
 	// 문자열을 순회하면서 각 문자가 알파벳이거나 숫자인지 체크
-	for (TCHAR Char : InputString)
+	for (const TCHAR Char : InputString)
 	{
 		if (!IsKoreanOrAlphaNumeric(Char))
 		{
@@ -70,6 +70,7 @@ void UCreateCharacterUserWidget::NativeConstruct()
 	}
 	if (NickNameEditTextBox)
 	{
+		NickNameEditTextBox->OnTextCommitted.AddDynamic(this, &UCreateCharacterUserWidget::OnNickNameTextCommitted);
 		NickNameEditTextBox->SetSelectAllTextWhenFocused(true);
 	}
 	if (CharacterPresetListView)
@@ -153,6 +154,11 @@ void UCreateCharacterUserWidget::PopulateList()
 
 void UCreateCharacterUserWidget::SendCreateCharacterInfo()
 {
+	if (IsCreateCharacterSucces)
+	{
+		UE_LOG(LogTemp, Error, TEXT("CreateCharacterSuccess is true but try create character"));
+		return;
+	}
 	const int MALE = 1;
 	const int FEMALE = 0;
 	FRequestCreateCharacterPacket Packet;
@@ -161,10 +167,79 @@ void UCreateCharacterUserWidget::SendCreateCharacterInfo()
 	Packet.HashCode = Cast<UMainGameInstance>(GetGameInstance())->GetUserAuthHashCode();
 	Packet.PresetID = CharacterPresetListView->GetIndexForItem(CharacterPresetListView->GetSelectedItem());
 	Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer<FRequestCreateCharacterPacket>(GamePacketListID::REQUEST_CREATE_CHARACTER, Packet);
-	
-	// 이걸 지금 보내지말고, 위의 캐릭 생성 성공하면 보내자, 그러면, Auth체크도 자동으로 된다.
-	FCreateNickNameRequestPacket LoginPacket;
-	LoginPacket.NickName = NickNameEditTextBox->GetText().ToString();
-	LoginPacket.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
-
 }
+
+void UCreateCharacterUserWidget::SendNickNameInfo()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			if (!IsCreateCharacterSucces)
+			{
+				UE_LOG(LogTemp, Error, TEXT("CreateCharacterSucces is false but try create nickname"));
+				return;
+			}
+			// 이걸 지금 보내지말고, 위의 캐릭 생성 성공하면 보내자, 그러면, Auth체크도 자동으로 된다.
+			FCreateNickNameRequestPacket LoginPacket;
+			LoginPacket.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
+			// 한국어를 사용할거면 반드시 UTF-16문자를 정상적으로 디코딩해서 UTF-8로 변환 시켜야함
+			FTCHARToUTF8 Convert(*NickName);
+			LoginPacket.NickName.Append(Convert.Get(), Convert.Length());
+			Cast<UMainGameInstance>(GetGameInstance())->SetNickName(NickName);
+			Cast<UMainGameInstance>(GetGameInstance())->SendPacketToLoginServer<FCreateNickNameRequestPacket>(LoginPacketListID::CREATE_NICKNAME_REQUEST, LoginPacket);
+		});
+}
+
+void UCreateCharacterUserWidget::CreateCharcterSuccess()
+{
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			IsCreateCharacterSucces = true;
+			SendNickNameInfo();
+		});
+}
+
+void UCreateCharacterUserWidget::CreateCharacterFail()
+{
+	if (ResultWidgetClass)
+	{
+		ResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), ResultWidgetClass);
+		ResultWidget->SetCreateCharacterFail();
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				ResultWidget->AddToViewport();
+			});
+	}
+}
+
+void UCreateCharacterUserWidget::CreateNickNameFail()
+{
+	if (ResultWidgetClass)
+	{
+		ResultWidget = CreateWidget<ULoginResultWidget>(GetWorld(), ResultWidgetClass);
+		ResultWidget->SetInvalidNickname();
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				ResultWidget->AddToViewport();
+			});
+	}
+}
+
+void UCreateCharacterUserWidget::OnNickNameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	NickName = Text.ToString();
+}
+
+// 추후 채팅 기능 만들때 UTF-8을 UTF-16으로 정상적으로 바꾸는 방법
+//// UTF-8 인코딩된 문자열을 FString으로 변환하는 예시
+//TArray<uint8> UTF8Data; // UTF-8 인코딩된 데이터를 포함하는 배열
+//UTF8Data.Add(0); // 널 종료 문자 추가 (이건 없애도 될 수도 있음 내가 언리얼 코드 조작하면서 널문자 제거 안하도록 바꿈)
+//
+//// UTF-8 데이터를 FString으로 변환
+//FString ChatMessage = UTF8_TO_TCHAR(reinterpret_cast<const char*>(UTF8Data.GetData()));
+//
+//// FString을 FText로 변환 (UI에 표시하기 위해)
+//FText ChatMessageText = FText::FromString(ChatMessage);
+//
+//// UEditableTextBox에 텍스트 지정
+//UEditableTextBox* MyEditableTextBox = ...; // UEditableTextBox 인스턴스를 얻는 방법은 상황에 따라 다름
+//MyEditableTextBox->SetText(ChatMessageText);
