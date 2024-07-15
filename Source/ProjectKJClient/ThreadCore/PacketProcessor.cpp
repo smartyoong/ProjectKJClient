@@ -112,6 +112,9 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 	case GamePacketListID::RESPONSE_CREATE_CHARACTER:
 		GameMode->OnResponseCreateCharacter(PacketToStruct<FResponseCreateCharacterPacket>(PacketData->Value));
 		break;
+	case GamePacketListID::RESPONSE_CHAR_BASE_INFO:
+		GameMode->OnResponseCharBaseInfo(PacketToStruct<FResponseCharBaseInfoPacket>(PacketData->Value));
+		break;
 	default:
 		break;
 	}

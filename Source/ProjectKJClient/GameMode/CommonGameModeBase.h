@@ -69,5 +69,7 @@ public:
 	virtual void OnResponseCreateCharacter(FResponseCreateCharacterPacket Packet) {};
 	// 닉네임 생성 응답 함수
 	virtual void OnResponseCreateNickName(FCreateNickNameResponsePacket Packet) {};
+	// 캐릭터 정보 요청 응답 함수
+	virtual void OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Packet) {};
 
 };

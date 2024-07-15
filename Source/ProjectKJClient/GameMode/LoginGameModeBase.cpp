@@ -216,6 +216,18 @@ void ALoginGameModeBase::OnResponseCreateNickName(FCreateNickNameResponsePacket 
 		});
 }
 
+void ALoginGameModeBase::OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Packet)
+{
+	// 이제 캐릭터 클래스에 정보를 장착해야하지만, 아직 캐릭터 작업 전이므로
+	// 우선은 로그만 찍고 로딩화면 -> OpenMap으로 시키자.
+	ShowLoadingScreen();
+
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			UGameplayStatics::OpenLevel(GetWorld(), TEXT("TopDownMap"));
+		});
+}
+
 void ALoginGameModeBase::ShowCreateCharacterWidget()
 {
 	CreateCharacterWidget = CreateWidget<UCreateCharacterUserWidget>(GetWorld(), CreateCharacterWidgetClass);

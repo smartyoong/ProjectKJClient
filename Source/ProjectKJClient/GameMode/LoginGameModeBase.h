@@ -52,6 +52,7 @@ public:
 	virtual void OnResponseNeedToMakeCharacter(FResponseNeedToMakeCharcterPacket Packet) override;
 	virtual void OnResponseCreateCharacter(FResponseCreateCharacterPacket Packet) override;
 	virtual void OnResponseCreateNickName(FCreateNickNameResponsePacket Packet) override;
+	virtual void OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Packet) override;
 
 	void ShowCreateCharacterWidget();
 };
