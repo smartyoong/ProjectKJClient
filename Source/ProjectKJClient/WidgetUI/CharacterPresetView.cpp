@@ -14,10 +14,10 @@ ACharacterPresetView::ACharacterPresetView()
 	PresetModelView = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PresetModelView"));
 
 	PresetModelBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelBody"));
-	PresetModelFeet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelFeet"));
-	PresetModelLegs = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelLegs"));
-	PresetModelTorso = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelTorso"));
 	PresetModelFace = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelFace"));
+	PresetModelTorso = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelTorso"));
+	PresetModelLegs = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelLegs"));
+	PresetModelFeet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelFeet"));
 
 	PresetModelBody->SetupAttachment(RootComponent);
 	PresetModelFace->SetupAttachment(PresetModelBody);
@@ -25,12 +25,12 @@ ACharacterPresetView::ACharacterPresetView()
 	PresetModelLegs->SetupAttachment(PresetModelBody);
 	PresetModelTorso->SetupAttachment(PresetModelBody);
 
-	PresetModelHair = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelHair"));
 	PresetModelBeard = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelBeard"));
 	PresetModelEyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelEyebrows"));
 	PresetModelEyelashes = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelEyelashes"));
 	PresetModelFuzz = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelFuzz"));
 	PresetModelMustache = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelMustache"));
+	PresetModelHair = CreateDefaultSubobject<UGroomComponent>(TEXT("PresetModelHair"));
 
 	PresetModelBeard->SetupAttachment(PresetModelFace);
 	PresetModelEyebrows->SetupAttachment(PresetModelFace);
