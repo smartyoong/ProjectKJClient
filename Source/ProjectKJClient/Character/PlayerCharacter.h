@@ -16,8 +16,8 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 private:
-	UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* SkeletalBody;
+	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
+	//USkeletalMeshComponent* SkeletalBody;
 	UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* SkeletalFeet;
 	UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))

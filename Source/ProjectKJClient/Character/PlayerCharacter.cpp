@@ -19,17 +19,17 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	SkeletalBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
+	//SkeletalBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
 	SkeletalFace = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Face"));
 	SkeletalTorso = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Torso"));
 	SkeletalLegs = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Legs"));
 	SkeletalFeet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Feet"));
 
-	SkeletalBody->SetupAttachment(RootComponent);
-	SkeletalFace->SetupAttachment(SkeletalBody);
-	SkeletalFeet->SetupAttachment(SkeletalBody);
-	SkeletalLegs->SetupAttachment(SkeletalBody);
-	SkeletalTorso->SetupAttachment(SkeletalBody);
+	//SkeletalBody->SetupAttachment(GetMesh());
+	SkeletalFace->SetupAttachment(GetMesh());
+	SkeletalFeet->SetupAttachment(GetMesh());
+	SkeletalLegs->SetupAttachment(GetMesh());
+	SkeletalTorso->SetupAttachment(GetMesh());
 
 	SkeletalBeard = CreateDefaultSubobject<UGroomComponent>(TEXT("Beard"));
 	SkeletalEyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
