@@ -33,7 +33,7 @@ void AProjectKJClientPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	// Add Input Mapping Context
+	// 매핑 문맥 추가 (현재는 일반 인간 모드 밖에 예정되어 있다 운전같은건 없을거니까,,)
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
@@ -42,13 +42,13 @@ void AProjectKJClientPlayerController::SetupInputComponent()
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		// Setup mouse input events
+		// 키,마우스 입력 추가
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &AProjectKJClientPlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &AProjectKJClientPlayerController::OnSetDestinationTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
 
-		// Setup touch input events
+		// 터치 입력 추가
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &AProjectKJClientPlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &AProjectKJClientPlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &AProjectKJClientPlayerController::OnTouchReleased);
@@ -68,10 +68,10 @@ void AProjectKJClientPlayerController::OnInputStarted()
 // Triggered every frame when the input is held down
 void AProjectKJClientPlayerController::OnSetDestinationTriggered()
 {
-	// We flag that the input is being pressed
+	// 짧은 클릭인지 판별하기 위해 시간초 체크
 	FollowTime += GetWorld()->GetDeltaSeconds();
 	
-	// We look for the location in the world where the player has pressed the input
+	// 터치 모드 여부에 따라서 클릭한 곳 or 마우스 커서의 위치를 가져온다.
 	FHitResult Hit;
 	bool bHitSuccessful = false;
 	if (bIsTouch)
@@ -83,13 +83,13 @@ void AProjectKJClientPlayerController::OnSetDestinationTriggered()
 		bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
 	}
 
-	// If we hit a surface, cache the location
+	// 정상적인 곳으로 커서 클릭을 했다, 캐싱해둔다.
 	if (bHitSuccessful)
 	{
 		CachedDestination = Hit.Location;
 	}
 	
-	// Move towards mouse pointer or touch
+	// 마우스 커서 방향으로 일단 이동
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)
 	{
@@ -100,11 +100,12 @@ void AProjectKJClientPlayerController::OnSetDestinationTriggered()
 
 void AProjectKJClientPlayerController::OnSetDestinationReleased()
 {
-	// If it was a short press
+	// 짧게 누른게 맞으면 이동 (BP에서 설정)
 	if (FollowTime <= ShortPressThreshold)
 	{
-		// We move there and spawn some particles
+		// 움직이는 건데, 아마 서버 작업이랑 진행한다하면, 여기를 다른걸로 바꿔야함
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+		// 커서를 누른 위치에 소환
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 
