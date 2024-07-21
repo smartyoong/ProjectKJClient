@@ -59,6 +59,8 @@ public:
 	FString GetAccountID() { return AccountID; }
 	FString GetNickName() {return NickName;}
 	FString GetUserAuthHashCode() {return AuthHashCode;}
+	//내일 구현하자
+	bool LoadAndParseJson(FString FileName) {};
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
