@@ -11,6 +11,8 @@
 #include "LoginPacketList.h"
 #include "JsonUtilities.h"
 #include "GamePacketList.h"
+#include "ResourceLoader.h"
+#include "GlobalTypes.h"
 #include "MainGameInstance.generated.h"
 /**
  * 
@@ -46,6 +48,9 @@ private:
 	TQueue<TSharedPtr<TArray<uint8>, ESPMode::ThreadSafe>>* GamePacketQueue;
 	TQueue<TSharedPtr<TPair<int32, TArray<uint8>>, ESPMode::ThreadSafe>>* GameDestinationPacketQueue;
 
+	//리소스 변수
+	TSharedPtr<ResourceLoader> Loader;
+	TMap<int32,FJsonChracterPreset> ResChracterPresetMap;
 public:
 
 	virtual void Init() override;
@@ -59,8 +64,7 @@ public:
 	FString GetAccountID() { return AccountID; }
 	FString GetNickName() {return NickName;}
 	FString GetUserAuthHashCode() {return AuthHashCode;}
-	//내일 구현하자
-	bool LoadAndParseJson(FString FileName) {};
+	void LoadResource();
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)

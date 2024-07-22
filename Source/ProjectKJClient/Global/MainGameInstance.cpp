@@ -2,9 +2,6 @@
 
 
 #include "MainGameInstance.h"
-#include "Dom/JsonObject.h"
-#include "Serialization/JsonSerializer.h"
-#include "Misc/FileHelper.h"
 
 void UMainGameInstance::Init()
 {
@@ -48,11 +45,24 @@ void UMainGameInstance::Init()
 
 	GamePacketProcessor = new PacketProcessor(GameDestinationPacketQueue, PacketProcessorMode::INGAME);
 	GamePacketProcessorThread = FRunnableThread::Create(GamePacketProcessor, TEXT("GamePacketProcessorThread"));
+
+	Loader = MakeShareable(new ResourceLoader());
+	if (!Loader->PrepareToLoad())
+	{
+		FText Message = FText::FromString(TEXT("리소스 폴더를 찾을 수 없습니다.\n리소스 폴더를 확인해주세요"));
+		FText Title = FText::FromString(TEXT("리소스 폴더 없음"));
+		// 메시지 박스 출력
+		FMessageDialog::Open(EAppMsgType::Ok,Message,Title);
+		// 게임 종료
+		FGenericPlatformMisc::RequestExit(false);
+	}
+	LoadResource();
 }
 
 void UMainGameInstance::Shutdown()
 {
 	Super::Shutdown();
+
 
 	LoginThread->Kill(true);
 	delete LoginThread;
@@ -106,4 +116,9 @@ void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMod
 {
 	LoginPacketProcessor->SetGameMode(GameMode);
 	GamePacketProcessor->SetGameMode(GameMode);
+}
+
+void UMainGameInstance::LoadResource()
+{
+	Loader->LoadChracterPresetInfo(ResChracterPresetMap);
 }
