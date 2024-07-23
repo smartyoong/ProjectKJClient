@@ -51,6 +51,7 @@ private:
 	//리소스 변수
 	TSharedPtr<ResourceLoader> Loader;
 	TMap<int32,FJsonChracterPreset> ResChracterPresetMap;
+	TMap<int32,FJsonMapInfo> ResMapInfoMap;
 public:
 
 	virtual void Init() override;

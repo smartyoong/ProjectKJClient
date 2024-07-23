@@ -24,3 +24,36 @@ struct FJsonChracterPreset
 	UPROPERTY()
 	FString PlayerCharacterName;
 };
+
+USTRUCT()
+struct FJsonObstacle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FVector Location;
+
+	UPROPERTY()
+	FVector Scale;
+
+	UPROPERTY()
+	FVector MeshSize;
+
+	UPROPERTY()
+	FString MeshName;
+};
+
+USTRUCT()
+struct FJsonMapInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 MapID;
+
+	UPROPERTY()
+	FString MapName;
+
+	UPROPERTY()
+	TArray<FJsonObstacle> Obstacles;
+};

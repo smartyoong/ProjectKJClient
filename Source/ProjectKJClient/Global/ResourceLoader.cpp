@@ -56,3 +56,15 @@ void ResourceLoader::LoadChracterPresetInfo(TMap<int32, FJsonChracterPreset>& Pr
 		PresetMap.Add(Preset.PresetID,Preset);
     }
 }
+
+void ResourceLoader::LoadMapInfo(TMap<int32, FJsonMapInfo>& MapInfoMap)
+{
+    TArray<FString> JsonFiles;
+    FString ChracterPresetJsonPath = JsonFilePath + TEXT("MapFiles/");
+    FindJsonFiles(ChracterPresetJsonPath, JsonFiles);
+    for (auto FilePaths : JsonFiles)
+    {
+        FJsonMapInfo MapInfo = ReadJsonFile<FJsonMapInfo>(FilePaths);
+        MapInfoMap.Add(MapInfo.MapID, MapInfo);
+    }
+}

@@ -45,4 +45,5 @@ public:
 	~ResourceLoader();
 	bool PrepareToLoad();
 	void LoadChracterPresetInfo(TMap<int32, FJsonChracterPreset>& PresetMap);
+    void LoadMapInfo(TMap<int32, FJsonMapInfo>& MapInfoMap);
 };

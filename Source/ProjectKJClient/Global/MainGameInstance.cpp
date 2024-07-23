@@ -121,4 +121,5 @@ void UMainGameInstance::RegistGameModeToPacketQueue(ACommonGameModeBase* GameMod
 void UMainGameInstance::LoadResource()
 {
 	Loader->LoadChracterPresetInfo(ResChracterPresetMap);
+	Loader->LoadMapInfo(ResMapInfoMap);
 }
