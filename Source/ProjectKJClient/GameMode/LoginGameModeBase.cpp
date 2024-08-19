@@ -221,10 +221,20 @@ void ALoginGameModeBase::OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Pack
 	// 이제 캐릭터 클래스에 정보를 장착해야하지만, 아직 캐릭터 작업 전이므로
 	// 우선은 로그만 찍고 로딩화면 -> OpenMap으로 시키자.
 	ShowLoadingScreen();
+	FString MapName = Cast<UMainGameInstance>(GetGameInstance())->GetMapNameByMapID(Packet.MapID);
+	if (MapName.IsEmpty())
+	{
+		UE_LOG(LogTemp, Error, TEXT("MapName is Empty"));
+		return;
+	}
 
-	AsyncTask(ENamedThreads::GameThread, [this]()
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterPresetID(Packet.PresetNumber);
+	Cast<UMainGameInstance>(GetGameInstance())->SetFirstSpawnLocation(FVector(Packet.X,Packet.Y,0));
+	Cast<UMainGameInstance>(GetGameInstance())->SetSpawnMapID(Packet.MapID);
+
+	AsyncTask(ENamedThreads::GameThread, [this,MapName]()
 		{
-			UGameplayStatics::OpenLevel(GetWorld(), TEXT("TopDownMap"));
+			UGameplayStatics::OpenLevel(GetWorld(), FName(*MapName));
 		});
 }
 

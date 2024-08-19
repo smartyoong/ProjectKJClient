@@ -6,6 +6,9 @@
 #include "MainGameInstance.h"
 #include "LoadingScreenWidget.h"
 
+
+//이제 여기 생성자에서 메인 게임 인스턴스를 통해 캐릭터 BP를 로드하고, BeginPlay에서 소환하자
+
 void AStartMapGameModeBase::ShowLoadingScreen()
 {
 	if (LoadingWidget != nullptr)

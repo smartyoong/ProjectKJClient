@@ -24,9 +24,15 @@ class PROJECTKJCLIENT_API UMainGameInstance : public UGameInstance
 
 private:
 
+	UPROPERTY()
+
+	//유저 최초 생성 관련 변수
 	FString AccountID;
 	FString NickName;
 	FString AuthHashCode;
+	int32 CharacterPresetID;
+	FVector FirstSpawnLocation;
+	int32 SpawnMapID;
 
 	// 로그인 관련 변수
 	SocketThread* LoginSockRun;
@@ -66,6 +72,12 @@ public:
 	FString GetNickName() {return NickName;}
 	FString GetUserAuthHashCode() {return AuthHashCode;}
 	void LoadResource();
+
+	//리소스 관련 함수들
+	FString GetMapNameByMapID(int32 MapID);
+	void SetCharacterPresetID(int32 ID) { CharacterPresetID = ID; }
+	void SetFirstSpawnLocation(FVector Location) { FirstSpawnLocation = Location; }
+	void SetSpawnMapID(int32 ID) { SpawnMapID = ID; }
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)

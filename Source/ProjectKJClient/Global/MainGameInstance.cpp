@@ -123,3 +123,12 @@ void UMainGameInstance::LoadResource()
 	Loader->LoadChracterPresetInfo(ResChracterPresetMap);
 	Loader->LoadMapInfo(ResMapInfoMap);
 }
+
+FString UMainGameInstance::GetMapNameByMapID(int32 MapID)
+{
+	if (ResMapInfoMap.Contains(MapID))
+	{
+		return ResMapInfoMap[MapID].MapName;
+	}
+	return FString();
+}

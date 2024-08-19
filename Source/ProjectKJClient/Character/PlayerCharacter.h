@@ -16,6 +16,13 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 private:
+
+	//유저 관련 변수
+	FString AccountID;
+	FString NickName;
+	FString AuthHashCode;
+	int32 CharacterPresetID;
+
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;
 	UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
