@@ -18,11 +18,14 @@ class PROJECTKJCLIENT_API AStartMapGameModeBase : public ACommonGameModeBase
 private:
 	UPROPERTY()
 	class ULoadingScreenWidget* LoadingWidget;
+	UPROPERTY()
+	class APlayerCharacter* PlayerCharacter;
+	UPROPERTY()
+	TSubclassOf<class APlayerCharacter> PlayerCharacterClass;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
-
 	void ShowLoadingScreen();
 	void HideLoadingScreen();
 	virtual void BeginPlay() override;

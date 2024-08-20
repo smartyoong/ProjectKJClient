@@ -5,6 +5,8 @@
 #include "WorldInfoToJson.h"
 #include "MainGameInstance.h"
 #include "LoadingScreenWidget.h"
+#include "PlayerCharacter.h"
+
 
 
 //이제 여기 생성자에서 메인 게임 인스턴스를 통해 캐릭터 BP를 로드하고, BeginPlay에서 소환하자
@@ -50,6 +52,10 @@ void AStartMapGameModeBase::BeginPlay()
 	// 맵 정보 읽어올때 사용
 	//WorldInfoToJson::SaveWorldInfoToJson(GetWorld(), 0);
 	//WorldInfoToJson::SaveWorldPortalInfoToJson(GetWorld(), 0);
+
+	// 캐릭터 소환 시작
+	FCharacterInfo Info = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterSpawnInfo();
+	//BP를 읽어와서 Info를 기반으로 실제 소환하자
 }
 
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

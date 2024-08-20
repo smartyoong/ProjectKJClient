@@ -231,7 +231,13 @@ void ALoginGameModeBase::OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Pack
 	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterPresetID(Packet.PresetNumber);
 	Cast<UMainGameInstance>(GetGameInstance())->SetFirstSpawnLocation(FVector(Packet.X,Packet.Y,0));
 	Cast<UMainGameInstance>(GetGameInstance())->SetSpawnMapID(Packet.MapID);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterGender(Packet.Gender);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterJob(Packet.Job);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterJobLevel(Packet.JobLevel);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterLevel(Packet.Level);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterEXP(Packet.EXP);
 
+	// 맵바꾸는건 여기서 하는거 아니면 답이 없다.
 	AsyncTask(ENamedThreads::GameThread, [this,MapName]()
 		{
 			UGameplayStatics::OpenLevel(GetWorld(), FName(*MapName));

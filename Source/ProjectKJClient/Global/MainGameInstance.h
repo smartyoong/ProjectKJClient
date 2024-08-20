@@ -27,12 +27,7 @@ private:
 	UPROPERTY()
 
 	//유저 최초 생성 관련 변수
-	FString AccountID;
-	FString NickName;
-	FString AuthHashCode;
-	int32 CharacterPresetID;
-	FVector FirstSpawnLocation;
-	int32 SpawnMapID;
+	FCharacterInfo CharacterSpawnInfo;
 
 	// 로그인 관련 변수
 	SocketThread* LoginSockRun;
@@ -65,19 +60,25 @@ public:
 
 	// 인스턴스에 현재 사용할 게임모드를 설정합니다. 이는 패킷을 받아오기에 매우 중요합니다.
 	void RegistGameModeToPacketQueue(ACommonGameModeBase* GameMode);
-	void SetNickName(FString NewNickName) {NickName = NewNickName;}
-	void SetUserAuthHashCode(FString Code) {AuthHashCode = Code;}
-	void SetAccountID(FString ID) { AccountID = ID; }
-	FString GetAccountID() { return AccountID; }
-	FString GetNickName() {return NickName;}
-	FString GetUserAuthHashCode() {return AuthHashCode;}
+	void SetNickName(FString NewNickName) { CharacterSpawnInfo.NickName = NewNickName;}
+	void SetUserAuthHashCode(FString Code) { CharacterSpawnInfo.AuthHashCode = Code;}
+	void SetAccountID(FString ID) { CharacterSpawnInfo.AccountID = ID; }
+	FString GetAccountID() { return CharacterSpawnInfo.AccountID; }
+	FString GetNickName() {return CharacterSpawnInfo.NickName;}
+	FString GetUserAuthHashCode() {return CharacterSpawnInfo.AuthHashCode;}
 	void LoadResource();
 
 	//리소스 관련 함수들
 	FString GetMapNameByMapID(int32 MapID);
-	void SetCharacterPresetID(int32 ID) { CharacterPresetID = ID; }
-	void SetFirstSpawnLocation(FVector Location) { FirstSpawnLocation = Location; }
-	void SetSpawnMapID(int32 ID) { SpawnMapID = ID; }
+	void SetCharacterPresetID(int32 ID) { CharacterSpawnInfo.CharacterPresetID = ID; }
+	void SetFirstSpawnLocation(FVector Location) { CharacterSpawnInfo.FirstSpawnLocation = Location; }
+	void SetSpawnMapID(int32 ID) { CharacterSpawnInfo.SpawnMapID = ID; }
+	void SetCharacterGender(int32 Gender) { CharacterSpawnInfo.Gender = Gender; }
+	void SetCharacterJob(int32 Job) { CharacterSpawnInfo.Job = Job; }
+	void SetCharacterJobLevel(int32 JobLevel) { CharacterSpawnInfo.JobLevel = JobLevel; }
+	void SetCharacterLevel(int32 Level) { CharacterSpawnInfo.JobLevel = Level; }
+	void SetCharacterEXP(int32 EXP) { CharacterSpawnInfo.JobLevel = EXP; }
+	FCharacterInfo GetCharacterSpawnInfo() { return CharacterSpawnInfo; }
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
