@@ -132,3 +132,60 @@ FString UMainGameInstance::GetMapNameByMapID(int32 MapID)
 	}
 	return FString();
 }
+
+void UMainGameInstance::SetCharacterPresetID(int32 ID)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.CharacterPresetID = ID;
+}
+
+void UMainGameInstance::SetFirstSpawnLocation(FVector Location)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.FirstSpawnLocation = Location;
+}
+
+void UMainGameInstance::SetSpawnMapID(int32 ID)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.SpawnMapID = ID;
+}
+
+void UMainGameInstance::SetCharacterGender(int32 Gender)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.Gender;
+}
+
+void UMainGameInstance::SetCharacterJob(int32 Job)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.Job = Job;
+}
+
+void UMainGameInstance::SetCharacterJobLevel(int32 JobLevel)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.JobLevel = JobLevel;
+}
+
+void UMainGameInstance::SetCharacterLevel(int32 Level)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.Level = Level;
+}
+
+void UMainGameInstance::SetCharacterEXP(int32 EXP)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.EXP = EXP;
+}
+
+FString UMainGameInstance::GetCharacterPresetBPPath(int32 ID)
+{
+	if (ResChracterPresetMap.Contains(ID))
+	{
+		return ResChracterPresetMap[ID].PlayerCharacterName;
+	}
+	return FString();
+}

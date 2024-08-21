@@ -24,10 +24,12 @@ private:
 	TSubclassOf<class APlayerCharacter> PlayerCharacterClass;
 
 public:
+	AStartMapGameModeBase();
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
 	void ShowLoadingScreen();
 	void HideLoadingScreen();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void SpawnPlayerCharacter(FVector Position, FRotator Rotation);
 };

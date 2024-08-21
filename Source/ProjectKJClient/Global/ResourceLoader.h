@@ -34,7 +34,6 @@ private:
             // JSON 파싱
             if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
             {
-                UE_LOG(LogTemp, Warning, TEXT("Successfully read JSON file: %s"), *FilePath);
                 FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &Data, 0, 0);
             }
         }

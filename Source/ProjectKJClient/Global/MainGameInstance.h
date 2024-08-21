@@ -53,6 +53,9 @@ private:
 	TSharedPtr<ResourceLoader> Loader;
 	TMap<int32,FJsonChracterPreset> ResChracterPresetMap;
 	TMap<int32,FJsonMapInfo> ResMapInfoMap;
+
+	//동기화 객체
+	FCriticalSection CriticalSection;
 public:
 
 	virtual void Init() override;
@@ -70,15 +73,16 @@ public:
 
 	//리소스 관련 함수들
 	FString GetMapNameByMapID(int32 MapID);
-	void SetCharacterPresetID(int32 ID) { CharacterSpawnInfo.CharacterPresetID = ID; }
-	void SetFirstSpawnLocation(FVector Location) { CharacterSpawnInfo.FirstSpawnLocation = Location; }
-	void SetSpawnMapID(int32 ID) { CharacterSpawnInfo.SpawnMapID = ID; }
-	void SetCharacterGender(int32 Gender) { CharacterSpawnInfo.Gender = Gender; }
-	void SetCharacterJob(int32 Job) { CharacterSpawnInfo.Job = Job; }
-	void SetCharacterJobLevel(int32 JobLevel) { CharacterSpawnInfo.JobLevel = JobLevel; }
-	void SetCharacterLevel(int32 Level) { CharacterSpawnInfo.JobLevel = Level; }
-	void SetCharacterEXP(int32 EXP) { CharacterSpawnInfo.JobLevel = EXP; }
+	void SetCharacterPresetID(int32 ID);
+	void SetFirstSpawnLocation(FVector Location);
+	void SetSpawnMapID(int32 ID);
+	void SetCharacterGender(int32 Gender);
+	void SetCharacterJob(int32 Job);
+	void SetCharacterJobLevel(int32 JobLevel);
+	void SetCharacterLevel(int32 Level);
+	void SetCharacterEXP(int32 EXP);
 	FCharacterInfo GetCharacterSpawnInfo() { return CharacterSpawnInfo; }
+	FString GetCharacterPresetBPPath(int32 ID);
 
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
