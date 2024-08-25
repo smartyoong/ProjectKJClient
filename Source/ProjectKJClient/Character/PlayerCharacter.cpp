@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -86,6 +87,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		// 나중에 컨트롤러에 있는 메서드를 여기로 옮겨야할 수 있음
+		// 캐릭터 관련된건 여기로 옮기자
+	}
 }
 

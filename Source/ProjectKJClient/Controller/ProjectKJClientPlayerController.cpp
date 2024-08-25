@@ -30,6 +30,7 @@ void AProjectKJClientPlayerController::BeginPlay()
 
 void AProjectKJClientPlayerController::SetupInputComponent()
 {
+	//여기는 이제 UI같은 캐릭터랑 상관 없는 부분을 담당한다.
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 

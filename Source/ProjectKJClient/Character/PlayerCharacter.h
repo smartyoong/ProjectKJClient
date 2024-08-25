@@ -21,7 +21,7 @@ private:
 	FString AccountID;
 	FString NickName;
 	FString AuthHashCode;
-	int32 CharacterPresetID;
+	int32 CharacterPresetID = 0;
 
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;
@@ -66,5 +66,4 @@ public:
 
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
 };
