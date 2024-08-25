@@ -94,3 +94,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
+void APlayerCharacter::MoveToLocation(FVector Location)
+{
+	FVector WorldDirection = (Location - GetActorLocation()).GetSafeNormal();
+	AddMovementInput(WorldDirection, 1.0, false);
+}
+
