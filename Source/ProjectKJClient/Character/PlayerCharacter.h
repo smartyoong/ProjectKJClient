@@ -23,6 +23,12 @@ private:
 	FString AuthHashCode;
 	int32 CharacterPresetID = 0;
 
+	//이동 관련 변수
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
+	int32 Speed;
+	FVector MoveDestination;
+	bool IsMoving = false;
+
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;
 	UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
@@ -53,10 +59,22 @@ private:
 	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SetDestinationClickAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UNiagaraSystem* FXCursor;
+
+
+private:
+	void UpdateMove(float DeltaTime);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -67,4 +85,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	void MoveToLocation(FVector Location);
+	void ClickAndMove();
+	UFUNCTION(BlueprintCallable)
+	bool IsMovingNow() { return IsMoving; }
 };

@@ -43,17 +43,11 @@ void AProjectKJClientPlayerController::SetupInputComponent()
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		// 키,마우스 입력 추가
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &AProjectKJClientPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &AProjectKJClientPlayerController::OnSetDestinationTriggered);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
-
-		// 터치 입력 추가
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &AProjectKJClientPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &AProjectKJClientPlayerController::OnTouchTriggered);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &AProjectKJClientPlayerController::OnTouchReleased);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &AProjectKJClientPlayerController::OnTouchReleased);
+		// UI 관련된건 여기로 옮기자
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &AProjectKJClientPlayerController::OnInputStarted);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &AProjectKJClientPlayerController::OnSetDestinationTriggered);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &AProjectKJClientPlayerController::OnSetDestinationReleased);
 	}
 	else
 	{
@@ -75,14 +69,8 @@ void AProjectKJClientPlayerController::OnSetDestinationTriggered()
 	// 터치 모드 여부에 따라서 클릭한 곳 or 마우스 커서의 위치를 가져온다.
 	FHitResult Hit;
 	bool bHitSuccessful = false;
-	if (bIsTouch)
-	{
-		bHitSuccessful = GetHitResultUnderFinger(ETouchIndex::Touch1, ECollisionChannel::ECC_Visibility, true, Hit);
-	}
-	else
-	{
-		bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
-	}
+
+	bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
 
 	// 정상적인 곳으로 커서 클릭을 했다, 캐싱해둔다.
 	if (bHitSuccessful)
@@ -111,17 +99,4 @@ void AProjectKJClientPlayerController::OnSetDestinationReleased()
 	}
 
 	FollowTime = 0.f;
-}
-
-// Triggered every frame when the input is held down
-void AProjectKJClientPlayerController::OnTouchTriggered()
-{
-	bIsTouch = true;
-	OnSetDestinationTriggered();
-}
-
-void AProjectKJClientPlayerController::OnTouchReleased()
-{
-	bIsTouch = false;
-	OnSetDestinationReleased();
 }

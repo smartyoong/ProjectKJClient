@@ -12,6 +12,10 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "ProjectKJClientPlayerController.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -69,6 +73,25 @@ APlayerCharacter::APlayerCharacter()
 	TopDownCameraComponent->bUsePawnControlRotation = false;
 }
 
+void APlayerCharacter::UpdateMove(float DeltaTime)
+{
+	if (IsMoving)
+	{
+		FVector CurrentLocation = GetActorLocation();
+		FVector Direction = (MoveDestination - CurrentLocation).GetSafeNormal();
+		FVector NewLocation = CurrentLocation + (Direction * Speed * DeltaTime);
+
+		// 목표 위치에 도달했는지 확인
+		if (FVector::Dist(NewLocation, MoveDestination) <= Speed * DeltaTime)
+		{
+			NewLocation = MoveDestination;
+			IsMoving = false;
+		}
+		SetActorRotation(Direction.Rotation());
+		SetActorLocation(NewLocation);
+	}
+}
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
@@ -80,23 +103,52 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UpdateMove(DeltaTime);
 }
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// 나중에 컨트롤러에 있는 메서드를 여기로 옮겨야할 수 있음
 		// 캐릭터 관련된건 여기로 옮기자
+		
+		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &APlayerCharacter::ClickAndMove);
+
+		// 기본 입력 매핑 컨텍스트를 추가합니다.
+		if (AProjectKJClientPlayerController* PlayerController = Cast<AProjectKJClientPlayerController>(GetController()))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 1);
+			}
+		}
 	}
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
 {
-	FVector WorldDirection = (Location - GetActorLocation()).GetSafeNormal();
-	AddMovementInput(WorldDirection, 1.0, false);
+	MoveDestination = Location;
+	IsMoving = true;
+}
+
+void APlayerCharacter::ClickAndMove()
+{
+	FHitResult Hit;
+	bool HitSuccessful = false;
+	if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown(EKeys::RightMouseButton))
+	{
+		HitSuccessful = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	}
+	if (HitSuccessful)
+	{
+		// Z축 보정
+		Hit.Location.Z = GetActorLocation().Z;
+		MoveToLocation(Hit.Location);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Hit.Location, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	}
 }
 
