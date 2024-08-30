@@ -68,6 +68,8 @@ struct FRequestCharBaseInfoPacket
     FString AccountID;
     UPROPERTY()
     FString HashCode;
+    UPROPERTY()
+    FString NickName;
 };
 
 USTRUCT()

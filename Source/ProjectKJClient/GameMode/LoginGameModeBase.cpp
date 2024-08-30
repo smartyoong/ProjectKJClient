@@ -60,6 +60,7 @@ void ALoginGameModeBase::SendRequestCharBaseInfoPacket()
 	}
 	RequestCharBaseInfoPacket.AccountID = GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID();
 	RequestCharBaseInfoPacket.HashCode = GetWorld()->GetGameInstance<UMainGameInstance>()->GetUserAuthHashCode();
+	GetWorld()->GetGameInstance<UMainGameInstance>()->MakeKoreanToUTF8(GetWorld()->GetGameInstance<UMainGameInstance>()->GetNickName(), RequestCharBaseInfoPacket.NickName);
 	GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer<FRequestCharBaseInfoPacket>(GamePacketListID::REQUEST_CHAR_BASE_INFO, RequestCharBaseInfoPacket);
 }
 
@@ -80,8 +81,6 @@ void ALoginGameModeBase::OnLoginResponsePacketReceived(FLoginResponsePacket Pack
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SetUserAuthHashCode(Packet.HashValue);
 		GetWorld()->GetGameInstance<UMainGameInstance>()->SendPacketToGameServer(GamePacketListID::REQUEST_HASH_AUTH_CHECK,
 			FRequestHashAuthCheckPacket{GetWorld()->GetGameInstance<UMainGameInstance>()->GetAccountID(), Packet.HashValue});
-
-		// 맵을 이동하는 것을 구현하도록 하자
 		break;
 		// 로그인은 성공했으나 Hash값 생성 실패
 	case HASH_CODE_CREATE_FAIL:
@@ -187,6 +186,7 @@ void ALoginGameModeBase::OnResponseCreateCharacter(FResponseCreateCharacterPacke
 		{
 			CreateCharacterWidget->CreateCharcterSuccess();
 		}
+		SendRequestCharBaseInfoPacket();
 	}
 	else
 	{
@@ -276,6 +276,13 @@ void ALoginGameModeBase::BeginPlay()
 	}
 
 	LoadingWidget = CreateWidget<ULoadingScreenWidget>(GetWorld(), LoadingWidgetClass);
+
+	if (GEngine)
+	{
+		GEngine->SetMaxFPS(60);
+		GEngine->bSmoothFrameRate = true;
+		GEngine->SmoothedFrameRateRange = FFloatRange(5.0f, 60.0f);
+	}
 }
 
 void ALoginGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

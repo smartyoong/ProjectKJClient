@@ -189,3 +189,9 @@ FString UMainGameInstance::GetCharacterPresetBPPath(int32 ID)
 	}
 	return FString();
 }
+
+void UMainGameInstance::MakeKoreanToUTF8(const FString& OriginString, FString& DestUTF8String)
+{
+	FTCHARToUTF8 Convert(*OriginString);
+	DestUTF8String = FString(Convert.Length(), Convert.Get());
+}

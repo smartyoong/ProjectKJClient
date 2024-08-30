@@ -84,6 +84,7 @@ public:
 	FCharacterInfo GetCharacterSpawnInfo() { return CharacterSpawnInfo; }
 	FString GetCharacterPresetBPPath(int32 ID);
 
+	//패킷 전송 함수들
 	template <typename T>
 	inline void SendPacketToLoginServer(LoginPacketListID ID, T Packet)
 	{
@@ -106,4 +107,5 @@ public:
 		FJsonObjectConverter::UStructToJsonObjectString(Packet, JSonString);
 		GameSockRun->SendPacket(JSonString, PacketData);
 	}
+	void MakeKoreanToUTF8(const FString& KoreanString, FString& UTF8String);
 };

@@ -67,6 +67,7 @@ public:
 	void CreateCharcterSuccess();
 	void CreateCharacterFail();
 	void CreateNickNameFail();
+	//여기서 캐릭 설정 성공후 캐릭터 정보 요청을 서버로 보내자
 
 	UFUNCTION()
 	void OnNickNameTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
