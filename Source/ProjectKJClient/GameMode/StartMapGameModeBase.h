@@ -32,4 +32,5 @@ public:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	void SpawnPlayerCharacter(FVector Position, FRotator Rotation);
+	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) override;
 };

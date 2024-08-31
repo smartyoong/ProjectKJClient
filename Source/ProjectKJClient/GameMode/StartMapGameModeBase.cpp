@@ -88,6 +88,7 @@ void AStartMapGameModeBase::SpawnPlayerCharacter(FVector Position, FRotator Rota
 			if (GetWorld()->GetFirstPlayerController() != nullptr)
 			{
 				GetWorld()->GetFirstPlayerController()->Possess(PlayerCharacter);
+				PlayerCharacter->SetSpawnBaseInfo(Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterSpawnInfo());
 			}
 			else
 			{
@@ -98,5 +99,30 @@ void AStartMapGameModeBase::SpawnPlayerCharacter(FVector Position, FRotator Rota
 		{
 			UE_LOG(LogTemp, Error, TEXT("플레이어 캐릭터를 소환할 수 없습니다. StartMapGameMode"));
 		}
+	}
+}
+
+void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
+{
+	const int32 FAIL = 1;
+	if (PlayerCharacter != nullptr)
+	{
+		if (Packet.ErrorCode == FAIL)
+		{
+			UE_LOG(LogTemp, Error, TEXT("OnResponseMoveCharacter 이동 실패"));
+			if (!IsInGameThread())
+			{
+				// 게임 스레드에서 실행되도록 큐에 추가
+				AsyncTask(ENamedThreads::GameThread, [this]()
+					{
+						PlayerCharacter->RollBackLocation();
+					});
+				return;
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnResponseMoveCharacter 플레이어 캐릭터가 없습니다. StartMapGameMode"));
 	}
 }

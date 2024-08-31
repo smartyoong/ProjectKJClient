@@ -16,6 +16,7 @@
 #include "ProjectKJClientPlayerController.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "MainGameInstance.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -89,6 +90,7 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 		}
 		SetActorRotation(Direction.Rotation());
 		SetActorLocation(NewLocation);
+		UE_LOG(LogTemp, Warning, TEXT("CurrentLocation: %s"), *NewLocation.ToString());
 	}
 }
 
@@ -129,10 +131,33 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
+void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
+{
+	AccountID = Info.AccountID;
+	NickName = Info.NickName;
+	AuthHashCode = Info.AuthHashCode;
+	CharacterPresetID = Info.CharacterPresetID;
+	OldLocation = Info.FirstSpawnLocation;
+	CurrentMapID = Info.SpawnMapID;
+	Gender = Info.Gender;
+	Job = Info.Job;
+	JobLevel = Info.JobLevel;
+	Level = Info.Level;
+	EXP = Info.EXP;
+}
+
 void APlayerCharacter::MoveToLocation(FVector Location)
 {
+	OldLocation = GetActorLocation();
 	MoveDestination = Location;
 	IsMoving = true;
+}
+
+void APlayerCharacter::RollBackLocation()
+{
+	if (OldLocation != FVector::ZeroVector)
+		SetActorLocation(OldLocation);
+	IsMoving = false;
 }
 
 void APlayerCharacter::ClickAndMove()
@@ -145,6 +170,7 @@ void APlayerCharacter::ClickAndMove()
 	}
 	if (HitSuccessful)
 	{
+		Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE,FRequestMovePacket(AccountID,AuthHashCode,CurrentMapID,Hit.Location.X,Hit.Location.Y));
 		// Z축 보정
 		Hit.Location.Z = GetActorLocation().Z;
 		MoveToLocation(Hit.Location);

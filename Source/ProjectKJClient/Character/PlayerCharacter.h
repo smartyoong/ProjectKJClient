@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GroomComponent.h"
+#include "GlobalTypes.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -23,10 +24,21 @@ private:
 	FString AuthHashCode;
 	int32 CharacterPresetID = 0;
 
+	//외형 정보
+	int32 Gender;
+
+	//캐릭터 정보
+	int32 Level;
+	int32 EXP;
+	int32 Job;
+	int32 JobLevel;
+
 	//이동 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
 	int32 Speed;
+	int32 CurrentMapID;
 	FVector MoveDestination;
+	FVector OldLocation;
 	bool IsMoving = false;
 
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
@@ -84,7 +96,9 @@ public:
 
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	void SetSpawnBaseInfo(FCharacterInfo Info);
 	void MoveToLocation(FVector Location);
+	void RollBackLocation();
 	void ClickAndMove();
 	UFUNCTION(BlueprintCallable)
 	bool IsMovingNow() { return IsMoving; }
