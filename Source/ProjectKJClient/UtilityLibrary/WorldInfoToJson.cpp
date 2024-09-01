@@ -32,23 +32,24 @@ void WorldInfoToJson::SaveWorldInfoToJson(UWorld* World, int MapID)
         AStaticMeshActor* MeshActor = Cast<AStaticMeshActor>(Actor);
 
         if (MeshActor == nullptr)
-		{
-			continue;
-		}
+        {
+            continue;
+        }
 
         UStaticMeshComponent* MeshComponent = MeshActor->GetStaticMeshComponent();
 
         FTransform Transform = Actor->GetActorTransform();
         FVector Location = Transform.GetLocation();
         FVector Scale = Transform.GetScale3D();
+        FRotator Rotation = Transform.GetRotation().Rotator();
 
         FBox BoundingBox = MeshComponent->GetStaticMesh()->GetBoundingBox();
         FVector MeshSize = BoundingBox.GetSize();
 
         FString MeshName = MeshComponent->GetStaticMesh()->GetName();
 
-        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshName\": \"%s\"},\n"),
-            Location.X, Location.Y, Location.Z, Scale.X, Scale.Y, Scale.Z, MeshSize.X, MeshSize.Y, MeshSize.Z, *MeshName);
+        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Rotation\": {\"Pitch\": %f, \"Yaw\": %f, \"Roll\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshName\": \"%s\"},\n"),
+            Location.X, Location.Y, Location.Z, Rotation.Pitch, Rotation.Yaw, Rotation.Roll, Scale.X, Scale.Y, Scale.Z, MeshSize.X, MeshSize.Y, MeshSize.Z, *MeshName);
     }
     OutputString.RemoveFromEnd(",\n");
     OutputString += "\n\t]\n}";
@@ -75,18 +76,19 @@ void WorldInfoToJson::SaveWorldPortalInfoToJson(UWorld* World, int MapID)
 
         if (PortalActor == nullptr)
         {
-			continue;
-		}
+            continue;
+        }
 
         FTransform Transform = Actor->GetActorTransform();
         FVector Location = Transform.GetLocation();
         FVector Scale = Transform.GetScale3D();
+        FRotator Rotation = Transform.GetRotation().Rotator();
         FVector BoxComponentSize;
         PortalActor->GetPortalBoxExtent(BoxComponentSize);
         int32 TargetMapID = PortalActor->GetTargetMapID();
 
-        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"BoxSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"LinkMapID\": %d},\n"),
-            Location.X, Location.Y, Location.Z, Scale.X, Scale.Y, Scale.Z, BoxComponentSize.X, BoxComponentSize.Y, BoxComponentSize.Z, TargetMapID);
+        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Rotation\": {\"Pitch\": %f, \"Yaw\": %f, \"Roll\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"BoxSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"LinkMapID\": %d},\n"),
+            Location.X, Location.Y, Location.Z, Rotation.Pitch, Rotation.Yaw, Rotation.Roll, Scale.X, Scale.Y, Scale.Z, BoxComponentSize.X, BoxComponentSize.Y, BoxComponentSize.Z, TargetMapID);
     }
     OutputString.RemoveFromEnd(",\n");
     OutputString += "\n\t]\n}";

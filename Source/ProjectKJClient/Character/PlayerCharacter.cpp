@@ -86,7 +86,9 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 		if (FVector::Dist(NewLocation, MoveDestination) <= Speed * DeltaTime)
 		{
 			NewLocation = MoveDestination;
+			OldLocation = NewLocation;
 			IsMoving = false;
+			UE_LOG(LogTemp, Warning, TEXT("Arrived at Destination"));
 		}
 		SetActorRotation(Direction.Rotation());
 		SetActorLocation(NewLocation);
@@ -173,6 +175,7 @@ void APlayerCharacter::ClickAndMove()
 		Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE,FRequestMovePacket(AccountID,AuthHashCode,CurrentMapID,Hit.Location.X,Hit.Location.Y));
 		// Z축 보정
 		Hit.Location.Z = GetActorLocation().Z;
+		UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *Hit.Location.ToString());
 		MoveToLocation(Hit.Location);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Hit.Location, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
