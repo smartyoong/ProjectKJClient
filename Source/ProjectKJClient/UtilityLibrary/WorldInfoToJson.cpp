@@ -42,14 +42,20 @@ void WorldInfoToJson::SaveWorldInfoToJson(UWorld* World, int MapID)
         FVector Location = Transform.GetLocation();
         FVector Scale = Transform.GetScale3D();
         FRotator Rotation = Transform.GetRotation().Rotator();
-
         FBox BoundingBox = MeshComponent->GetStaticMesh()->GetBoundingBox();
         FVector MeshSize = BoundingBox.GetSize();
 
         FString MeshName = MeshComponent->GetStaticMesh()->GetName();
 
-        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Rotation\": {\"Pitch\": %f, \"Yaw\": %f, \"Roll\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshName\": \"%s\"},\n"),
-            Location.X, Location.Y, Location.Z, Rotation.Pitch, Rotation.Yaw, Rotation.Roll, Scale.X, Scale.Y, Scale.Z, MeshSize.X, MeshSize.Y, MeshSize.Z, *MeshName);
+        // 실린더의 반지름과 높이 계산
+        float CylinderRadius = MeshSize.X * 0.5f * Scale.X;
+        float CylinderHeight = MeshSize.Z * Scale.Z;
+
+        // 구의 반지름 계산
+        float SphereRadius = FMath::Max3(MeshSize.X, MeshSize.Y, MeshSize.Z) * 0.5f * FMath::Max3(Scale.X, Scale.Y, Scale.Z);
+
+        OutputString += FString::Printf(TEXT("\t\t{\"Location\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"Rotation\": {\"Pitch\": %f, \"Yaw\": %f, \"Roll\": %f}, \"Scale\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshSize\": {\"X\": %f, \"Y\": %f, \"Z\": %f}, \"MeshName\": \"%s\", \"CylinderRadius\": %f, \"CylinderHeight\": %f, \"SphereRadius\": %f},\n"),
+            Location.X, Location.Y, Location.Z, Rotation.Pitch, Rotation.Yaw, Rotation.Roll, Scale.X, Scale.Y, Scale.Z, MeshSize.X, MeshSize.Y, MeshSize.Z, *MeshName, CylinderRadius, CylinderHeight, SphereRadius);
     }
     OutputString.RemoveFromEnd(",\n");
     OutputString += "\n\t]\n}";
