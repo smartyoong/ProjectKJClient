@@ -92,7 +92,13 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 		}
 		SetActorRotation(Direction.Rotation());
 		SetActorLocation(NewLocation);
-		UE_LOG(LogTemp, Warning, TEXT("CurrentLocation: %s"), *NewLocation.ToString());
+
+		// 현재 시간 가져오기
+		FDateTime Now = FDateTime::Now();
+		// 시간을 문자열로 변환
+		FString CurrentTimeString = FString::Printf(TEXT("%02d:%02d:%02d.%03d"),
+			Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
+		UE_LOG(LogTemp, Warning, TEXT("Time : %s CurrentLocation: %s"), *CurrentTimeString ,*NewLocation.ToString());
 	}
 }
 
