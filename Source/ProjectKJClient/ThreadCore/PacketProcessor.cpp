@@ -118,6 +118,9 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 	case GamePacketListID::RESPONSE_MOVE:
 		GameMode->OnResponseMoveCharacter(PacketToStruct<FResponseMovePacket>(PacketData->Value));
 		break;
+	case GamePacketListID::SEND_ANOTHER_CHAR_BASE_INFO:
+		GameMode->OnSendAnotherCharBaseInfo(PacketToStruct<FSendAnotherCharBaseInfoPacket>(PacketData->Value));
+		break;
 	default:
 		break;
 	}

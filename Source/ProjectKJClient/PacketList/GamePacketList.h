@@ -22,7 +22,8 @@ enum class GamePacketListID
     REQUEST_CREATE_CHARACTER = 8,
     RESPONSE_CREATE_CHARACTER = 9,
     REQUEST_MOVE = 10,
-    RESPONSE_MOVE = 11
+    RESPONSE_MOVE = 11,
+	SEND_ANOTHER_CHAR_BASE_INFO = 12
 };
 
 enum class KickReason
@@ -158,4 +159,33 @@ struct FResponseMovePacket
 
 	UPROPERTY()
 	int32 ErrorCode;
+};
+
+USTRUCT()
+struct FSendAnotherCharBaseInfoPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    int32 Gender;
+    UPROPERTY()
+    int32 PresetNumber;
+    UPROPERTY()
+    int32 Job;
+    UPROPERTY()
+    int32 JobLevel;
+    UPROPERTY()
+    int32 MapID;
+    UPROPERTY()
+    int32 X;
+    UPROPERTY()
+    int32 Y;
+    UPROPERTY()
+    int32 Level;
+    UPROPERTY()
+    int32 EXP;
+	UPROPERTY()
+	FString NickName;
 };

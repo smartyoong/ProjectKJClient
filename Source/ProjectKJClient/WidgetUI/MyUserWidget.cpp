@@ -117,6 +117,7 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 			break;
 		default:
 			LoginResultWidget->SetTryLoginLater();
+			UE_LOG(LogTemp, Error, TEXT("Invalid Mode %d"),Mode);
 			break;
 		}
 		ButtonClicked = false;

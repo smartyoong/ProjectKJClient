@@ -22,6 +22,7 @@ private:
 	class APlayerCharacter* PlayerCharacter;
 	UPROPERTY()
 	TSubclassOf<class APlayerCharacter> PlayerCharacterClass;
+	TArray<class APlayerCharacter*> AnotherPlayerCharacterList;
 
 public:
 	AStartMapGameModeBase();
@@ -33,4 +34,5 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	void SpawnPlayerCharacter(FVector Position, FRotator Rotation);
 	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) override;
+	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) override;
 };

@@ -73,5 +73,6 @@ public:
 	virtual void OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Packet) {};
 	// 캐릭터 이동 응답 함수
 	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) {};
-
+	// 같은 맵의 다른 캐릭터를 그리도록 명령하는 함수
+	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) {};
 };

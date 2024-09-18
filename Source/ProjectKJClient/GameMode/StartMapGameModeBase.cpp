@@ -76,6 +76,11 @@ void AStartMapGameModeBase::BeginPlay()
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	// 정리
+	for (auto a : AnotherPlayerCharacterList)
+	{
+		a->Destroy();
+	}
 }
 
 void AStartMapGameModeBase::SpawnPlayerCharacter(FVector Position, FRotator Rotation)
@@ -124,5 +129,38 @@ void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("OnResponseMoveCharacter 플레이어 캐릭터가 없습니다. StartMapGameMode"));
+	}
+}
+
+void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet)
+{
+	int32 BP_ID = Packet.PresetNumber;
+	FString BP_Name = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterPresetBPPath(BP_ID);
+	auto AnotherClass = LoadClass<ACharacter>(nullptr, *BP_Name);
+
+	if (AnotherClass != nullptr)
+	{
+		auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 0), FRotator(0, 0, 0));
+		if (AnotherPlayerCharacter != nullptr)
+		{
+			FCharacterInfo CharacterSpawnInfo;
+			CharacterSpawnInfo.AccountID = Packet.AccountID;
+			CharacterSpawnInfo.CharacterPresetID = Packet.PresetNumber;
+			CharacterSpawnInfo.EXP = Packet.EXP;
+			CharacterSpawnInfo.FirstSpawnLocation = FVector(Packet.X, Packet.Y, 0);
+			CharacterSpawnInfo.Gender = Packet.Gender;
+			CharacterSpawnInfo.Job = Packet.Job;
+			CharacterSpawnInfo.JobLevel = Packet.JobLevel;
+			CharacterSpawnInfo.Level = Packet.Level;
+			CharacterSpawnInfo.NickName = Packet.NickName;
+			CharacterSpawnInfo.SpawnMapID = Packet.MapID;
+			AnotherPlayerCharacter->SetSpawnBaseInfo(CharacterSpawnInfo);
+			// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
+			AnotherPlayerCharacterList.Add(AnotherPlayerCharacter);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("다른 플레이어 캐릭터를 소환할 수 없습니다. StartMapGameMode"));
+		}
 	}
 }
