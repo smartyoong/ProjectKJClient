@@ -19,6 +19,7 @@ class PROJECTKJCLIENT_API UMyUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 private:
+	bool ButtonClicked = false;
 	FString ID;
 	FString Password;
 	UPROPERTY()

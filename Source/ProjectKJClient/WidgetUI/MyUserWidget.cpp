@@ -57,6 +57,12 @@ void UMyUserWidget::NativeOnInitialized()
 
 void UMyUserWidget::OnLoginButtonClicked()
 {
+	if (ID.Len() == 0 || Password.Len() == 0)
+		return;
+
+	if (ButtonClicked)
+		return;
+	ButtonClicked = true;
 	// 패킷 송수신하도록 작업하고 여기에 추가하자
 	FLoginRequestPacket LoginPacket;
 	LoginPacket.AccountID = ID;
@@ -113,6 +119,7 @@ void UMyUserWidget::ShowLoginResultWidget(int Mode)
 			LoginResultWidget->SetTryLoginLater();
 			break;
 		}
+		ButtonClicked = false;
 		AsyncTask(ENamedThreads::GameThread, [this, Mode]()
 			{
 				LoginResultWidget->AddToViewport();
