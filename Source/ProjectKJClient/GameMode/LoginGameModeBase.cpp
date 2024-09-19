@@ -144,7 +144,6 @@ void ALoginGameModeBase::OnHashAuthCheckResponsePacketReceived(FResponseHashAuth
 		{
 			FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 			FTimerHandle UnusedHandle;
-
 			switch (Packet.ErrorCode)
 			{
 			case REGIST_NOT_YET: // 게임 서버에 아직 등록 안됨
@@ -254,6 +253,10 @@ void ALoginGameModeBase::ShowCreateCharacterWidget()
 				CreateCharacterWidget->AddToViewport();
 				CreateCharacterWidget->PopulateList();
 			});
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CreateCharacterWidget is nullptr"));
 	}
 }
 

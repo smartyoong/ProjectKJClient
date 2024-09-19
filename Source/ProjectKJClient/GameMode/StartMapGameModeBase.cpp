@@ -140,6 +140,11 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 
 	if (AnotherClass != nullptr)
 	{
+		if(GetWorld() == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("GetWorld() == nullptr StartMapGameMode"));
+			return;
+		}
 		auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 0), FRotator(0, 0, 0));
 		if (AnotherPlayerCharacter != nullptr)
 		{
