@@ -207,12 +207,6 @@ void ALoginGameModeBase::OnResponseCreateNickName(FCreateNickNameResponsePacket 
 		UE_LOG(LogTemp, Error, TEXT("Create NickName Fail"));
 		Cast<UMainGameInstance>(GetGameInstance())->SetNickName("GUEST");
 	}
-
-	AsyncTask(ENamedThreads::GameThread, [this]()
-		{
-			ShowLoadingScreen();
-			UGameplayStatics::OpenLevel(GetWorld(), TEXT("TopDownMap"));
-		});
 }
 
 void ALoginGameModeBase::OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Packet)

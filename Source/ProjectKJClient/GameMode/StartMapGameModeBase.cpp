@@ -48,17 +48,13 @@ void AStartMapGameModeBase::HideLoadingScreen()
 void AStartMapGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	GetWorld()->GetGameInstance<UMainGameInstance>()->RegistGameModeToPacketQueue(this);
-
 	if (GetWorld() != nullptr)
 	{
 		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
 	}
-
 	LoadingWidget = CreateWidget<ULoadingScreenWidget>(GetWorld(), LoadingWidgetClass);
-	
 	// 맵 정보 읽어올때 사용
 	//WorldInfoToJson::SaveWorldInfoToJson(GetWorld(), 0);
 	//WorldInfoToJson::SaveWorldPortalInfoToJson(GetWorld(), 0);
@@ -70,7 +66,6 @@ void AStartMapGameModeBase::BeginPlay()
 	FString BP_Name = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterPresetBPPath(BP_ID);
 	PlayerCharacterClass = LoadClass<ACharacter>(nullptr, *BP_Name);
 	SpawnPlayerCharacter(Info.FirstSpawnLocation, FRotator(0, 0, 0));
-
 }
 
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -85,6 +80,12 @@ void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AStartMapGameModeBase::SpawnPlayerCharacter(FVector Position, FRotator Rotation)
 {
+	if (GetWorld() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("GetWorld() == nullptr StartMapGameMode"));
+		return;
+	}
+
 	if (PlayerCharacterClass != nullptr)
 	{
 		PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(PlayerCharacterClass, Position, Rotation);
@@ -134,38 +135,44 @@ void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
 
 void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet)
 {
-	int32 BP_ID = Packet.PresetNumber;
-	FString BP_Name = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterPresetBPPath(BP_ID);
-	auto AnotherClass = LoadClass<ACharacter>(nullptr, *BP_Name);
-
-	if (AnotherClass != nullptr)
-	{
-		if(GetWorld() == nullptr)
+	AsyncTask(ENamedThreads::GameThread, [this, Packet]()
 		{
-			UE_LOG(LogTemp, Error, TEXT("GetWorld() == nullptr StartMapGameMode"));
-			return;
-		}
-		auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 0), FRotator(0, 0, 0));
-		if (AnotherPlayerCharacter != nullptr)
-		{
-			FCharacterInfo CharacterSpawnInfo;
-			CharacterSpawnInfo.AccountID = Packet.AccountID;
-			CharacterSpawnInfo.CharacterPresetID = Packet.PresetNumber;
-			CharacterSpawnInfo.EXP = Packet.EXP;
-			CharacterSpawnInfo.FirstSpawnLocation = FVector(Packet.X, Packet.Y, 0);
-			CharacterSpawnInfo.Gender = Packet.Gender;
-			CharacterSpawnInfo.Job = Packet.Job;
-			CharacterSpawnInfo.JobLevel = Packet.JobLevel;
-			CharacterSpawnInfo.Level = Packet.Level;
-			CharacterSpawnInfo.NickName = Packet.NickName;
-			CharacterSpawnInfo.SpawnMapID = Packet.MapID;
-			AnotherPlayerCharacter->SetSpawnBaseInfo(CharacterSpawnInfo);
-			// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
-			AnotherPlayerCharacterList.Add(AnotherPlayerCharacter);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("다른 플레이어 캐릭터를 소환할 수 없습니다. StartMapGameMode"));
-		}
-	}
+			int32 BP_ID = Packet.PresetNumber;
+			FString BP_Name = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterPresetBPPath(BP_ID);
+			auto AnotherClass = LoadClass<ACharacter>(nullptr, *BP_Name);
+			if (GetWorld() == nullptr)
+			{
+				UE_LOG(LogTemp, Error, TEXT("GetWorld() == nullptr StartMapGameMode"));
+				return;
+			}
+			if (AnotherClass != nullptr)
+			{
+				auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 0), FRotator(0, 0, 0));
+				if (AnotherPlayerCharacter != nullptr)
+				{
+					FCharacterInfo CharacterSpawnInfo;
+					CharacterSpawnInfo.AccountID = Packet.AccountID;
+					CharacterSpawnInfo.CharacterPresetID = Packet.PresetNumber;
+					CharacterSpawnInfo.EXP = Packet.EXP;
+					CharacterSpawnInfo.FirstSpawnLocation = FVector(Packet.X, Packet.Y, 0);
+					CharacterSpawnInfo.Gender = Packet.Gender;
+					CharacterSpawnInfo.Job = Packet.Job;
+					CharacterSpawnInfo.JobLevel = Packet.JobLevel;
+					CharacterSpawnInfo.Level = Packet.Level;
+					CharacterSpawnInfo.NickName = Packet.NickName;
+					CharacterSpawnInfo.SpawnMapID = Packet.MapID;
+					AnotherPlayerCharacter->SetSpawnBaseInfo(CharacterSpawnInfo);
+					// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
+					AnotherPlayerCharacterList.Add(AnotherPlayerCharacter);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("다른 플레이어 캐릭터를 소환할 수 없습니다. StartMapGameMode"));
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("다른 플레이어 캐릭터 BP를 찾을 수 없습니다. StartMapGameMode"));
+			}
+		});
 }
