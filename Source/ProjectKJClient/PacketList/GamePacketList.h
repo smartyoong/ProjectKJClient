@@ -23,7 +23,8 @@ enum class GamePacketListID
     RESPONSE_CREATE_CHARACTER = 9,
     REQUEST_MOVE = 10,
     RESPONSE_MOVE = 11,
-	SEND_ANOTHER_CHAR_BASE_INFO = 12
+	SEND_ANOTHER_CHAR_BASE_INFO = 12,
+    REQUEST_GET_SAME_MAP_USER = 13
 };
 
 enum class KickReason
@@ -188,4 +189,17 @@ struct FSendAnotherCharBaseInfoPacket
     int32 EXP;
 	UPROPERTY()
 	FString NickName;
+};
+
+USTRUCT()
+struct FRequestGetSameMapUserPacket
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+	FString AccountID;
+	UPROPERTY()
+	FString HashCode;
+	UPROPERTY()
+	int32 MapID;
 };

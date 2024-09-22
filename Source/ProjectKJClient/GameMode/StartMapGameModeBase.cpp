@@ -66,6 +66,8 @@ void AStartMapGameModeBase::BeginPlay()
 	FString BP_Name = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetCharacterPresetBPPath(BP_ID);
 	PlayerCharacterClass = LoadClass<ACharacter>(nullptr, *BP_Name);
 	SpawnPlayerCharacter(Info.FirstSpawnLocation, FRotator(0, 0, 0));
+	// 다른 플레이어 캐릭터 소환
+	GetSameMapUser(PlayerCharacter);
 }
 
 void AStartMapGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -135,6 +137,7 @@ void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
 
 void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet)
 {
+	UE_LOG(LogTemp, Warning, TEXT("다른 플레이어 캐릭터 소환"));
 	AsyncTask(ENamedThreads::GameThread, [this, Packet]()
 		{
 			int32 BP_ID = Packet.PresetNumber;
@@ -175,4 +178,18 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 				UE_LOG(LogTemp, Error, TEXT("다른 플레이어 캐릭터 BP를 찾을 수 없습니다. StartMapGameMode"));
 			}
 		});
+}
+
+void AStartMapGameModeBase::GetSameMapUser(APlayerCharacter* Player)
+{
+	if (Player == nullptr)
+	{
+		return;
+	}
+	// 현재 맵에 있는 다른 플레이어 캐릭터 정보를 요청
+	FRequestGetSameMapUserPacket Packet;
+	Packet.AccountID = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetAccountID();
+	Packet.HashCode = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetUserAuthHashCode();
+	Packet.MapID = Player->GetMapID();
+	Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_GET_SAME_MAP_USER, Packet);
 }

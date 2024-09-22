@@ -102,4 +102,5 @@ public:
 	void ClickAndMove();
 	UFUNCTION(BlueprintCallable)
 	bool IsMovingNow() { return IsMoving; }
+	int32 GetMapID() { return CurrentMapID; }
 };

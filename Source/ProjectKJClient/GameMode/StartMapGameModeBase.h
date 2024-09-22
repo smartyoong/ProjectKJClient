@@ -35,4 +35,5 @@ public:
 	void SpawnPlayerCharacter(FVector Position, FRotator Rotation);
 	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) override;
 	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) override;
+	void GetSameMapUser(class APlayerCharacter* Player);
 };
