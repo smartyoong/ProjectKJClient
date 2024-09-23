@@ -81,9 +81,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UNiagaraSystem* FXCursor;
 
-
+	FTimerHandle TimerHandle;
 private:
 	void UpdateMove(float DeltaTime);
+	void PingCheck();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -103,4 +104,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsMovingNow() { return IsMoving; }
 	int32 GetMapID() { return CurrentMapID; }
+	FString GetAccountID() { return AccountID; }
+	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
 };

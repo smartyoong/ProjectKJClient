@@ -75,4 +75,8 @@ public:
 	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) {};
 	// 같은 맵의 다른 캐릭터를 그리도록 명령하는 함수
 	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) {};
+	// 같은 맵의 다른 유저를 이동 시키는 함수
+	virtual void OnSendUserMove(FSendUserMovePacket Packet) {};
+	// 핑 체크하는 함수
+	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet) {};
 };

@@ -24,7 +24,10 @@ enum class GamePacketListID
     REQUEST_MOVE = 10,
     RESPONSE_MOVE = 11,
 	SEND_ANOTHER_CHAR_BASE_INFO = 12,
-    REQUEST_GET_SAME_MAP_USER = 13
+    REQUEST_GET_SAME_MAP_USER = 13,
+	SEND_USER_MOVE = 14,
+    REQUEST_PING_CHECK = 15,
+	RESPONSE_PING_CHECK = 16
 };
 
 enum class KickReason
@@ -202,4 +205,55 @@ struct FRequestGetSameMapUserPacket
 	FString HashCode;
 	UPROPERTY()
 	int32 MapID;
+};
+
+USTRUCT()
+struct FSendUserMovePacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString AccountID;
+	UPROPERTY()
+	int32 MapID;
+	UPROPERTY()
+	int32 X;
+	UPROPERTY()
+	int32 Y;
+};
+
+USTRUCT()
+struct FRequestPingCheckPacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+    int32 Hour;
+
+	UPROPERTY()
+	int32 Min;
+
+	UPROPERTY()
+	int32 Secs;
+
+	UPROPERTY()
+	int32 MSecs;
+};
+
+USTRUCT()
+struct FResponsePingCheckPacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 Hour;
+
+	UPROPERTY()
+	int32 Min;
+
+	UPROPERTY()
+	int32 Secs;
+
+	UPROPERTY()
+	int32 MSecs;
 };

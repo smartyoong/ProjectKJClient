@@ -53,7 +53,7 @@ void PacketDispatcher::Stop()
 
 void PacketDispatcher::Exit()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PacketDispatcher Exit"));
+	//UE_LOG(LogTemp, Warning, TEXT("PacketDispatcher Exit"));
 }
 
 

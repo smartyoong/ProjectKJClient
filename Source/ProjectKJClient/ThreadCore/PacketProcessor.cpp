@@ -121,6 +121,12 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 	case GamePacketListID::SEND_ANOTHER_CHAR_BASE_INFO:
 		GameMode->OnSendAnotherCharBaseInfo(PacketToStruct<FSendAnotherCharBaseInfoPacket>(PacketData->Value));
 		break;
+	case GamePacketListID::SEND_USER_MOVE:
+		GameMode->OnSendUserMove(PacketToStruct<FSendUserMovePacket>(PacketData->Value));
+		break;
+	case GamePacketListID::RESPONSE_PING_CHECK:
+		GameMode->OnResponsePingCheck(PacketToStruct<FResponsePingCheckPacket>(PacketData->Value));
+		break;
 	default:
 		break;
 	}

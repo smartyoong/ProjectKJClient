@@ -23,6 +23,7 @@ private:
 	UPROPERTY()
 	TSubclassOf<class APlayerCharacter> PlayerCharacterClass;
 	TArray<class APlayerCharacter*> AnotherPlayerCharacterList;
+	FCriticalSection CriticalSection;
 
 public:
 	AStartMapGameModeBase();
@@ -36,4 +37,6 @@ public:
 	virtual void OnResponseMoveCharacter(FResponseMovePacket Packet) override;
 	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) override;
 	void GetSameMapUser(class APlayerCharacter* Player);
+	virtual void OnSendUserMove(FSendUserMovePacket Packet);
+	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet);
 };

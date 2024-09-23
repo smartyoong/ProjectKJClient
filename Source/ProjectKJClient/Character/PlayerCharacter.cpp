@@ -88,16 +88,28 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 			NewLocation = MoveDestination;
 			OldLocation = NewLocation;
 			IsMoving = false;
-			UE_LOG(LogTemp, Warning, TEXT("Arrived at Destination"));
 			// 현재 시간 가져오기
 			FDateTime Now = FDateTime::Now();
 			// 시간을 문자열로 변환
 			FString CurrentTimeString = FString::Printf(TEXT("%02d:%02d:%02d.%03d"),
 				Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
-			UE_LOG(LogTemp, Warning, TEXT("Time : %s CurrentLocation: %s"), *CurrentTimeString, *NewLocation.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Time : %s CurrentLocation: %s %s"), *CurrentTimeString, *NewLocation.ToString(), *AccountID);
 		}
 		SetActorRotation(Direction.Rotation());
 		SetActorLocation(NewLocation);
+	}
+}
+
+void APlayerCharacter::PingCheck()
+{
+	// 현재 시간 가져오기
+	FDateTime Now = FDateTime::Now();
+	// 시간을 문자열로 변환
+	FRequestPingCheckPacket Packet(Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
+	auto GameInstance = Cast<UMainGameInstance>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->SendPacketToGameServer(GamePacketListID::REQUEST_PING_CHECK, Packet);
 	}
 }
 
@@ -105,7 +117,7 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::PingCheck, 30.0f, true);
 }
 
 // Called every frame
@@ -180,7 +192,6 @@ void APlayerCharacter::ClickAndMove()
 		Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE,FRequestMovePacket(AccountID,AuthHashCode,CurrentMapID,Hit.Location.X,Hit.Location.Y));
 		// Z축 보정
 		Hit.Location.Z = GetActorLocation().Z;
-		UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *Hit.Location.ToString());
 		MoveToLocation(Hit.Location);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Hit.Location, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}

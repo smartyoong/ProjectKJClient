@@ -117,7 +117,6 @@ void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
 	{
 		if (Packet.ErrorCode == FAIL)
 		{
-			UE_LOG(LogTemp, Error, TEXT("OnResponseMoveCharacter 이동 실패"));
 			if (!IsInGameThread())
 			{
 				// 게임 스레드에서 실행되도록 큐에 추가
@@ -166,6 +165,7 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 					CharacterSpawnInfo.SpawnMapID = Packet.MapID;
 					AnotherPlayerCharacter->SetSpawnBaseInfo(CharacterSpawnInfo);
 					// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
+					FScopeLock Lock(&CriticalSection);
 					AnotherPlayerCharacterList.Add(AnotherPlayerCharacter);
 				}
 				else
@@ -191,5 +191,37 @@ void AStartMapGameModeBase::GetSameMapUser(APlayerCharacter* Player)
 	Packet.AccountID = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetAccountID();
 	Packet.HashCode = Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->GetUserAuthHashCode();
 	Packet.MapID = Player->GetMapID();
-	Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_GET_SAME_MAP_USER, Packet);
+	Cast<UMainGameInstance>(GetWorld()->GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_GET_SAME_MAP_USER, Packet);	
+}
+
+void AStartMapGameModeBase::OnSendUserMove(FSendUserMovePacket Packet)
+{
+	FScopeLock Lock(&CriticalSection);
+	for (auto p : AnotherPlayerCharacterList)
+	{
+		if (p->GetAccountID() == Packet.AccountID)
+		{
+			if (!IsInGameThread())
+			{
+				// 게임 스레드에서 실행되도록 큐에 추가
+				AsyncTask(ENamedThreads::GameThread, [this,Packet,p]()
+					{
+						p->MoveToLocation(FVector(Packet.X, Packet.Y, p->GetActorLocation().Z));
+					});
+			}
+			return;
+		}
+	}
+}
+
+void AStartMapGameModeBase::OnResponsePingCheck(FResponsePingCheckPacket Packet)
+{
+	FDateTime Now = FDateTime::Now();
+	FDateTime Start (Now.GetYear(), Now.GetMonth(), Now.GetDay(), Packet.Hour, Packet.Min, Packet.Secs, Packet.MSecs); // 밀리초를 마이크로초로 변환
+	FTimespan Span = Now - Start;
+	FString Message = FString::Printf(TEXT("Ping : %.2f ms"), Span.GetTotalMilliseconds());
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+	}
 }
