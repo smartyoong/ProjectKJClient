@@ -38,5 +38,6 @@ public:
 	virtual void OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet) override;
 	void GetSameMapUser(class APlayerCharacter* Player);
 	virtual void OnSendUserMove(FSendUserMovePacket Packet);
+	virtual void OnSendUserMoveArrived(FSendUserMoveArrivedPacket Packet);
 	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet);
 };

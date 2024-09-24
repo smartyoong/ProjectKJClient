@@ -91,9 +91,12 @@ void APlayerCharacter::UpdateMove(float DeltaTime)
 			// 현재 시간 가져오기
 			FDateTime Now = FDateTime::Now();
 			// 시간을 문자열로 변환
-			FString CurrentTimeString = FString::Printf(TEXT("%02d:%02d:%02d.%03d"),
+			FString CurrentTimeString = FString::Printf(TEXT("%d:%d:%d: %d"),
 				Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
-			UE_LOG(LogTemp, Warning, TEXT("Time : %s CurrentLocation: %s %s"), *CurrentTimeString, *NewLocation.ToString(), *AccountID);
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, CurrentTimeString +" "+ NewLocation.ToString() + " " + AccountID);
+			}
 		}
 		SetActorRotation(Direction.Rotation());
 		SetActorLocation(NewLocation);

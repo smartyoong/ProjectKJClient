@@ -127,6 +127,9 @@ void PacketProcessor::ProcessGamePacket(TSharedPtr<TPair<int32, TArray<uint8>>> 
 	case GamePacketListID::RESPONSE_PING_CHECK:
 		GameMode->OnResponsePingCheck(PacketToStruct<FResponsePingCheckPacket>(PacketData->Value));
 		break;
+	case GamePacketListID::SEND_USER_MOVE_ARRIVED:
+		GameMode->OnSendUserMoveArrived(PacketToStruct<FSendUserMoveArrivedPacket>(PacketData->Value));
+		break;
 	default:
 		break;
 	}

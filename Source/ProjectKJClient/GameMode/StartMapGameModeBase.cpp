@@ -136,7 +136,6 @@ void AStartMapGameModeBase::OnResponseMoveCharacter(FResponseMovePacket Packet)
 
 void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPacket Packet)
 {
-	UE_LOG(LogTemp, Warning, TEXT("다른 플레이어 캐릭터 소환"));
 	AsyncTask(ENamedThreads::GameThread, [this, Packet]()
 		{
 			int32 BP_ID = Packet.PresetNumber;
@@ -212,6 +211,18 @@ void AStartMapGameModeBase::OnSendUserMove(FSendUserMovePacket Packet)
 			return;
 		}
 	}
+}
+
+// 최종 위치에 다른 유저가 도달 했을때 정확한 위치로 이동시키는 함수 위의 로직과 동일함
+void AStartMapGameModeBase::OnSendUserMoveArrived(FSendUserMoveArrivedPacket Packet)
+{
+	//일단 이 도착 패킷 함수는 사용안함 (서버에서 코드 제거)
+	FSendUserMovePacket MovePacket;
+	MovePacket.AccountID = Packet.AccountID;
+	MovePacket.MapID = Packet.MapID;
+	MovePacket.X = Packet.X;
+	MovePacket.Y = Packet.Y;
+	OnSendUserMove(MovePacket);
 }
 
 void AStartMapGameModeBase::OnResponsePingCheck(FResponsePingCheckPacket Packet)

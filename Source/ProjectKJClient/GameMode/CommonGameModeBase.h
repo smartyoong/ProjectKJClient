@@ -79,4 +79,6 @@ public:
 	virtual void OnSendUserMove(FSendUserMovePacket Packet) {};
 	// 핑 체크하는 함수
 	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet) {};
+	// 유저 도착시 다른 맵 유저들에게 최종위치로 이동시키도록 전달하는 함수
+	virtual void OnSendUserMoveArrived(FSendUserMoveArrivedPacket Packet) {};
 };
