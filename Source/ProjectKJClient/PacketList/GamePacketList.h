@@ -193,6 +193,10 @@ struct FSendAnotherCharBaseInfoPacket
     int32 EXP;
 	UPROPERTY()
 	FString NickName;
+    UPROPERTY()
+    int32 DestX;
+	UPROPERTY()
+	int32 DestY;
 };
 
 USTRUCT()

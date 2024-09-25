@@ -166,6 +166,9 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 					// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
 					FScopeLock Lock(&CriticalSection);
 					AnotherPlayerCharacterList.Add(AnotherPlayerCharacter);
+					// 음수벡터는 이제막 생성되었을때
+					if (Packet.DestX >= 0 && Packet.DestY >= 0)
+						AnotherPlayerCharacter->MoveToLocation(FVector(Packet.DestX, Packet.DestY, AnotherPlayerCharacter->GetActorLocation().Z));
 				}
 				else
 				{
