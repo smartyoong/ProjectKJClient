@@ -143,7 +143,7 @@ void KinematicController::StopMove()
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)
 {
-	if (Velocity.Size() > 0)
+	if (Velocity.Length() > 0)
 	{
 		return FMath::Atan2(Velocity.Y, Velocity.X);
 	}
