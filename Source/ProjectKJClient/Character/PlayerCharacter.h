@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GroomComponent.h"
 #include "GlobalTypes.h"
+#include "KinematicController.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -36,10 +37,13 @@ private:
 	//이동 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
 	int32 Speed;
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
+	float DestinationBoardRadius;
+	bool PlayMovingAnimation;
 	int32 CurrentMapID;
-	FVector MoveDestination;
 	FVector OldLocation;
-	bool IsMoving = false;
+
+	KinematicController* KinematicMover;
 
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;
@@ -83,7 +87,6 @@ private:
 
 	FTimerHandle TimerHandle;
 private:
-	void UpdateMove(float DeltaTime);
 	void PingCheck();
 protected:
 	// Called when the game starts or when spawned
@@ -95,6 +98,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual ~APlayerCharacter();
+
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	void SetSpawnBaseInfo(FCharacterInfo Info);
@@ -102,8 +107,9 @@ public:
 	void RollBackLocation();
 	void ClickAndMove();
 	UFUNCTION(BlueprintCallable)
-	bool IsMovingNow() { return IsMoving; }
+	bool IsMoveingNow() { return PlayMovingAnimation; };
 	int32 GetMapID() { return CurrentMapID; }
 	FString GetAccountID() { return AccountID; }
 	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
+	void PlayMovingAnim(bool NeedPlay) { PlayMovingAnimation = NeedPlay; };
 };

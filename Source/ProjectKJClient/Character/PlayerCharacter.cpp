@@ -74,34 +74,6 @@ APlayerCharacter::APlayerCharacter()
 	TopDownCameraComponent->bUsePawnControlRotation = false;
 }
 
-void APlayerCharacter::UpdateMove(float DeltaTime)
-{
-	if (IsMoving)
-	{
-		FVector CurrentLocation = GetActorLocation();
-		FVector Direction = (MoveDestination - CurrentLocation).GetSafeNormal();
-		FVector NewLocation = CurrentLocation + (Direction * Speed * DeltaTime);
-
-		// 목표 위치에 도달했는지 확인
-		if (FVector::Dist(NewLocation, MoveDestination) <= Speed * DeltaTime)
-		{
-			NewLocation = MoveDestination;
-			OldLocation = NewLocation;
-			IsMoving = false;
-			// 현재 시간 가져오기
-			FDateTime Now = FDateTime::Now();
-			// 시간을 문자열로 변환
-			FString CurrentTimeString = FString::Printf(TEXT("%d:%d:%d: %d"),
-				Now.GetHour(), Now.GetMinute(), Now.GetSecond(), Now.GetMillisecond());
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, CurrentTimeString +" "+ NewLocation.ToString() + " " + AccountID);
-			}
-		}
-		SetActorRotation(Direction.Rotation());
-		SetActorLocation(NewLocation);
-	}
-}
 
 void APlayerCharacter::PingCheck()
 {
@@ -127,7 +99,9 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UpdateMove(DeltaTime);
+
+	if (KinematicMover)
+		KinematicMover->Update(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -153,6 +127,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
+APlayerCharacter::~APlayerCharacter()
+{
+	if (KinematicMover)
+	{
+		delete KinematicMover;
+		KinematicMover = nullptr;
+	}
+}
+
 void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 {
 	AccountID = Info.AccountID;
@@ -166,20 +149,23 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	JobLevel = Info.JobLevel;
 	Level = Info.Level;
 	EXP = Info.EXP;
+	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius);
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
 {
 	OldLocation = GetActorLocation();
-	MoveDestination = Location;
-	IsMoving = true;
+	if (KinematicMover)
+		KinematicMover->MoveToLocation(Location);
 }
 
 void APlayerCharacter::RollBackLocation()
 {
+	if (KinematicMover)
+		KinematicMover->StopMove();
+
 	if (OldLocation != FVector::ZeroVector)
 		SetActorLocation(OldLocation);
-	IsMoving = false;
 }
 
 void APlayerCharacter::ClickAndMove()
