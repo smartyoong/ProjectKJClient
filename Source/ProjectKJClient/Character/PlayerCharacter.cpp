@@ -149,7 +149,7 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	JobLevel = Info.JobLevel;
 	Level = Info.Level;
 	EXP = Info.EXP;
-	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius);
+	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)

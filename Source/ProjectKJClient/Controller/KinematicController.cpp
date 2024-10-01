@@ -4,101 +4,51 @@
 #include "Controller/KinematicController.h"
 #include "Engine/Engine.h"
 #include "Character/PlayerCharacter.h"
+#include "ChaseMethod.h"
+#include "RunMethod.h"
+#include "MoveMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
-KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius)
+KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius, float MaxAccelerate)
 {
-	Limit.MaxAngular = 1.f;
-	Limit.MaxSpeed = MaxSpeed;
-	Limit.Radius = Radius;
-	Handle.Velocity = FVector::ZeroVector;
-	Handle.Rotation = 0.0f;
-	Steering.Linear = FVector::ZeroVector;
-	Steering.Angular = 0.0f;
-	Destination = MinusOneVector;
+	MaxAngular = 1.f;
+	this->MaxSpeed = MaxSpeed;
+	BoardRadius = Radius;
+	MaxAcceleration = MaxAccelerate;
+	CharacterData.Position = Position;
+	CharacterData.Orientation = 0.0f;
+	CharacterData.Velocity = FVector::ZeroVector;
+	CharacterData.Rotation = 0.0f;
+	TargetData.Orientation = 0.0f;
+	TargetData.Position = MinusOneVector;
+	TargetData.Velocity = FVector::ZeroVector;
+	TargetData.Rotation = 0.0f;
+	TimeToTarget = 0.25f;
+	SlowRadius = 100.0f;
 	this->Owner = Owner;
+	MaxRotation = 10.f;
 }
 
 KinematicController::~KinematicController()
 {
+	if (!BehaviorQueue.IsEmpty())
+	{
+		Behaviors* TempBehavior = nullptr;
+		while (BehaviorQueue.Dequeue(TempBehavior))
+		{
+			delete TempBehavior;
+		}
+	}
 }
 
 void KinematicController::MoveToLocation(FVector ToDestination)
 {
-	// 이동 실패여부를 따지지 않고 이동시킵니다.
-	KinematicHandle NewHandle;
-	// 목적지까지의 가속도 및 방향을 계산합니다.
-	NewHandle.Velocity = ToDestination - GetCurrentPosition();
-	NewHandle.Velocity.Normalize();
-	NewHandle.Velocity *= Limit.MaxSpeed;
-	NewHandle.Rotation = 0;
-	// 이동을 위한 핸들을 업데이트합니다.
-	FScopeLock Lock(&CS);
-	SetDestination(ToDestination);
-	SetKinematicHandle(NewHandle);
-	SetRotation(NewOrientation(GetCurrentOrientation(), Handle.Velocity));
-	MakePlayMovingAnimation();
+	TargetData.Position = ToDestination;
+	MoveMethod* TempMove = new MoveMethod();
+	BehaviorQueue.Enqueue(TempMove);
 }
 
-void KinematicController::RunFromTarget(FVector TargetPosition)
-{
-	// 이동 실패여부를 따지지 않고 이동시킵니다.
-	// 종료 조건은 존재하지 않습니다. 다른 방법으로 핸들을 조정해야합니다.
-	KinematicHandle NewHandle;
-	// 목적지까지의 가속도 및 방향을 계산합니다.
-	NewHandle.Velocity = GetCurrentPosition() - TargetPosition;
-	NewHandle.Velocity.Normalize();
-	NewHandle.Velocity *= Limit.MaxSpeed;
-	NewHandle.Rotation = 0;
-	// 이동을 위한 핸들을 업데이트합니다.
-	SetKinematicHandle(NewHandle);
-	SetRotation(NewOrientation(GetCurrentOrientation(), Handle.Velocity));
-	MakePlayMovingAnimation();
-}
-
-void KinematicController::Wandering()
-{
-	// 이동 실패여부를 따지지 않고 이동시킵니다.
-	// 종료 조건은 존재하지 않습니다. 다른 방법으로 핸들을 조정해야합니다.
-	KinematicHandle NewHandle;
-	NewHandle.Velocity = Limit.MaxSpeed * FVector(FMath::Cos(GetCurrentOrientation()), FMath::Sin(GetCurrentOrientation()), 0);
-	NewHandle.Rotation = (FMath::FRand()-FMath::FRand()) * Limit.MaxAngular;
-	// 이동을 위한 핸들을 업데이트합니다.
-	SetKinematicHandle(NewHandle);
-	MakePlayMovingAnimation();
-}
-
-float KinematicController::GetCurrentOrientation()
-{
-	if (Owner)
-		return FMath::DegreesToRadians(Owner->GetActorRotation().Yaw);
-	return -1.f;
-}
-
-FVector KinematicController::GetCurrentPosition()
-{
-	if (Owner)
-		return Owner->GetActorLocation();
-	return MinusOneVector;
-}
-
-FVector KinematicController::GetDestination()
-{
-	return Destination;
-}
-
-void KinematicController::SetDestination(FVector ToDestination)
-{
-	FScopeLock Lock(&CS);
-	this->Destination = ToDestination;
-}
-
-void KinematicController::SetKinematicHandle(KinematicHandle NewHandle)
-{
-	FScopeLock Lock(&CS);
-	Handle = NewHandle;
-}
 
 void KinematicController::SetRotation(float NewOrientation) // 라디안
 {
@@ -110,35 +60,100 @@ void KinematicController::SetRotation(float NewOrientation) // 라디안
 void KinematicController::SetPosition(FVector NewPosition)
 {
 	if (Owner)
-		Owner->SetActorLocation(NewPosition);
+	{
+		FVector CurrentPosition = Owner->GetActorLocation();
+		FVector MixPosition{ NewPosition.X, NewPosition.Y, CurrentPosition.Z };
+		Owner->SetActorLocation(MixPosition);
+	}
 }
 
 void KinematicController::Update(float DeltaTime)
 {
-	// 위치와 방향을 속도에 따라 업데이트
-	SetPosition(GetCurrentPosition() + Handle.Velocity * DeltaTime);
-	SetRotation(GetCurrentOrientation() + Handle.Rotation * DeltaTime);
+	// 위치와 방향을 속도에 따라 업데이트 (Z축은 사용하지 않음)
+	CharacterData.Position.X += CharacterData.Velocity.X * DeltaTime;
+	CharacterData.Position.Y += CharacterData.Velocity.Y * DeltaTime;
+	CharacterData.Position.Z = 0.0f;
+	CharacterData.Velocity.Z = 0.0f;
+	TargetData.Position.Z = 0.0f;
+	TargetData.Velocity.Z = 0.0f;
 
-	// 목적지가 설정되어있으면, 목적지에 도착했는지 확인
-	if (Destination != MinusOneVector)
+	CharacterData.Orientation += CharacterData.Rotation * DeltaTime;
+	SetPosition(CharacterData.Position);
+	SetRotation(CharacterData.Orientation);
+
+	SteeringHandle CharacterSteering;
+	CharacterSteering.Linear = FVector::ZeroVector;
+	CharacterSteering.Angular = 0.0f;
+
+	TQueue<Behaviors*> BackupQueue;
+	while(!BehaviorQueue.IsEmpty())
 	{
-		Arrive();
+		std::optional<SteeringHandle> TempHandle;
+		Behaviors* TempBehavior = nullptr;
+		BehaviorQueue.Dequeue(TempBehavior);
+		if (TempBehavior == nullptr)
+			continue;
+		TempHandle = TempBehavior->GetSteeringHandle(CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (!TempHandle)
+		{
+			// 더이상 움직임이 필요없는 운동은 삭제
+			delete TempBehavior;
+			FDateTime Now = FDateTime::Now();
+			UE_LOG(LogTemp, Warning, TEXT("도착 ! %s"), *Now.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("도착 ! %s"), *CharacterData.Position.ToString());
+			StopMove();
+			continue;
+		}
+		// 속도와 회전 속도를 가속도와 각가속도에 따라 업데이트
+		CharacterSteering.Linear += TempHandle->Linear;
+		CharacterSteering.Angular += TempHandle->Angular;
+		// 아직 운동량이 남았으니 다시 큐에 넣어줄 준비를한다.
+		BackupQueue.Enqueue(TempBehavior);
+	}
+
+	//큐에 백업된 것들을 다시 큐에 넣어준다.
+	if (!BackupQueue.IsEmpty())
+	{
+		while (!BackupQueue.IsEmpty())
+		{
+			Behaviors* TempBehavior = nullptr;
+			BackupQueue.Dequeue(TempBehavior);
+			BehaviorQueue.Enqueue(TempBehavior);
+		}
 	}
 
 	// 속도와 회전 속도를 가속도와 각가속도에 따라 업데이트
-	FScopeLock Lock(&CS);
-	Handle.Velocity += Steering.Linear * DeltaTime;
-	Handle.Rotation += Steering.Angular * DeltaTime;
+	CharacterData.Velocity.X += CharacterSteering.Linear.X * DeltaTime;
+	CharacterData.Velocity.Y += CharacterSteering.Linear.Y * DeltaTime;
+	CharacterData.Rotation += CharacterSteering.Angular * DeltaTime;
+
+	if (CharacterData.Velocity.Size() > MaxSpeed)
+	{
+		CharacterData.Velocity.Normalize();
+		CharacterData.Velocity *= MaxSpeed;
+	}
+
+	if (CharacterData.Rotation > MaxAngular)
+	{
+		CharacterData.Rotation = MaxAngular;
+	}
+	// 움직임 여부에 따라서 애니메이션 처리
+	if (!IsMovingNow())
+	{
+		StopMovingAnimation();
+	}
+	else
+	{
+		MakePlayMovingAnimation();
+	}
 }
 
 void KinematicController::StopMove()
 {
-	SetDestination(MinusOneVector);
-	StopMovingAnimation();
-	KinematicHandle NewHandle;
-	NewHandle.Velocity = FVector::ZeroVector;
-	NewHandle.Rotation = 0;
-	SetKinematicHandle(NewHandle);
+	// 이동을 멈추고, 애니메이션을 멈춥니다.
+	CharacterData.Velocity = FVector::ZeroVector;
+	CharacterData.Rotation = 0;
+	BehaviorQueue.Empty();
 }
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)
@@ -149,36 +164,6 @@ float KinematicController::NewOrientation(float CurrentOrientation, FVector Velo
 	}
 
 	return CurrentOrientation;
-}
-
-void KinematicController::Arrive()
-{
-	KinematicHandle NewHandle;
-	FVector CurrentPosition = GetCurrentPosition();
-	FVector CurrentDestination = GetDestination();
-	NewHandle.Velocity = CurrentDestination - CurrentPosition;
-	// 목적지에 도착했는지 확인
-	if (NewHandle.Velocity.Length() < Limit.Radius)
-	{
-		NewHandle.Velocity = FVector::ZeroVector;
-		NewHandle.Rotation = 0;
-		SetPosition(CurrentDestination);
-		SetDestination(MinusOneVector);
-		StopMovingAnimation();
-	}
-	else
-	{
-		const float TimeToTarget = 0.25f;
-		NewHandle.Velocity /= TimeToTarget;
-		if (NewHandle.Velocity.Length() > Limit.MaxSpeed)
-		{
-			NewHandle.Velocity.Normalize();
-			NewHandle.Velocity *= Limit.MaxSpeed;
-			NewHandle.Rotation = 0;
-		}
-	}
-	SetKinematicHandle(NewHandle);
-	SetRotation(NewOrientation(GetCurrentOrientation(), Handle.Velocity));
 }
 
 void KinematicController::MakePlayMovingAnimation()
@@ -206,6 +191,11 @@ void KinematicController::StopMovingAnimation()
 			Player->PlayMovingAnim(false);
 		}
 	}
+}
+
+bool KinematicController::IsMovingNow()
+{
+	return FMath::Abs(CharacterData.Rotation) > 1.f || CharacterData.Velocity.Length() > 3.f;
 }
 
 

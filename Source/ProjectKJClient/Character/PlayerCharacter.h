@@ -39,6 +39,8 @@ private:
 	int32 Speed;
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
 	float DestinationBoardRadius;
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
+	float MaxAccelerate;
 	bool PlayMovingAnimation;
 	int32 CurrentMapID;
 	FVector OldLocation;

@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <optional>
 
 /**
  * 
  */
 
-struct StreeringHandle
+
+struct SteeringHandle
 {
 	FVector Linear; // 가속도
 	float Angular; // 각가속도
@@ -18,47 +20,45 @@ struct KinematicStatic
 {
 	FVector Position; // 위치
 	float Orientation; // 방향
+	FVector Velocity; // 속도
+	float Rotation; // 회전
 };
 
-struct LimitData
+class Behaviors
 {
-	float MaxSpeed; // 최대 속도
-	float MaxAngular; // 최대 각속도
-	float Radius; // 반경
-};
-
-struct KinematicHandle
-{
-	FVector Velocity;
-	float Rotation;
+public:
+	virtual std::optional<SteeringHandle> GetSteeringHandle(KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
+		float MaxRotation, float MaxAngular, float TargetRadius, float SlowRadius, float TimeToTarget) = 0;
+	virtual ~Behaviors() = default; // 가상 소멸자 추가
 };
 
 class PROJECTKJCLIENT_API KinematicController
 {
 private:
 	class AActor* Owner;
-	LimitData Limit;
-	KinematicHandle Handle;
-	StreeringHandle Steering;
-	FVector Destination;
-	FCriticalSection CS;
-	float GetCurrentOrientation();
-	FVector GetCurrentPosition();
-	FVector GetDestination();
-	void SetDestination(FVector Destination);
-	void SetKinematicHandle(KinematicHandle NewHandle);
+	float MaxSpeed; // 최대 속도
+	float MaxAngular; // 최대 각속도
+	float BoardRadius; // 반경
+	float MaxAcceleration; // 최대 가속도
+	float MaxRotation; // 최대 회전
+	float SlowRadius; // 감속 반경
+	float TimeToTarget; // 목표까지 도달하는 시간
+	KinematicStatic CharacterData;
+	KinematicStatic TargetData;
+	TQueue<Behaviors*,EQueueMode::Mpsc> BehaviorQueue;
+
 	void SetRotation(float NewOrientation);
 	void SetPosition(FVector NewPosition);
 	float NewOrientation(float CurrentOrientation, FVector Velocity);
-	void Arrive();
+
 	void MakePlayMovingAnimation();
 	void StopMovingAnimation();
+	bool IsMovingNow();
+
 public:
-	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius);
+	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate);
 	~KinematicController();
 	void MoveToLocation(FVector Destination);
-	void RunFromTarget(FVector TargetPosition);
-	void Wandering();
 	void Update(float DeltaTime);
 	void StopMove();
 };
