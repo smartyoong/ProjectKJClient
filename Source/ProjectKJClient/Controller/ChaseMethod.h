@@ -11,7 +11,7 @@
 class PROJECTKJCLIENT_API ChaseMethod : public Behaviors
 {
 public:
-	virtual std::optional<SteeringHandle> GetSteeringHandle(KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
+	virtual std::optional<SteeringHandle> GetSteeringHandle(float Ratio, KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
 		float MaxRotation, float MaxAngular, float TargetRadius, float SlowRadius, float TimeToTarget) override;
 	virtual ~ChaseMethod() = default;
 };

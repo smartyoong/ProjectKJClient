@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include <optional>
+#include <atomic>
 
 /**
  * 
@@ -14,6 +15,12 @@ struct SteeringHandle
 {
 	FVector Linear; // 가속도
 	float Angular; // 각가속도
+	SteeringHandle& operator += (const SteeringHandle& Other)
+	{
+		Linear += Other.Linear;
+		Angular += Other.Angular;
+		return *this;
+	}
 };
 
 struct KinematicStatic
@@ -24,10 +31,23 @@ struct KinematicStatic
 	float Rotation; // 회전
 };
 
+enum class MoveType : int32
+{
+	None = 0,
+	Chase = 1 << 0,
+	RunAway = 1 << 1,
+	Move = 1 << 2,
+	VelocityStop = 1 << 3,
+	ForceAdjustPosition = 1 << 4,
+	Brake = 1 << 5
+};
+// 비트 연산을 지원하기 위한 매크로
+ENUM_CLASS_FLAGS(MoveType)
+
 class Behaviors
 {
 public:
-	virtual std::optional<SteeringHandle> GetSteeringHandle(KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
+	virtual std::optional<SteeringHandle> GetSteeringHandle(float Ratio, KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
 		float MaxRotation, float MaxAngular, float TargetRadius, float SlowRadius, float TimeToTarget) = 0;
 	virtual ~Behaviors() = default; // 가상 소멸자 추가
 };
@@ -45,7 +65,7 @@ private:
 	float TimeToTarget; // 목표까지 도달하는 시간
 	KinematicStatic CharacterData;
 	KinematicStatic TargetData;
-	TQueue<Behaviors*,EQueueMode::Mpsc> BehaviorQueue;
+	std::atomic<int32>MoveFlag;
 
 	void SetRotation(float NewOrientation);
 	void SetPosition(FVector NewPosition);
@@ -54,11 +74,15 @@ private:
 	void MakePlayMovingAnimation();
 	void StopMovingAnimation();
 	bool IsMovingNow();
+	void AddMoveFlag(MoveType Flag);
+	void RemoveMoveFlag(MoveType Flag);
+	bool HasMoveFlag(MoveType Flag);
 
 public:
 	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate);
-	~KinematicController();
+	~KinematicController() = default;
 	void MoveToLocation(FVector Destination);
 	void Update(float DeltaTime);
 	void StopMove();
+
 };

@@ -7,6 +7,7 @@
 #include "ChaseMethod.h"
 #include "RunMethod.h"
 #include "MoveMethod.h"
+#include "BrakeMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
@@ -24,29 +25,17 @@ KinematicController::KinematicController(AActor* Owner ,FVector Position, float 
 	TargetData.Position = MinusOneVector;
 	TargetData.Velocity = FVector::ZeroVector;
 	TargetData.Rotation = 0.0f;
-	TimeToTarget = 0.25f;
+	TimeToTarget = 0.1f;
 	SlowRadius = 100.0f;
 	this->Owner = Owner;
 	MaxRotation = 10.f;
 }
 
-KinematicController::~KinematicController()
-{
-	if (!BehaviorQueue.IsEmpty())
-	{
-		Behaviors* TempBehavior = nullptr;
-		while (BehaviorQueue.Dequeue(TempBehavior))
-		{
-			delete TempBehavior;
-		}
-	}
-}
 
 void KinematicController::MoveToLocation(FVector ToDestination)
 {
 	TargetData.Position = ToDestination;
-	MoveMethod* TempMove = new MoveMethod();
-	BehaviorQueue.Enqueue(TempMove);
+	AddMoveFlag(MoveType::Move);
 }
 
 
@@ -78,49 +67,90 @@ void KinematicController::Update(float DeltaTime)
 	TargetData.Velocity.Z = 0.0f;
 
 	CharacterData.Orientation += CharacterData.Rotation * DeltaTime;
+
 	SetPosition(CharacterData.Position);
 	SetRotation(CharacterData.Orientation);
 
-	SteeringHandle CharacterSteering;
-	CharacterSteering.Linear = FVector::ZeroVector;
-	CharacterSteering.Angular = 0.0f;
+	SteeringHandle CharacterSteering{FVector::ZeroVector,0};
 
-	TQueue<Behaviors*> BackupQueue;
-	while(!BehaviorQueue.IsEmpty())
+
+	// 우선 순위 기반 행동 조합이다.
+
+	if (HasMoveFlag(MoveType::Move))
 	{
-		std::optional<SteeringHandle> TempHandle;
-		Behaviors* TempBehavior = nullptr;
-		BehaviorQueue.Dequeue(TempBehavior);
-		if (TempBehavior == nullptr)
-			continue;
-		TempHandle = TempBehavior->GetSteeringHandle(CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (!TempHandle)
+		MoveMethod Move;
+		auto Result = Move.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
 		{
-			// 더이상 움직임이 필요없는 운동은 삭제
-			delete TempBehavior;
-			FDateTime Now = FDateTime::Now();
-			UE_LOG(LogTemp, Warning, TEXT("도착 ! %s"), *Now.ToString());
-			UE_LOG(LogTemp, Warning, TEXT("도착 ! %s"), *CharacterData.Position.ToString());
-			StopMove();
-			continue;
+			CharacterSteering += *Result;
 		}
-		// 속도와 회전 속도를 가속도와 각가속도에 따라 업데이트
-		CharacterSteering.Linear += TempHandle->Linear;
-		CharacterSteering.Angular += TempHandle->Angular;
-		// 아직 운동량이 남았으니 다시 큐에 넣어줄 준비를한다.
-		BackupQueue.Enqueue(TempBehavior);
-	}
-
-	//큐에 백업된 것들을 다시 큐에 넣어준다.
-	if (!BackupQueue.IsEmpty())
-	{
-		while (!BackupQueue.IsEmpty())
+		else
 		{
-			Behaviors* TempBehavior = nullptr;
-			BackupQueue.Dequeue(TempBehavior);
-			BehaviorQueue.Enqueue(TempBehavior);
+			RemoveMoveFlag(MoveType::Move);
+			AddMoveFlag(MoveType::Brake);
 		}
 	}
+
+	if (HasMoveFlag(MoveType::Chase))
+	{
+		ChaseMethod Chase;
+		auto Result = Chase.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::Chase);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::RunAway))
+	{
+		RunMethod RunAway;
+		auto Result = RunAway.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::RunAway);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::Brake))
+	{
+		BrakeMethod Brake;
+		auto Result = Brake.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, DeltaTime);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::Brake);
+			AddMoveFlag(MoveType::VelocityStop);
+			AddMoveFlag(MoveType::ForceAdjustPosition);
+		}
+	}
+
+	// 속력을 완전 0으로 만들어주는 플래그 (강제 멈춤)
+	if (HasMoveFlag(MoveType::VelocityStop))
+	{
+		CharacterData.Velocity = FVector::ZeroVector;
+		CharacterSteering.Linear = FVector::ZeroVector;
+		RemoveMoveFlag(MoveType::VelocityStop);
+		UE_LOG(LogTemp, Warning, TEXT("Velocity Stop"));
+	}
+	// 위치를 강제로 조정하는 플래그
+	if (HasMoveFlag(MoveType::ForceAdjustPosition))
+	{
+		CharacterData.Position = TargetData.Position;
+		RemoveMoveFlag(MoveType::ForceAdjustPosition);
+		UE_LOG(LogTemp, Warning, TEXT("Force Adjust Position %s"), *CharacterData.Position.ToString());
+	}
+
 
 	// 속도와 회전 속도를 가속도와 각가속도에 따라 업데이트
 	CharacterData.Velocity.X += CharacterSteering.Linear.X * DeltaTime;
@@ -151,9 +181,8 @@ void KinematicController::Update(float DeltaTime)
 void KinematicController::StopMove()
 {
 	// 이동을 멈추고, 애니메이션을 멈춥니다.
-	CharacterData.Velocity = FVector::ZeroVector;
-	CharacterData.Rotation = 0;
-	BehaviorQueue.Empty();
+	RemoveMoveFlag(MoveType::Move);
+	AddMoveFlag(MoveType::VelocityStop);
 }
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)
@@ -196,6 +225,31 @@ void KinematicController::StopMovingAnimation()
 bool KinematicController::IsMovingNow()
 {
 	return FMath::Abs(CharacterData.Rotation) > 1.f || CharacterData.Velocity.Length() > 3.f;
+}
+
+void KinematicController::AddMoveFlag(MoveType Flag)
+{
+	int32 InitialValue, NewValue;
+	do
+	{
+		InitialValue = MoveFlag.load();
+		NewValue = InitialValue | static_cast<int32>(Flag);
+	} while (!MoveFlag.compare_exchange_weak(InitialValue, NewValue));
+}
+
+void KinematicController::RemoveMoveFlag(MoveType Flag)
+{
+	int32 InitialValue, NewValue;
+	do
+	{
+		InitialValue = MoveFlag.load();
+		NewValue = InitialValue & ~static_cast<int32>(Flag);
+	} while (!MoveFlag.compare_exchange_weak(InitialValue, NewValue));
+}
+
+bool KinematicController::HasMoveFlag(MoveType Flag)
+{
+	return (MoveFlag.load() & static_cast<int32>(Flag)) == static_cast<int32>(Flag);
 }
 
 
