@@ -8,6 +8,8 @@
 #include "RunMethod.h"
 #include "MoveMethod.h"
 #include "BrakeMethod.h"
+#include "AlignMethod.h"
+#include "EqualVelocityMoveMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
@@ -35,7 +37,10 @@ KinematicController::KinematicController(AActor* Owner ,FVector Position, float 
 void KinematicController::MoveToLocation(FVector ToDestination)
 {
 	TargetData.Position = ToDestination;
-	AddMoveFlag(MoveType::Move);
+	TargetData.Position.Z = 0.0f;
+	CharacterData.Position.Z = 0.0f;
+	CharacterData.Orientation = NewOrientation(CharacterData.Orientation, TargetData.Position - CharacterData.Position);
+	AddMoveFlag(MoveType::EqualVelocityMove);
 }
 
 
@@ -91,6 +96,21 @@ void KinematicController::Update(float DeltaTime)
 		}
 	}
 
+	if (HasMoveFlag(MoveType::Align))
+	{
+		AlignMethod Align;
+		auto Result = Align.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, 2.f, 10.f, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::Align);
+			AddMoveFlag(MoveType::RotateStop);
+		}
+	}
+
 	if (HasMoveFlag(MoveType::Chase))
 	{
 		ChaseMethod Chase;
@@ -131,24 +151,39 @@ void KinematicController::Update(float DeltaTime)
 		{
 			RemoveMoveFlag(MoveType::Brake);
 			AddMoveFlag(MoveType::VelocityStop);
-			AddMoveFlag(MoveType::ForceAdjustPosition);
 		}
 	}
 
-	// 속력을 완전 0으로 만들어주는 플래그 (강제 멈춤)
+	if (HasMoveFlag(MoveType::EqualVelocityMove))
+	{
+		EqualVelocityMoveMethod EqualVelocityMove;
+		auto Result = EqualVelocityMove.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			// 이 메서드는 등속도 운동이다.
+			CharacterData.Velocity += Result->Linear;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::EqualVelocityMove);
+			AddMoveFlag(MoveType::VelocityStop);
+		}
+	}
+
+	// 속력을 완전 0으로 만들어주는 플래그 (강제 멈춤, 위치 강제 조정)
 	if (HasMoveFlag(MoveType::VelocityStop))
 	{
 		CharacterData.Velocity = FVector::ZeroVector;
 		CharacterSteering.Linear = FVector::ZeroVector;
-		RemoveMoveFlag(MoveType::VelocityStop);
-		UE_LOG(LogTemp, Warning, TEXT("Velocity Stop"));
-	}
-	// 위치를 강제로 조정하는 플래그
-	if (HasMoveFlag(MoveType::ForceAdjustPosition))
-	{
 		CharacterData.Position = TargetData.Position;
-		RemoveMoveFlag(MoveType::ForceAdjustPosition);
-		UE_LOG(LogTemp, Warning, TEXT("Force Adjust Position %s"), *CharacterData.Position.ToString());
+		RemoveMoveFlag(MoveType::VelocityStop);
+	}
+	// 회전을 강제로 멈추는 플래그
+	if (HasMoveFlag(MoveType::RotateStop))
+	{
+		CharacterData.Rotation = 0;
+		CharacterSteering.Angular = 0;
+		RemoveMoveFlag(MoveType::RotateStop);
 	}
 
 
@@ -182,7 +217,9 @@ void KinematicController::StopMove()
 {
 	// 이동을 멈추고, 애니메이션을 멈춥니다.
 	RemoveMoveFlag(MoveType::Move);
-	AddMoveFlag(MoveType::VelocityStop);
+	RemoveMoveFlag(MoveType::Chase);
+	RemoveMoveFlag(MoveType::RunAway);
+	RemoveMoveFlag(MoveType::EqualVelocityMove);
 }
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)

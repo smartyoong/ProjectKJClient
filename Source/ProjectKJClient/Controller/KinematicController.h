@@ -14,7 +14,7 @@
 struct SteeringHandle
 {
 	FVector Linear; // 가속도
-	float Angular; // 각가속도
+	float Angular = 0.f; // 각가속도
 	SteeringHandle& operator += (const SteeringHandle& Other)
 	{
 		Linear += Other.Linear;
@@ -26,9 +26,9 @@ struct SteeringHandle
 struct KinematicStatic
 {
 	FVector Position; // 위치
-	float Orientation; // 방향
+	float Orientation = 0.f; // 방향
 	FVector Velocity; // 속도
-	float Rotation; // 회전
+	float Rotation =0.f; // 회전
 };
 
 enum class MoveType : int32
@@ -38,8 +38,10 @@ enum class MoveType : int32
 	RunAway = 1 << 1,
 	Move = 1 << 2,
 	VelocityStop = 1 << 3,
-	ForceAdjustPosition = 1 << 4,
-	Brake = 1 << 5
+	EqualVelocityMove = 1 << 4,
+	Brake = 1 << 5,
+	RotateStop = 1 << 6,
+	Align = 1 << 7,
 };
 // 비트 연산을 지원하기 위한 매크로
 ENUM_CLASS_FLAGS(MoveType)
