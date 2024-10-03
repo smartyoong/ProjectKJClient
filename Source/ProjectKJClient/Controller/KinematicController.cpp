@@ -10,6 +10,7 @@
 #include "BrakeMethod.h"
 #include "AlignMethod.h"
 #include "EqualVelocityMoveMethod.h"
+#include "VelocityMatchMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
@@ -108,6 +109,20 @@ void KinematicController::Update(float DeltaTime)
 		{
 			RemoveMoveFlag(MoveType::Align);
 			AddMoveFlag(MoveType::RotateStop);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::VelocityMatch))
+	{
+		VelocityMatchMethod VelocityMatch;
+		auto Result = VelocityMatch.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::VelocityMatch);
 		}
 	}
 
