@@ -47,6 +47,7 @@ enum class MoveType : int32
 	LockOn = 1 << 10,
 	LookAtToMove = 1 << 11,
 	EqualVelocityWander = 1 << 12,
+	Wander = 1 << 13,
 };
 // 비트 연산을 지원하기 위한 매크로
 ENUM_CLASS_FLAGS(MoveType)

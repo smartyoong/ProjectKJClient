@@ -15,6 +15,7 @@
 #include "LockOnMethod.h"
 #include "LookAtToMoveMethod.h"
 #include "EqualVelocityWander.h"
+#include "WanderMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
@@ -165,6 +166,18 @@ void KinematicController::Update(float DeltaTime)
 		{
 			RemoveMoveFlag(MoveType::Brake);
 			AddMoveFlag(MoveType::VelocityStop);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::Wander))
+	{
+		WanderMethod Wander;
+		auto Result = Wander.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			// 가속도를 1번만 추가하니까 늦을수도 있음 (어울릴지도?)
+			CharacterSteering += *Result;
+			RemoveMoveFlag(MoveType::Wander);
 		}
 	}
 
