@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include <optional>
 #include <atomic>
+#include "PathComponent.h"
 
 /**
  * 
@@ -48,6 +49,13 @@ enum class MoveType : int32
 	LookAtToMove = 1 << 11,
 	EqualVelocityWander = 1 << 12,
 	Wander = 1 << 13,
+	FollowPath = 1 << 14,
+	Seperate = 1 << 15,
+	CollisionAvoidance = 1 << 16,
+	ObstacleAvoidance = 1 << 17,
+	EqualVelocityChase = 1 << 18,
+	EqualVelocityRunAway = 1 << 19,
+	OrientationChange = 1 << 20,
 };
 // 비트 연산을 지원하기 위한 매크로
 ENUM_CLASS_FLAGS(MoveType)
@@ -75,6 +83,8 @@ private:
 	KinematicStatic TargetData;
 	std::atomic<int32>MoveFlag;
 
+	PathComponent* PathComp;
+
 	void SetRotation(float NewOrientation);
 	void SetPosition(FVector NewPosition);
 	float NewOrientation(float CurrentOrientation, FVector Velocity);
@@ -87,7 +97,7 @@ private:
 	bool HasMoveFlag(MoveType Flag);
 
 public:
-	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate);
+	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate, PathComponent* Path);
 	~KinematicController() = default;
 	void MoveToLocation(FVector Destination);
 	void Update(float DeltaTime);

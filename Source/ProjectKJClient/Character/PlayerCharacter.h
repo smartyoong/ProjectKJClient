@@ -7,6 +7,7 @@
 #include "GroomComponent.h"
 #include "GlobalTypes.h"
 #include "KinematicController.h"
+#include "PathComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -46,6 +47,7 @@ private:
 	FVector OldLocation;
 
 	KinematicController* KinematicMover;
+	PathComponent* PathComp;
 
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;

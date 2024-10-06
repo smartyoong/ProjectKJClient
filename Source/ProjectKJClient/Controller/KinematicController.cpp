@@ -16,10 +16,17 @@
 #include "LookAtToMoveMethod.h"
 #include "EqualVelocityWander.h"
 #include "WanderMethod.h"
+#include "PathComponent.h"
+#include "FollowPathMethod.h"
+#include "SeperateMethod.h"
+#include "CollisionAvoidanceMethod.h"
+#include "ObstacleAvoidanceMethod.h"
+#include "EqualVelocityChaseMethod.h"
+#include "EqualVelocityRunAwayMethod.h"
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
-KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius, float MaxAccelerate)
+KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius, float MaxAccelerate, PathComponent* Path)
 {
 	MaxAngular = 30.f;
 	this->MaxSpeed = MaxSpeed;
@@ -37,6 +44,7 @@ KinematicController::KinematicController(AActor* Owner ,FVector Position, float 
 	SlowRadius = 100.0f;
 	this->Owner = Owner;
 	MaxRotation = 100.f;
+	PathComp = Path;
 }
 
 
@@ -45,7 +53,6 @@ void KinematicController::MoveToLocation(FVector ToDestination)
 	TargetData.Position = ToDestination;
 	TargetData.Position.Z = 0.0f;
 	CharacterData.Position.Z = 0.0f;
-	CharacterData.Orientation = NewOrientation(CharacterData.Orientation, TargetData.Position - CharacterData.Position);
 	AddMoveFlag(MoveType::EqualVelocityMove);
 	//이거 되는지 테스트 해봅시다. 되긴하는데 체감이 안좋다 빙판 걷는 느낌이랄까?
 	//AddMoveFlag(MoveType::Move);
@@ -181,6 +188,61 @@ void KinematicController::Update(float DeltaTime)
 		}
 	}
 
+	if (HasMoveFlag(MoveType::FollowPath))
+	{
+		if (PathComp == nullptr)
+		{
+			RemoveMoveFlag(MoveType::FollowPath);
+			return;
+		}
+
+		FollowPathMethod FollowPath(PathComp);
+		auto Result = FollowPath.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+	}
+
+	if (HasMoveFlag(MoveType::Seperate))
+	{
+		//실제로 사용할 때는 타겟을 넣어주어야 한다.
+		SeperateMethod Seperate(nullptr);
+		auto Result = Seperate.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+	}
+
+	if (HasMoveFlag(MoveType::CollisionAvoidance))
+	{
+		//실제로 사용할 때는 타겟을 넣어주어야 한다.
+		CollisionAvoidanceMethod CollisionAvoidance(nullptr);
+		//여기서 BoardRadius 대신 Collision Component의 Radius를 넣어주어야 한다.
+		auto Result = CollisionAvoidance.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+	}
+
+	if (HasMoveFlag(MoveType::ObstacleAvoidance))
+	{
+		// 아직 서버가 구현되지 않았다.
+		ObstacleAvoidanceMethod ObstacleAvoidance(Owner);
+		auto Result = ObstacleAvoidance.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterSteering += *Result;
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::ObstacleAvoidance);
+		}
+	}
+
+
 	if (HasMoveFlag(MoveType::EqualVelocityMove))
 	{
 		EqualVelocityMoveMethod EqualVelocityMove;
@@ -189,6 +251,7 @@ void KinematicController::Update(float DeltaTime)
 		{
 			// 이 메서드는 등속도 운동이다.
 			CharacterData.Velocity += Result->Linear;
+			AddMoveFlag(MoveType::OrientationChange);
 		}
 		else
 		{
@@ -207,6 +270,33 @@ void KinematicController::Update(float DeltaTime)
 			CharacterData.Rotation += Result->Angular;
 			//한번 배회하면 일단 다시 배회는 다음에 하자
 			RemoveMoveFlag(MoveType::EqualVelocityWander);
+			AddMoveFlag(MoveType::OrientationChange);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::EqualVelocityChase))
+	{
+		EqualVelocityChaseMethod EqualVelocityChase;
+		auto Result = EqualVelocityChase.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterData.Velocity += Result->Linear;
+			CharacterData.Rotation += Result->Angular;
+			RemoveMoveFlag(MoveType::EqualVelocityChase);
+			AddMoveFlag(MoveType::OrientationChange);
+		}
+	}
+
+	if (HasMoveFlag(MoveType::EqualVelocityRunAway))
+	{
+		EqualVelocityRunAwayMethod EqualVelocityRunAway;
+		auto Result = EqualVelocityRunAway.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
+		if (Result)
+		{
+			CharacterData.Velocity += Result->Linear;
+			CharacterData.Rotation += Result->Angular;
+			RemoveMoveFlag(MoveType::EqualVelocityRunAway);
+			AddMoveFlag(MoveType::OrientationChange);
 		}
 	}
 
@@ -290,6 +380,12 @@ void KinematicController::Update(float DeltaTime)
 	if (CharacterData.Rotation > MaxAngular)
 	{
 		CharacterData.Rotation = MaxAngular;
+	}
+
+	if (HasMoveFlag(MoveType::OrientationChange))
+	{
+		CharacterData.Orientation = NewOrientation(CharacterData.Orientation, TargetData.Position - CharacterData.Position);
+		RemoveMoveFlag(MoveType::OrientationChange);
 	}
 
 	// 회전을 강제로 멈추는 플래그

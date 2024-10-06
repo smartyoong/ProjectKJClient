@@ -149,7 +149,8 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	JobLevel = Info.JobLevel;
 	Level = Info.Level;
 	EXP = Info.EXP;
-	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
+	// 캐릭터는 PathComponenet를 일단 안쓴다. (변수에는 들고 있도록 가정하자)
+	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate, nullptr);
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
