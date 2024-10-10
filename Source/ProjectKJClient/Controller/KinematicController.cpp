@@ -72,7 +72,15 @@ void KinematicController::SetPosition(FVector NewPosition)
 	{
 		FVector CurrentPosition = Owner->GetActorLocation();
 		FVector MixPosition{ NewPosition.X, NewPosition.Y, CurrentPosition.Z };
-		Owner->SetActorLocation(MixPosition);
+		FHitResult HitResult;
+		Owner->SetActorLocation(MixPosition, true, &HitResult);
+
+		// 충돌이 발생했는지 확인
+		if (HitResult.IsValidBlockingHit())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *HitResult.GetActor()->GetName());
+			StopMove();
+		}
 	}
 }
 
@@ -404,6 +412,8 @@ void KinematicController::StopMove()
 	RemoveMoveFlag(MoveType::Chase);
 	RemoveMoveFlag(MoveType::RunAway);
 	RemoveMoveFlag(MoveType::EqualVelocityMove);
+	TargetData.Position = CharacterData.Position;
+	AddMoveFlag(MoveType::VelocityStop);
 }
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)
