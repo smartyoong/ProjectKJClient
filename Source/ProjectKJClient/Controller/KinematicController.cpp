@@ -74,8 +74,7 @@ void KinematicController::SetPosition(FVector NewPosition)
 		FVector MixPosition{ NewPosition.X, NewPosition.Y, CurrentPosition.Z };
 		FHitResult HitResult;
 		Owner->SetActorLocation(MixPosition, true, &HitResult);
-
-		// 충돌이 발생했는지 확인
+		// 충돌이 발생했는지 확인 지금은 계속 못움직이는데, 일단 추후에 충돌 위치를 보정시켜보자
 		if (HitResult.IsValidBlockingHit())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *HitResult.GetActor()->GetName());
@@ -106,6 +105,7 @@ void KinematicController::Update(float DeltaTime)
 
 	if (HasMoveFlag(MoveType::Move))
 	{
+		//가속도 기반 이동
 		MoveMethod Move;
 		auto Result = Move.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
 		if (Result)
@@ -116,83 +116,6 @@ void KinematicController::Update(float DeltaTime)
 		{
 			RemoveMoveFlag(MoveType::Move);
 			AddMoveFlag(MoveType::VelocityStop);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::Pursue))
-	{
-		PursueMethod Pursue;
-		auto Result = Pursue.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-		else
-		{
-			RemoveMoveFlag(MoveType::Pursue);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::VelocityMatch))
-	{
-		VelocityMatchMethod VelocityMatch;
-		auto Result = VelocityMatch.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-		else
-		{
-			RemoveMoveFlag(MoveType::VelocityMatch);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::Chase))
-	{
-		ChaseMethod Chase;
-		auto Result = Chase.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-			RemoveMoveFlag(MoveType::Chase);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::RunAway))
-	{
-		RunMethod RunAway;
-		auto Result = RunAway.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-			RemoveMoveFlag(MoveType::RunAway);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::Brake))
-	{
-		BrakeMethod Brake;
-		auto Result = Brake.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, DeltaTime);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-		else
-		{
-			RemoveMoveFlag(MoveType::Brake);
-			AddMoveFlag(MoveType::VelocityStop);
-		}
-	}
-
-	if (HasMoveFlag(MoveType::Wander))
-	{
-		WanderMethod Wander;
-		auto Result = Wander.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			// 가속도를 1번만 추가하니까 늦을수도 있음 (어울릴지도?)
-			CharacterSteering += *Result;
-			RemoveMoveFlag(MoveType::Wander);
 		}
 	}
 
@@ -208,45 +131,7 @@ void KinematicController::Update(float DeltaTime)
 		auto Result = FollowPath.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
 		if (Result)
 		{
-			CharacterSteering += *Result;
-		}
-	}
-
-	if (HasMoveFlag(MoveType::Seperate))
-	{
-		//실제로 사용할 때는 타겟을 넣어주어야 한다.
-		SeperateMethod Seperate(nullptr);
-		auto Result = Seperate.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-	}
-
-	if (HasMoveFlag(MoveType::CollisionAvoidance))
-	{
-		//실제로 사용할 때는 타겟을 넣어주어야 한다.
-		CollisionAvoidanceMethod CollisionAvoidance(nullptr);
-		//여기서 BoardRadius 대신 Collision Component의 Radius를 넣어주어야 한다.
-		auto Result = CollisionAvoidance.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-	}
-
-	if (HasMoveFlag(MoveType::ObstacleAvoidance))
-	{
-		// 아직 서버가 구현되지 않았다.
-		ObstacleAvoidanceMethod ObstacleAvoidance(Owner);
-		auto Result = ObstacleAvoidance.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-		else
-		{
-			RemoveMoveFlag(MoveType::ObstacleAvoidance);
+			CharacterData.Velocity += Result->Linear;
 		}
 	}
 
@@ -369,21 +254,6 @@ void KinematicController::Update(float DeltaTime)
 		}
 	}
 
-	if (HasMoveFlag(MoveType::Align))
-	{
-		AlignMethod Align;
-		auto Result = Align.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, 2.f, 10.f, TimeToTarget);
-		if (Result)
-		{
-			CharacterSteering += *Result;
-		}
-		else
-		{
-			RemoveMoveFlag(MoveType::Align);
-			AddMoveFlag(MoveType::RotateStop);
-		}
-	}
-
 	CharacterData.Rotation += (CharacterSteering.Angular * DeltaTime);
 	if (CharacterData.Rotation > MaxAngular)
 	{
@@ -409,8 +279,8 @@ void KinematicController::StopMove()
 {
 	// 이동을 멈추고, 애니메이션을 멈춥니다.
 	RemoveMoveFlag(MoveType::Move);
-	RemoveMoveFlag(MoveType::Chase);
-	RemoveMoveFlag(MoveType::RunAway);
+	RemoveMoveFlag(MoveType::EqualVelocityChase);
+	RemoveMoveFlag(MoveType::EqualVelocityRunAway);
 	RemoveMoveFlag(MoveType::EqualVelocityMove);
 	TargetData.Position = CharacterData.Position;
 	AddMoveFlag(MoveType::VelocityStop);

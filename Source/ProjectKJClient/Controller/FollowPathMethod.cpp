@@ -2,7 +2,7 @@
 
 
 #include "Controller/FollowPathMethod.h"
-#include "Controller/ChaseMethod.h"
+#include "Controller/EqualVelocityChaseMethod.h"
 
 FollowPathMethod::FollowPathMethod(PathComponent* PathComponent) : Path(PathComponent)
 {
@@ -20,6 +20,6 @@ std::optional<SteeringHandle> FollowPathMethod::GetSteeringHandle(float Ratio, K
         TargetPoint.Position = Path->GetPosition(CurrentIndex);
     }
 
-    ChaseMethod Chase;
+    EqualVelocityChaseMethod Chase;
     return Chase.GetSteeringHandle(Ratio, Character, TargetPoint, MaxSpeed, MaxAccelerate, MaxRotation, MaxAngular, TargetRadius, SlowRadius, TimeToTarget);
 }
