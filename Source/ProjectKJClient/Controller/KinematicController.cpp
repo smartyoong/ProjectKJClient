@@ -75,14 +75,37 @@ void KinematicController::SetPosition(FVector NewPosition)
 		FHitResult HitResult;
 		Owner->SetActorLocation(MixPosition, true, &HitResult);
 		// 충돌이 발생했는지 확인 지금은 계속 못움직이는데, 일단 추후에 충돌 위치를 보정시켜보자
+		// 충돌이 발생했는지 확인
 		if (HitResult.IsValidBlockingHit())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *HitResult.GetActor()->GetName());
-			StopMove();
+			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *MixPosition.ToString());
+
+			// 충돌 지점에서 약간 떨어진 위치로 보정
+			FVector ImpactNormal = HitResult.ImpactNormal;
+			FVector Correction = ImpactNormal * 50.f; // 50f 만큼 떨어진 위치로 보정
+			FVector CorrectedPosition = HitResult.ImpactPoint + Correction;
+			CorrectedPosition.Z = CurrentPosition.Z; // Z축은 그대로 유지
+
+			// 보정된 위치가 여전히 충돌하는지 확인
+			FHitResult CorrectedHitResult;
+			Owner->SetActorLocation(CorrectedPosition, true, &CorrectedHitResult);
+			while (CorrectedHitResult.IsValidBlockingHit())
+			{
+				// 여전히 충돌하는 경우, 더 멀리 떨어진 위치로 보정
+				Correction = ImpactNormal * 50.f; // 50f 만큼 더 떨어진 위치로 보정
+				CorrectedPosition += Correction;
+				CorrectedPosition.Z = CurrentPosition.Z; // Z축은 그대로 유지
+				Owner->SetActorLocation(CorrectedPosition, true, &CorrectedHitResult);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Corrected Position: %s"), *CorrectedPosition.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Normal: %s"), *ImpactNormal.ToString());
+			// 이동 멈추기 로직
+			StopMove(); // 아마 이때 CharacterData.Position이 안바뀌어서 이동 안하는듯
 		}
 	}
 }
-
 void KinematicController::Update(float DeltaTime)
 {
 	// 위치와 방향을 속도에 따라 업데이트 (Z축은 사용하지 않음)
