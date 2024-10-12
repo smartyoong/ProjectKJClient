@@ -164,7 +164,7 @@ void APlayerCharacter::MoveToLocation(FVector Location)
 void APlayerCharacter::RollBackLocation()
 {
 	if (KinematicMover)
-		KinematicMover->StopMove();
+		KinematicMover->StopMove(nullptr);
 
 	if (OldLocation != FVector::ZeroVector)
 		SetActorLocation(OldLocation);

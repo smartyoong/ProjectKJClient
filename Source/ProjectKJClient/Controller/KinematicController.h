@@ -91,6 +91,6 @@ public:
 	~KinematicController() = default;
 	void MoveToLocation(FVector Destination);
 	void Update(float DeltaTime);
-	void StopMove();
+	void StopMove(FVector* Target);
 
 };

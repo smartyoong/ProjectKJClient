@@ -74,35 +74,21 @@ void KinematicController::SetPosition(FVector NewPosition)
 		FVector MixPosition{ NewPosition.X, NewPosition.Y, CurrentPosition.Z };
 		FHitResult HitResult;
 		Owner->SetActorLocation(MixPosition, true, &HitResult);
-		// 충돌이 발생했는지 확인 지금은 계속 못움직이는데, 일단 추후에 충돌 위치를 보정시켜보자
+
 		// 충돌이 발생했는지 확인
 		if (HitResult.IsValidBlockingHit())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *HitResult.GetActor()->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *MixPosition.ToString());
 
-			// 충돌 지점에서 약간 떨어진 위치로 보정
+			// 충돌 지점에서의 법선 벡터를 이용하여 슬라이딩 벡터 계산
 			FVector ImpactNormal = HitResult.ImpactNormal;
-			FVector Correction = ImpactNormal * 50.f; // 50f 만큼 떨어진 위치로 보정
-			FVector CorrectedPosition = HitResult.ImpactPoint + Correction;
-			CorrectedPosition.Z = CurrentPosition.Z; // Z축은 그대로 유지
+			FVector SlideDirection = FVector::VectorPlaneProject(MixPosition - CurrentPosition, ImpactNormal);
+			FVector SlidePosition = CurrentPosition + SlideDirection;
 
-			// 보정된 위치가 여전히 충돌하는지 확인
-			FHitResult CorrectedHitResult;
-			Owner->SetActorLocation(CorrectedPosition, true, &CorrectedHitResult);
-			while (CorrectedHitResult.IsValidBlockingHit())
-			{
-				// 여전히 충돌하는 경우, 더 멀리 떨어진 위치로 보정
-				Correction = ImpactNormal * 50.f; // 50f 만큼 더 떨어진 위치로 보정
-				CorrectedPosition += Correction;
-				CorrectedPosition.Z = CurrentPosition.Z; // Z축은 그대로 유지
-				Owner->SetActorLocation(CorrectedPosition, true, &CorrectedHitResult);
-			}
-
-			UE_LOG(LogTemp, Warning, TEXT("Corrected Position: %s"), *CorrectedPosition.ToString());
-			UE_LOG(LogTemp, Warning, TEXT("Normal: %s"), *ImpactNormal.ToString());
-			// 이동 멈추기 로직
-			StopMove(); // 아마 이때 CharacterData.Position이 안바뀌어서 이동 안하는듯
+			// 슬라이딩 위치로 이동
+			Owner->SetActorLocation(SlidePosition, true, &HitResult);
+			CharacterData.Position = SlidePosition;
+			UE_LOG(LogTemp, Warning, TEXT("Sliding to Position: %s"), *SlidePosition.ToString());
 		}
 	}
 }
@@ -298,14 +284,21 @@ void KinematicController::Update(float DeltaTime)
 	}
 }
 
-void KinematicController::StopMove()
+void KinematicController::StopMove(FVector* Target)
 {
 	// 이동을 멈추고, 애니메이션을 멈춥니다.
 	RemoveMoveFlag(MoveType::Move);
 	RemoveMoveFlag(MoveType::EqualVelocityChase);
 	RemoveMoveFlag(MoveType::EqualVelocityRunAway);
 	RemoveMoveFlag(MoveType::EqualVelocityMove);
-	TargetData.Position = CharacterData.Position;
+	if (Target != nullptr)
+	{
+		TargetData.Position = *Target;
+	}
+	else
+	{
+		TargetData.Position = CharacterData.Position;
+	}
 	AddMoveFlag(MoveType::VelocityStop);
 }
 
