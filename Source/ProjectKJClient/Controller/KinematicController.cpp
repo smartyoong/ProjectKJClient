@@ -78,7 +78,6 @@ void KinematicController::SetPosition(FVector NewPosition)
 		// 충돌이 발생했는지 확인
 		if (HitResult.IsValidBlockingHit())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Collision detected with: %s"), *HitResult.GetActor()->GetName());
 
 			// 충돌 지점에서의 법선 벡터를 이용하여 슬라이딩 벡터 계산
 			FVector ImpactNormal = HitResult.ImpactNormal;
@@ -88,7 +87,8 @@ void KinematicController::SetPosition(FVector NewPosition)
 			// 슬라이딩 위치로 이동
 			Owner->SetActorLocation(SlidePosition, true, &HitResult);
 			CharacterData.Position = SlidePosition;
-			UE_LOG(LogTemp, Warning, TEXT("Sliding to Position: %s"), *SlidePosition.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Sliding to Position : %s , Current : %s, Direction : %s"), *SlidePosition.ToString(), *CurrentPosition.ToString(), *SlideDirection.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Sliding to Next : %s, Normal : %s"), *MixPosition.ToString(), *ImpactNormal.ToString());
 		}
 	}
 }
