@@ -91,6 +91,11 @@ void KinematicController::SetPosition(FVector NewPosition)
 			UE_LOG(LogTemp, Warning, TEXT("Sliding to Next : %s, Normal : %s"), *MixPosition.ToString(), *ImpactNormal.ToString());
 		}
 	}
+	else
+	{
+		// 여기가 걸리는지 확인해보자
+		UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
+	}
 }
 void KinematicController::Update(float DeltaTime)
 {
