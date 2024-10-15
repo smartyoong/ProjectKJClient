@@ -19,7 +19,6 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 private:
-
 	//유저 관련 변수
 	FString AccountID;
 	FString NickName;
@@ -90,6 +89,7 @@ private:
 	class UNiagaraSystem* FXCursor;
 
 	FTimerHandle TimerHandle;
+
 private:
 	void PingCheck();
 protected:
@@ -116,4 +116,5 @@ public:
 	FString GetAccountID() { return AccountID; }
 	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
 	void PlayMovingAnim(bool NeedPlay) { PlayMovingAnimation = NeedPlay; };
+	void MoveToNextNode(const FVector& NextNodeLocation);
 };

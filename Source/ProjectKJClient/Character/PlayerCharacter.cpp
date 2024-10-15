@@ -17,6 +17,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "MainGameInstance.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -156,6 +158,12 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 
 void APlayerCharacter::MoveToLocation(FVector Location)
 {
+	// 서버로 패킷 전송
+	if (UMainGameInstance* GameInstance = Cast<UMainGameInstance>(GetGameInstance()))
+	{
+		GameInstance->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE, FRequestMovePacket(AccountID, AuthHashCode, CurrentMapID, Location.X, Location.Y));
+	}
+
 	OldLocation = GetActorLocation();
 	if (KinematicMover)
 		KinematicMover->MoveToLocation(Location);
@@ -180,10 +188,23 @@ void APlayerCharacter::ClickAndMove()
 	}
 	if (HitSuccessful)
 	{
-		Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE,FRequestMovePacket(AccountID,AuthHashCode,CurrentMapID,Hit.Location.X,Hit.Location.Y));
+		//Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE,FRequestMovePacket(AccountID,AuthHashCode,CurrentMapID,Hit.Location.X,Hit.Location.Y));
 		// Z축 보정
 		Hit.Location.Z = GetActorLocation().Z;
-		MoveToLocation(Hit.Location);
+		UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+		if (NavSys)
+		{			
+			//뭔가 이걸 이용하면 될거 같은데, 이걸 그대로 길찾기 Method로 넘기면될것 같기도한데? 잘될지는 모르겠다.
+			UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), Hit.Location);
+			if (NavPath)
+			{
+				for (int i = 0; i < NavPath->PathPoints.Num(); i++)
+				{
+					MoveToLocation(NavPath->PathPoints[i]);
+				}
+			}
+		}
+		//MoveToLocation(Hit.Location);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Hit.Location, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 }
