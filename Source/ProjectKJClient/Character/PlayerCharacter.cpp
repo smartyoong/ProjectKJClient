@@ -153,7 +153,7 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	Level = Info.Level;
 	EXP = Info.EXP;
 	// 캐릭터는 PathComponenet를 일단 안쓴다. (변수에는 들고 있도록 가정하자)
-	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate, nullptr);
+	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
@@ -198,14 +198,33 @@ void APlayerCharacter::ClickAndMove()
 			UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(GetWorld(), GetActorLocation(), Hit.Location);
 			if (NavPath)
 			{
-				for (int i = 0; i < NavPath->PathPoints.Num(); i++)
+				if (KinematicMover)
 				{
-					MoveToLocation(NavPath->PathPoints[i]);
+					OldLocation = GetActorLocation();
+					KinematicMover->FollowPathPoints(NavPath->PathPoints, Hit.Location);
 				}
 			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("NavPath is nullptr"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NavSys is nullptr"));
 		}
 		//MoveToLocation(Hit.Location);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Hit.Location, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	}
+}
+
+void APlayerCharacter::SendMovePacket(FVector Location)
+{
+	// 서버로 패킷 전송
+	if (UMainGameInstance* GameInstance = Cast<UMainGameInstance>(GetGameInstance()))
+	{
+		GameInstance->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE, FRequestMovePacket(AccountID, AuthHashCode, CurrentMapID, Location.X, Location.Y));
+		//UE_LOG(LogTemp, Warning, TEXT("Send Move Packet %s") , *Location.ToString());
 	}
 }
 

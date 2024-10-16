@@ -73,7 +73,7 @@ private:
 	KinematicStatic TargetData;
 	std::atomic<int32>MoveFlag;
 
-	PathComponent* PathComp;
+	PathComponent PathComp;
 
 	void SetRotation(float NewOrientation);
 	void SetPosition(FVector NewPosition);
@@ -87,10 +87,10 @@ private:
 	bool HasMoveFlag(MoveType Flag);
 
 public:
-	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate, PathComponent* Path);
+	KinematicController(class AActor* Owner, FVector Position, float MaxSpeed, float Radius, float MaxAccelerate);
 	~KinematicController() = default;
 	void MoveToLocation(FVector Destination);
 	void Update(float DeltaTime);
 	void StopMove(FVector* Target);
-
+	void FollowPathPoints(TArray<FVector>& Points, FVector ToDestination);
 };

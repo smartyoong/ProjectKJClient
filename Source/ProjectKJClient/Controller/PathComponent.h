@@ -13,6 +13,7 @@ private:
 	TArray<FVector> Positions;
 	int CurrentPositionIndex = 0;
 	int TotalSize = 0;
+	FCriticalSection CriticalSection;
 public:
 	PathComponent() = default;
 	void AddPosition(FVector Position);
@@ -20,4 +21,5 @@ public:
 	FVector GetPosition(int Index);
 	int GetNextPositionIndex();
 	bool Arrived(FVector CharacterPosition);
+	void SetPathPoints(TArray<FVector> PathPoints);
 };

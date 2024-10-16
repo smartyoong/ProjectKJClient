@@ -46,7 +46,6 @@ private:
 	FVector OldLocation;
 
 	KinematicController* KinematicMover;
-	PathComponent* PathComp;
 
 	//UPROPERTY(EditAnywhere, Category = "SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	//USkeletalMeshComponent* SkeletalBody;
@@ -116,5 +115,5 @@ public:
 	FString GetAccountID() { return AccountID; }
 	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
 	void PlayMovingAnim(bool NeedPlay) { PlayMovingAnimation = NeedPlay; };
-	void MoveToNextNode(const FVector& NextNodeLocation);
+	void SendMovePacket(FVector Location);
 };

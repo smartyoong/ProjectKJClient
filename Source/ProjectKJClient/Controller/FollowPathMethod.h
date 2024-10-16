@@ -11,9 +11,10 @@
 class PROJECTKJCLIENT_API FollowPathMethod : public Behaviors
 {
 private:
+	AActor* Sender;
 	PathComponent* Path;
 public:
-	FollowPathMethod(PathComponent* PathComponent);
+	FollowPathMethod(AActor* Sender ,PathComponent* PathComponent);
 	virtual ~FollowPathMethod() = default;
 	virtual std::optional<SteeringHandle> GetSteeringHandle(float Ratio, KinematicStatic Character, KinematicStatic Target, float MaxSpeed, float MaxAccelerate,
 		float MaxRotation, float MaxAngular, float TargetRadius, float SlowRadius, float TimeToTarget);

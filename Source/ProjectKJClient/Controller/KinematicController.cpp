@@ -26,7 +26,7 @@
 
 const FVector MinusOneVector(-1.0f, -1.0f, -1.0f);
 
-KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius, float MaxAccelerate, PathComponent* Path)
+KinematicController::KinematicController(AActor* Owner ,FVector Position, float MaxSpeed, float Radius, float MaxAccelerate)
 {
 	MaxAngular = 30.f;
 	this->MaxSpeed = MaxSpeed;
@@ -44,7 +44,6 @@ KinematicController::KinematicController(AActor* Owner ,FVector Position, float 
 	SlowRadius = 100.0f;
 	this->Owner = Owner;
 	MaxRotation = 100.f;
-	PathComp = Path;
 }
 
 
@@ -87,8 +86,8 @@ void KinematicController::SetPosition(FVector NewPosition)
 			// 슬라이딩 위치로 이동
 			Owner->SetActorLocation(SlidePosition, true, &HitResult);
 			CharacterData.Position = SlidePosition;
-			UE_LOG(LogTemp, Warning, TEXT("Sliding to Position : %s , Current : %s, Direction : %s"), *SlidePosition.ToString(), *CurrentPosition.ToString(), *SlideDirection.ToString());
-			UE_LOG(LogTemp, Warning, TEXT("Sliding to Next : %s, Normal : %s"), *MixPosition.ToString(), *ImpactNormal.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("Sliding to Position : %s , Current : %s, Direction : %s"), *SlidePosition.ToString(), *CurrentPosition.ToString(), *SlideDirection.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("Sliding to Next : %s, Normal : %s"), *MixPosition.ToString(), *ImpactNormal.ToString());
 		}
 	}
 	else
@@ -135,17 +134,18 @@ void KinematicController::Update(float DeltaTime)
 
 	if (HasMoveFlag(MoveType::FollowPath))
 	{
-		if (PathComp == nullptr)
-		{
-			RemoveMoveFlag(MoveType::FollowPath);
-			return;
-		}
-
-		FollowPathMethod FollowPath(PathComp);
+		// 주소값을 넘겨야한다. 그래야 PathComp의 Index같은게 업데이트 된다.
+		FollowPathMethod FollowPath(Owner, &PathComp);
 		auto Result = FollowPath.GetSteeringHandle(1, CharacterData, TargetData, MaxSpeed, MaxAcceleration, MaxRotation, MaxAngular, BoardRadius, SlowRadius, TimeToTarget);
 		if (Result)
 		{
 			CharacterData.Velocity += Result->Linear;
+			AddMoveFlag(MoveType::OrientationChange);
+		}
+		else
+		{
+			RemoveMoveFlag(MoveType::FollowPath);
+			AddMoveFlag(MoveType::VelocityStop);
 		}
 	}
 
@@ -305,6 +305,20 @@ void KinematicController::StopMove(FVector* Target)
 		TargetData.Position = CharacterData.Position;
 	}
 	AddMoveFlag(MoveType::VelocityStop);
+}
+
+void KinematicController::FollowPathPoints(TArray<FVector>& Points, FVector ToDestination)
+{
+	for (auto& p : Points)
+	{
+		p.Z = 0.0f;
+	}
+
+	// 이 밑의 메서드를 확인해보자
+	PathComp.SetPathPoints(Points);
+	TargetData.Position = ToDestination;
+	TargetData.Position.Z = 0.0f;
+	AddMoveFlag(MoveType::FollowPath);
 }
 
 float KinematicController::NewOrientation(float CurrentOrientation, FVector Velocity)
