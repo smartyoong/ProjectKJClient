@@ -158,12 +158,6 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 
 void APlayerCharacter::MoveToLocation(FVector Location)
 {
-	// 서버로 패킷 전송
-	if (UMainGameInstance* GameInstance = Cast<UMainGameInstance>(GetGameInstance()))
-	{
-		GameInstance->SendPacketToGameServer(GamePacketListID::REQUEST_MOVE, FRequestMovePacket(AccountID, AuthHashCode, CurrentMapID, Location.X, Location.Y));
-	}
-
 	OldLocation = GetActorLocation();
 	if (KinematicMover)
 		KinematicMover->MoveToLocation(Location);

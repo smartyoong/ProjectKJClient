@@ -33,6 +33,7 @@ KinematicController::KinematicController(AActor* Owner ,FVector Position, float 
 	BoardRadius = Radius;
 	MaxAcceleration = MaxAccelerate;
 	CharacterData.Position = Position;
+	CharacterData.Position.Z = 0.0f; // 여기선 z축 사용안함 (실제 위치 조정때는 사용)
 	CharacterData.Orientation = 0.0f;
 	CharacterData.Velocity = FVector::ZeroVector;
 	CharacterData.Rotation = 0.0f;

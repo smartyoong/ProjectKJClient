@@ -148,7 +148,8 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 			}
 			if (AnotherClass != nullptr)
 			{
-				auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 0), FRotator(0, 0, 0));
+				//여기 Z축을 넉넉히 주지 않으면 충돌로 안움직인다. 그리고 FRotator도 서버한테서 라디안 받아와서 방향도 설정하자
+				auto AnotherPlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>(AnotherClass, FVector(Packet.X, Packet.Y, 90), FRotator(0, 0, 0));
 				if (AnotherPlayerCharacter != nullptr)
 				{
 					FCharacterInfo CharacterSpawnInfo;
