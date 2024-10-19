@@ -154,6 +154,8 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	EXP = Info.EXP;
 	// 캐릭터는 PathComponenet를 일단 안쓴다. (변수에는 들고 있도록 가정하자)
 	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
+	// 중력 가속도 가져오는법 예시
+	GetWorld()->GetGravityZ();
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
