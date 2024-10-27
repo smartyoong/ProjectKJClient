@@ -3,99 +3,133 @@
 
 #include "Controller/ArcKinematicController.h"
 #include "GameFramework/Actor.h"
+#include "PlayerCharacter.h"
 
 
-ArcKinematicController::ArcKinematicController(AActor* Owner, FVector Start, FVector End, float Speed, FVector Gravity)
+ArcKinematicController::ArcKinematicController(AActor* Owner, FVector Start, FVector End, float Speed)
 {
 	this->Owner = Owner;
 	this->Position = Start;
+	this->StartPosition = Start;
 	this->TargetPosition = End;
-	this->Speed = Speed;
-	this->Arrived = false;
-	this->Radius = 1.f;
+	this->IsLaunched = false;
 	this->Velocity = FVector::ZeroVector;
-	this->Gravity = Gravity;
+	this->Gravity = Owner->GetWorld()->GetGravityZ() * FVector::UpVector; // Z축 중력 가속도
+	this->ElapsedTime = 0.0f;
+
+	// 속도가 0보다 크면 속도를 설정하고, 아니면 초기 속도를 계산한다 가장 빠른 45도로.
+	if (Speed > 0)
+		this->Speed = Speed;
+	else
+		this->Speed = CalculateInitialSpeed(Start, End, 45.f, Gravity);
 }
 
 void ArcKinematicController::Update(float DeltaTime)
 {
-	if (Arrived)
+	if (!IsLaunched)
 	{
+		StopLaunchAnimation();
 		return;
 	}
 
+	// 액터가 존재한다면, Actor의 위치 업데이트
 	if(Owner)
 		Owner->SetActorLocation(Position);
 
-	auto Value =  CalculateVelocity(Position, TargetPosition, Speed);
+	LaunchAnimation();
 
-	if (Value.has_value())
+	FVector Displacement = Velocity * ElapsedTime + 0.5f * Gravity * ElapsedTime * ElapsedTime;
+	Position = StartPosition + Displacement;
+
+	if (Displacement.Z <= 0 && ElapsedTime > 0.1f)
 	{
-		Velocity = Value.value();
+		float t = (-Velocity.Z - sqrt(Velocity.Z * Velocity.Z - 2 * Gravity.Z * (StartPosition.Z * TargetPosition.Z))) / Gravity.Z;
+		Position = StartPosition + Velocity * t + 0.5f * Gravity * t * t;
+		IsLaunched = false;
+		// 도착
 	}
-	else
+
+}
+
+void ArcKinematicController::LaunchAnimation()
+{
+	if(Owner == nullptr)
 	{
-		Arrived = true;
-		UE_LOG(LogTemp, Warning, TEXT("Projectiile Cant Move When Move %s to %s"), *Position.ToString(), *TargetPosition.ToString());
 		return;
 	}
-
-	Position += Velocity * DeltaTime;
-
-	UE_LOG(LogTemp, Warning, TEXT("Projectile Move %s"), *Position.ToString());
-
-	if (FVector::Dist(Position, TargetPosition) < Radius)
+	// 나중에 실제 발사체 액터 만들어서 작업하자
+	APlayerCharacter* Player = Cast<APlayerCharacter>(Owner);
+	if (Player != nullptr)
 	{
-		Arrived = true;
-		UE_LOG(LogTemp, Warning, TEXT("Projectile Arrived %s"), *Position.ToString());
+		//나중에 여기서 작업하자
 	}
 }
 
-bool ArcKinematicController::CheckCanShoot()
+void ArcKinematicController::StopLaunchAnimation()
 {
-	auto Value = CalculateVelocity(Position, TargetPosition, Speed);
-	return Value.has_value();
+	if (Owner == nullptr)
+	{
+		return;
+	}
+	// 나중에 실제 발사체 액터 만들어서 작업하자
+	APlayerCharacter* Player = Cast<APlayerCharacter>(Owner);
+	if (Player != nullptr)
+	{
+		//나중에 여기서 작업하자
+	}
 }
 
-std::optional<FVector> ArcKinematicController::CalculateVelocity(FVector Start, FVector End, float MuzzleV)
+bool ArcKinematicController::CalculateTrajectory()
 {
-	FVector Delta = End - Start;
-	float a = Gravity.SizeSquared();
-	float b = -4 * (FVector::DotProduct(Delta, Gravity) + MuzzleV * MuzzleV);
-	float c = 4 * Delta.SizeSquared();
+	FVector ToTarget = TargetPosition - StartPosition;
+	float HorizontalDistance = FVector(ToTarget.X, ToTarget.Y, 0.0f).Size();
+	float VerticalDistance = ToTarget.Z;
 
-	float D = b * b - 4 * a * c;
-	if (D < 0)
+	// 수평 거리가 0이면 발사 불가능
+	if (HorizontalDistance == 0.0f)
 	{
-		return std::nullopt;
+		return false;
 	}
+	// 이 부분 최적화 가능할거 같긴한데 위에서 CalculateInitialSpeed에서 이미 계산했다면 바로 발사도 가능할것 같긴한데 코드 더러워질듯 걍하자
+	float Angle = CalculateLaunchAngle(HorizontalDistance, VerticalDistance, Speed, Gravity.Z);
 
-	float t1 = FMath::Sqrt((-b + FMath::Sqrt(D)) / (2 * a));
-	float t2 = FMath::Sqrt((-b - FMath::Sqrt(D)) / (2 * a));
+	// 발사 각도가 NaN이면 발사 불가능
+	if (isnan(Angle))
+		return false;
 
-	float ttt = 0.f;
-	if (t1 < 0)
-	{
-		if (t2 < 0)
-		{
-			return std::nullopt;
-		}
-		else
-		{
-			ttt = t2;
-		}
-	}
-	else
-	{
-		if (t2 < 0)
-		{
-			ttt = t1;
-		}
-		else
-		{
-			ttt = FMath::Min(t1, t2);
-		}
-	}
+	Launch(Angle);
 
-	return (Delta * 2 - Gravity * (ttt * ttt)) / (2 * MuzzleV * ttt);
+	return true;
 }
+
+float ArcKinematicController::CalculateLaunchAngle(float HorizontalDistance, float Height, float SpeedScalar, float GravityZ)
+{
+	float SpeedSquare = SpeedScalar * SpeedScalar;
+	float Root = sqrt(SpeedSquare * SpeedSquare - GravityZ * (GravityZ * HorizontalDistance * HorizontalDistance + 2 * Height * SpeedSquare));
+	float Term1 = SpeedSquare + Root;
+	float Term2 = GravityZ * HorizontalDistance;
+	return atan2(Term1, Term2);
+}
+
+float ArcKinematicController::CalculateInitialSpeed(FVector Start, FVector Target, float Angle, FVector FGravity)
+{
+	FVector ToTarget = Target - Start;
+	float HorizontalDistance = FVector(ToTarget.X, ToTarget.Y, 0.0f).Size();
+	float VerticalDistance = ToTarget.Z;
+	float AngleInRadian = FMath::DegreesToRadians(Angle);
+	float CosAngle = cos(AngleInRadian);
+	float SinAngle = sin(AngleInRadian);
+	float TanAngle = tan(AngleInRadian);
+	float SpeedSquare = (HorizontalDistance * HorizontalDistance * FGravity.Z) / (2 * CosAngle * CosAngle * (VerticalDistance - TanAngle * HorizontalDistance));
+	return sqrt(abs(SpeedSquare));
+}
+
+void ArcKinematicController::Launch(float Radian)
+{
+	FVector ToTarget = TargetPosition - StartPosition;
+	FVector HorizontalDirection = FVector(ToTarget.X, ToTarget.Y, 0.0f).GetSafeNormal();
+	Velocity = HorizontalDirection * Speed * cos(Radian);
+	Velocity.Z = Speed * sin(Radian);
+	IsLaunched = true;
+}
+
