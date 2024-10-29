@@ -29,8 +29,11 @@ void ArcKinematicController::Update(float DeltaTime)
 	if (!IsLaunched)
 	{
 		StopLaunchAnimation();
+		if (Owner)
+			Owner->SetActorLocation(TargetPosition); //보정
 		return;
 	}
+	ElapsedTime += DeltaTime;
 
 	// 액터가 존재한다면, Actor의 위치 업데이트
 	if(Owner)
@@ -40,7 +43,6 @@ void ArcKinematicController::Update(float DeltaTime)
 
 	FVector Displacement = Velocity * ElapsedTime + 0.5f * Gravity * ElapsedTime * ElapsedTime;
 	Position = StartPosition + Displacement;
-
 	if (Displacement.Z <= 0 && ElapsedTime > 0.1f)
 	{
 		float t = (-Velocity.Z - sqrt(Velocity.Z * Velocity.Z - 2 * Gravity.Z * (StartPosition.Z * TargetPosition.Z))) / Gravity.Z;
@@ -91,12 +93,14 @@ bool ArcKinematicController::CalculateTrajectory()
 		return false;
 	}
 	// 이 부분 최적화 가능할거 같긴한데 위에서 CalculateInitialSpeed에서 이미 계산했다면 바로 발사도 가능할것 같긴한데 코드 더러워질듯 걍하자
-	float Angle = CalculateLaunchAngle(HorizontalDistance, VerticalDistance, Speed, Gravity.Z);
+	float Angle = CalculateLaunchAngle(HorizontalDistance, VerticalDistance, Speed, FMath::Abs(Gravity.Z));
 
 	// 발사 각도가 NaN이면 발사 불가능
 	if (isnan(Angle))
 		return false;
 
+	UE_LOG(LogTemp, Warning, TEXT("Angle : %f  Speed : %f"), (Angle * 180 / PI), Speed);
+	UE_LOG(LogTemp, Warning, TEXT("Gravity %s"), *Gravity.ToString());
 	Launch(Angle);
 
 	return true;

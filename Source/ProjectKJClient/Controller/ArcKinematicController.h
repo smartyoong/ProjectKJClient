@@ -30,4 +30,5 @@ public:
 	float CalculateLaunchAngle(float HorizontalDistance, float Height, float Speed, float Gravity);
 	float CalculateInitialSpeed(FVector Start, FVector Target, float Angle, FVector Gravity);
 	void Launch(float Radian);
+	// 도착시 델리게이트도 만들면 좋을듯
 };
