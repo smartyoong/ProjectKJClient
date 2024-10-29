@@ -49,6 +49,10 @@ void ArcKinematicController::Update(float DeltaTime)
 		Position = StartPosition + Velocity * t + 0.5f * Gravity * t * t;
 		IsLaunched = false;
 		// 도착
+		//if (Owner)
+		//{
+		//	Owner->WhenArrived(); 도착시 호출할 메서드 추후 실사용 때에는 언리얼 델리게이트로 구현하자
+		//}
 	}
 
 }
