@@ -34,6 +34,18 @@ private:
 	int32 Job;
 	int32 JobLevel;
 
+	//HP MP
+	UPROPERTY(EditAnywhere, Category = "HP")
+	int32 HPPerLevel;
+
+	UPROPERTY(EditAnywhere, Category = "MP")
+	int32 MPPerLevel;
+
+	int32 HP;
+	int32 MP;
+	int32 MaxHP;
+	int32 MaxMP;
+
 	//이동 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivate))
 	int32 Speed;

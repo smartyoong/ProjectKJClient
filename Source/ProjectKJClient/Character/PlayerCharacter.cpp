@@ -152,10 +152,15 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	JobLevel = Info.JobLevel;
 	Level = Info.Level;
 	EXP = Info.EXP;
+	HP = Info.HP;
+	MP = Info.MP;
+	MaxHP = Level * HPPerLevel; // 이거 리소스화 시키자
+	MaxMP = Level * MPPerLevel; // 이거 리소스화 시키자
 	// 캐릭터는 PathComponenet를 일단 안쓴다. (변수에는 들고 있도록 가정하자)
 	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
-	// 중력 가속도 가져오는법 예시
-	GetWorld()->GetGravityZ();
+
+	UE_LOG(LogTemp, Warning, TEXT("SetSpawnBaseInfo %u"), HP);
+	UE_LOG(LogTemp, Warning, TEXT("SetSpawnBaseInfo %u"), MP);
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)

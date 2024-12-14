@@ -229,6 +229,7 @@ void ALoginGameModeBase::OnResponseCharBaseInfo(FResponseCharBaseInfoPacket Pack
 	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterJobLevel(Packet.JobLevel);
 	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterLevel(Packet.Level);
 	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterEXP(Packet.EXP);
+	Cast<UMainGameInstance>(GetGameInstance())->SetCharacterHPMP(Packet.HP, Packet.MP);
 
 	// 맵바꾸는건 여기서 하는거 아니면 답이 없다.
 	AsyncTask(ENamedThreads::GameThread, [this,MapName]()

@@ -85,4 +85,8 @@ struct FCharacterInfo
 	int32 Level;
 	UPROPERTY()
 	int32 EXP;
+	UPROPERTY()
+	int32 HP;
+	UPROPERTY()
+	int32 MP;
 };

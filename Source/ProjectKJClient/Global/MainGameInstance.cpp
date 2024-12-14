@@ -181,6 +181,13 @@ void UMainGameInstance::SetCharacterEXP(int32 EXP)
 	CharacterSpawnInfo.EXP = EXP;
 }
 
+void UMainGameInstance::SetCharacterHPMP(int32 HP, int32 MP)
+{
+	FScopeLock Lock(&CriticalSection);
+	CharacterSpawnInfo.HP = HP;
+	CharacterSpawnInfo.MP = MP;
+}
+
 FString UMainGameInstance::GetCharacterPresetBPPath(int32 ID)
 {
 	if (ResChracterPresetMap.Contains(ID))

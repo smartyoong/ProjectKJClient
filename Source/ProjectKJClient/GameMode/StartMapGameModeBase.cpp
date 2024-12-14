@@ -163,6 +163,8 @@ void AStartMapGameModeBase::OnSendAnotherCharBaseInfo(FSendAnotherCharBaseInfoPa
 					CharacterSpawnInfo.Level = Packet.Level;
 					CharacterSpawnInfo.NickName = Packet.NickName;
 					CharacterSpawnInfo.SpawnMapID = Packet.MapID;
+					CharacterSpawnInfo.HP = Packet.HP;
+					CharacterSpawnInfo.MP = Packet.MP;
 					AnotherPlayerCharacter->SetSpawnBaseInfo(CharacterSpawnInfo);
 					// 주의 해당 캐릭터는 가비지 컬렉션이 작동하지 않습니다.
 					FScopeLock Lock(&CriticalSection);

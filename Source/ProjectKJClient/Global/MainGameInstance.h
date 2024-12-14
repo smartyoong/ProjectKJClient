@@ -81,6 +81,7 @@ public:
 	void SetCharacterJobLevel(int32 JobLevel);
 	void SetCharacterLevel(int32 Level);
 	void SetCharacterEXP(int32 EXP);
+	void SetCharacterHPMP(int32 HP, int32 MP);
 	FCharacterInfo GetCharacterSpawnInfo() { return CharacterSpawnInfo; }
 	FString GetCharacterPresetBPPath(int32 ID);
 

@@ -105,6 +105,10 @@ struct FResponseCharBaseInfoPacket
     int32 Level;
     UPROPERTY()
     int32 EXP;
+	UPROPERTY()
+    int32 HP;
+	UPROPERTY()
+	int32 MP;
 };
 
 USTRUCT()
@@ -197,6 +201,10 @@ struct FSendAnotherCharBaseInfoPacket
     int32 DestX;
 	UPROPERTY()
 	int32 DestY;
+    UPROPERTY()
+	int32 HP;
+	UPROPERTY()
+	int32 MP;
 };
 
 USTRUCT()
