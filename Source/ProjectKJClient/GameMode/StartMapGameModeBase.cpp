@@ -5,6 +5,7 @@
 #include "WorldInfoToJson.h"
 #include "MainGameInstance.h"
 #include "LoadingScreenWidget.h"
+#include "MainHUDWidget.h"
 #include "PlayerCharacter.h"
 
 

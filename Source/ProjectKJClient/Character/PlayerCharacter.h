@@ -101,6 +101,9 @@ private:
 
 	FTimerHandle TimerHandle;
 
+	UPROPERTY()
+	class UMainHUDWidget* MainHUDWidget;
+
 private:
 	void PingCheck();
 protected:
@@ -128,4 +131,7 @@ public:
 	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
 	void PlayMovingAnim(bool NeedPlay) { PlayMovingAnimation = NeedPlay; };
 	void SendMovePacket(FVector Location);
+
+	UPROPERTY(EditDefaultsOnly, Category ="HUD")
+	TSubclassOf<class UMainHUDWidget> MainHUDWidgetClass;
 };

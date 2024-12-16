@@ -19,6 +19,7 @@
 #include "MainGameInstance.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+#include "MainHUDWidget.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -96,6 +97,15 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::PingCheck, 30.0f, true);
+
+	MainHUDWidget = CreateWidget<UMainHUDWidget>(GetWorld(), MainHUDWidgetClass);
+	if (MainHUDWidget != nullptr)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				MainHUDWidget->AddToViewport();
+			});
+	}
 }
 
 // Called every frame
@@ -158,9 +168,14 @@ void APlayerCharacter::SetSpawnBaseInfo(FCharacterInfo Info)
 	MaxMP = Level * MPPerLevel; // 이거 리소스화 시키자
 	// 캐릭터는 PathComponenet를 일단 안쓴다. (변수에는 들고 있도록 가정하자)
 	KinematicMover = new KinematicController(this, OldLocation, Speed, DestinationBoardRadius, MaxAccelerate);
-
-	UE_LOG(LogTemp, Warning, TEXT("SetSpawnBaseInfo %u"), HP);
-	UE_LOG(LogTemp, Warning, TEXT("SetSpawnBaseInfo %u"), MP);
+	if (MainHUDWidget != nullptr)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this]()
+			{
+				MainHUDWidget->SetHP(HP, MaxHP);
+				MainHUDWidget->SetMP(MP, MaxMP);
+			});
+	}
 }
 
 void APlayerCharacter::MoveToLocation(FVector Location)
