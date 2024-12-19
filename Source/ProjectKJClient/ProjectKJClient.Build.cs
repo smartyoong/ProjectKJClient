@@ -24,5 +24,7 @@ public class ProjectKJClient : ModuleRules
         PrivateIncludePaths.Add("ProjectKJClient/GameMode");
         PrivateIncludePaths.Add("ProjectKJClient/Controller");
         PrivateIncludePaths.Add("ProjectKJClient/Character");
+        PrivateIncludePaths.Add("ProjectKJClient/Component");
+        PrivateIncludePaths.Add("ProjectKJClient/Pawns");
     }
 }
