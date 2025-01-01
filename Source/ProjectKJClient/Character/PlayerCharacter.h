@@ -21,16 +21,20 @@ public:
 private:
 	//유저 관련 변수
 	FString AccountID;
-	FString NickName;
 	FString AuthHashCode;
-	int32 CharacterPresetID = 0;
+
+	//캐릭터 정보
+	FString NickName;
 
 	//외형 정보
 	int32 Gender;
+	int32 CharacterPresetID = 0;
 
-	//캐릭터 정보
+	//레벨 정보
 	int32 Level;
 	int32 EXP;
+
+	//직업 정보
 	int32 Job;
 	int32 JobLevel;
 
