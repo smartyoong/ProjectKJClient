@@ -12,6 +12,7 @@ ACharacterPresetView::ACharacterPresetView()
 	DefaultSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
 	RootComponent = DefaultSceneComponent;
 	PresetModelView = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("PresetModelView"));
+	PresetModelView->SetupAttachment(RootComponent);
 
 	PresetModelBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelBody"));
 	PresetModelFace = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PresetModelFace"));
