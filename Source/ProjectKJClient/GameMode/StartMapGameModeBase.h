@@ -28,7 +28,7 @@ private:
 public:
 	AStartMapGameModeBase();
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;;
+	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
 	void ShowLoadingScreen();
 	void HideLoadingScreen();
 	virtual void BeginPlay() override;

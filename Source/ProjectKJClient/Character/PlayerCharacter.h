@@ -100,6 +100,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SetDestinationClickAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ChattingAction;
+
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UNiagaraSystem* FXCursor;
 
@@ -107,6 +110,12 @@ private:
 
 	UPROPERTY()
 	class UMainHUDWidget* MainHUDWidget;
+
+	UPROPERTY()
+	class UChatWidget* ChatWidget;
+
+	UPROPERTY(EditAnywhere, Category ="HUD")
+	TSubclassOf<class UChatWidget> ChatWidgetClass;
 
 private:
 	void PingCheck();
@@ -138,4 +147,5 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category ="HUD")
 	TSubclassOf<class UMainHUDWidget> MainHUDWidgetClass;
+
 };

@@ -20,6 +20,7 @@
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "MainHUDWidget.h"
+#include "ChatWidget.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -106,6 +107,19 @@ void APlayerCharacter::BeginPlay()
 				MainHUDWidget->AddToViewport();
 			});
 	}
+
+	if (ChatWidgetClass != nullptr)
+	{
+		ChatWidget = CreateWidget<UChatWidget>(GetWorld(), ChatWidgetClass);
+		ChatWidget->SetNickName(Cast<UMainGameInstance>(GetGameInstance())->GetNickName());
+		if (ChatWidget != nullptr)
+		{
+			AsyncTask(ENamedThreads::GameThread, [this]()
+				{
+					ChatWidget->AddToViewport();
+				});
+		}
+	}
 }
 
 // Called every frame
@@ -128,6 +142,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// 캐릭터 관련된건 여기로 옮기자
 		
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &APlayerCharacter::ClickAndMove);
+		EnhancedInputComponent->BindAction(ChattingAction, ETriggerEvent::Started, ChatWidget, &UChatWidget::ChatShortcutAction);
 
 		// 기본 입력 매핑 컨텍스트를 추가합니다.
 		if (AProjectKJClientPlayerController* PlayerController = Cast<AProjectKJClientPlayerController>(GetController()))
