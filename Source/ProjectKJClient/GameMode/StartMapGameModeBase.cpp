@@ -52,8 +52,8 @@ void AStartMapGameModeBase::BeginPlay()
 	GetWorld()->GetGameInstance<UMainGameInstance>()->RegistGameModeToPacketQueue(this);
 	if (GetWorld() != nullptr)
 	{
-		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 	}
 	LoadingWidget = CreateWidget<ULoadingScreenWidget>(GetWorld(), LoadingWidgetClass);
 	// 맵 정보 읽어올때 사용

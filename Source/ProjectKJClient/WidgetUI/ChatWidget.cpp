@@ -59,8 +59,13 @@ void UChatWidget::OnChatSendButtonClicked()
 	FString Message = NickName + " : " + ChatEditableTextBox->GetText().ToString();
 	AddChatMessage(Message);
 	ChatEditableTextBox->SetText(FText::FromString(TEXT("")));
-	UE_LOG(LogTemp, Warning, TEXT("Chat Send"));
+
+	ChatEditableTextBox->SetIsEnabled(false);
+
 	// TODO : 채팅 패킷 전송, 채팅 엔터 연속으로 입력안되는거 확인필요
+	//PlayerController->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
+	//bEnableClickEvents = true; 를 활성화하여 마우스 입력이 게임에서 처리되도록 설정
+	FSlateApplication::Get().SetUserFocusToGameViewport(0); //를 호출하여 강제로 게임으로 포커스를 이동 이게 있어?
 }
 
 void UChatWidget::OnChatEditableTextBoxCommitted(const FText& Text, ETextCommit::Type CommitMethod)
@@ -77,7 +82,8 @@ void UChatWidget::SetFocusToChatEditableTextBox()
 
 	if (ChatEditableTextBox)
 	{
-		ChatEditableTextBox->SetUserFocus(GetOwningPlayer());
+		ChatEditableTextBox->SetIsEnabled(true);
+		ChatEditableTextBox->SetKeyboardFocus();
 	}
 
 	if (ChatSendButton)
@@ -108,7 +114,6 @@ void UChatWidget::OnChatModeButtonClicked()
 	default:
 		break;
 	}
-
 	SetFocusToChatEditableTextBox();
 }
 
@@ -171,14 +176,8 @@ void UChatWidget::AddChatMessage(const FString& Message)
 
 void UChatWidget::ChatShortcutAction()
 {
-	if (IsChattingNow())
-	{
-		OnChatSendButtonClicked();
-		UE_LOG(LogTemp, Warning, TEXT("Chatting End"));
-	}
-	else
+	if (!IsChattingNow())
 	{
 		SetFocusToChatEditableTextBox();
-		UE_LOG(LogTemp, Warning, TEXT("Chatting Start"));
 	}
 }
