@@ -28,7 +28,9 @@ enum class GamePacketListID
 	SEND_USER_MOVE = 14,
     REQUEST_PING_CHECK = 15,
 	RESPONSE_PING_CHECK = 16,
-    SEND_USER_MOVE_ARRIVED = 17
+    SEND_USER_MOVE_ARRIVED = 17,
+	SEND_USER_SAY = 18,
+	REQUEST_USER_SAY = 19
 };
 
 enum class KickReason
@@ -284,4 +286,29 @@ struct FSendUserMoveArrivedPacket
 	int32 X;
 	UPROPERTY()
 	int32 Y;
+};
+
+USTRUCT()
+struct FSendUserSayPacket
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString AccountID;
+    UPROPERTY()
+    FString SenderNickName;
+	UPROPERTY()
+	FString Message;
+    UPROPERTY()
+	int32 SayType;
+};
+
+USTRUCT()
+struct FRequestUserSayPacket
+{
+	GENERATED_BODY()
+	UPROPERTY()
+	FString AccountID;
+	UPROPERTY()
+	FString Message;
 };

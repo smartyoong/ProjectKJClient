@@ -40,4 +40,5 @@ public:
 	virtual void OnSendUserMove(FSendUserMovePacket Packet);
 	virtual void OnSendUserMoveArrived(FSendUserMoveArrivedPacket Packet);
 	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet);
+	virtual void OnChatPacketReceived(FSendUserSayPacket Packet);
 };

@@ -15,6 +15,8 @@ enum class EChatMode : uint8
 	MAP,
 	ALL,
 	FRIEND,
+	WHISPER,
+	PARTY,
 	MAX
 };
 
@@ -58,7 +60,7 @@ private:
 	void OnChatModeButtonClicked();
 	void RemoveOldestChatMessage();
 	void ClearChatMessage();
-	void SetTextColorByMode(class UTextBlock& Text);
+	void SetTextColorByMode(class UTextBlock& Text, int32 ChatType);
 	UFUNCTION()
 	void OnChatSendButtonClicked();
 	UFUNCTION()
@@ -66,7 +68,7 @@ private:
 	void SetFocusToChatEditableTextBox();
 	bool IsChattingNow();
 public:
-	void AddChatMessage(const FString& Message);
+	void AddChatMessage(const FString& SenderNickName, const FString& Message, int32 ChatType);
 	void SetNickName(const FString& InNickName) { NickName = InNickName; }
 	void ChatShortcutAction();
 };

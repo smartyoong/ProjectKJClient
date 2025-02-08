@@ -243,3 +243,9 @@ void AStartMapGameModeBase::OnResponsePingCheck(FResponsePingCheckPacket Packet)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
 	}
 }
+
+void AStartMapGameModeBase::OnChatPacketReceived(FSendUserSayPacket Packet)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnChatPacketReceived"));
+	PlayerCharacter->AddChatMessage(Packet.SenderNickName, Packet.Message, Packet.SayType);
+}

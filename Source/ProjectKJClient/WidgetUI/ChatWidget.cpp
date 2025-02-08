@@ -9,6 +9,8 @@
 #include "Components/ScrollBox.h"
 #include "Components/Border.h"
 #include "ProjectKJClientPlayerController.h"
+#include "PacketList/GamePacketList.h"
+#include "MainGameInstance.h"
 
 
 
@@ -56,10 +58,37 @@ void UChatWidget::OnChatSendButtonClicked()
 	{
 		return;
 	}
-	FString Message = NickName + " : " + ChatEditableTextBox->GetText().ToString();
-	AddChatMessage(Message);
-	ChatEditableTextBox->SetText(FText::FromString(TEXT("")));
 
+	FString Message;
+	switch (ChatMode)
+	{
+		case EChatMode::MAP:
+			Message = "";
+			break;
+		case EChatMode::ALL:
+			Message = "/a";
+			break;
+		case EChatMode::FRIEND:
+			Message = "/f";
+			break;
+		default:
+			break;
+	}
+	Message += " ";
+	// 추후에 귓속말 만들때 여기를 상대방으로 지정해야함, 그 외에는 나의 닉네임을 보내도록 처리
+	Message += NickName;
+	Message += " ";
+	Message += ChatEditableTextBox->GetText().ToString();
+	// C#은 UTF-8 인코딩을 사용하고 있음 언리얼을 UTF-16인데 이걸 UTF-8로 바꿔서 보내야함
+	FTCHARToUTF8 UTF8String(*Message);
+	FString PacketMessage = UTF8String.Get();
+
+	FRequestUserSayPacket ChatPacket;
+	ChatPacket.AccountID = Cast<UMainGameInstance>(GetGameInstance())->GetAccountID();
+	ChatPacket.Message = PacketMessage;
+	Cast<UMainGameInstance>(GetGameInstance())->SendPacketToGameServer<FRequestUserSayPacket>(GamePacketListID::REQUEST_USER_SAY, ChatPacket);
+
+	ChatEditableTextBox->SetText(FText::FromString(TEXT("")));
 	ChatEditableTextBox->SetIsEnabled(false);
 
 	// TODO : 채팅 패킷 전송, 채팅 엔터 연속으로 입력안되는거 확인필요
@@ -130,9 +159,10 @@ void UChatWidget::ClearChatMessage()
 	ChatVerticalBox->ClearChildren();
 }
 
-void UChatWidget::SetTextColorByMode(UTextBlock& Text)
+void UChatWidget::SetTextColorByMode(UTextBlock& Text, int32 ChatType)
 {
-	switch (ChatMode)
+	EChatMode ChatTypeMode = static_cast<EChatMode>(ChatType);
+	switch (ChatTypeMode)
 	{
 	case EChatMode::MAP:
 		Text.SetColorAndOpacity(FSlateColor(FLinearColor::White));
@@ -144,14 +174,19 @@ void UChatWidget::SetTextColorByMode(UTextBlock& Text)
 		Text.SetColorAndOpacity(FSlateColor(FLinearColor::Blue));
 		break;
 	default:
+		// 잘못왔다는 것을 명시하기 위함
+		Text.SetColorAndOpacity(FSlateColor(FLinearColor::Black));
 		break;
 	}
 }
 
-void UChatWidget::AddChatMessage(const FString& Message)
+void UChatWidget::AddChatMessage(const FString& SenderNickName, const FString& Message, int32 ChatType)
 {
 
 	if (!ChatVerticalBox) return;
+
+	// 출력에 문제가 생기면 여기 수정 필요
+	FString ChatMessage = SenderNickName + TEXT(" : ") + Message;
 
 	UBorder* MessageBorder = NewObject<UBorder>(this);
 	if (MessageBorder)
@@ -162,16 +197,20 @@ void UChatWidget::AddChatMessage(const FString& Message)
 		UTextBlock* NewMessage = NewObject<UTextBlock>(this);
 		if (NewMessage)
 		{
-			NewMessage->SetText(FText::FromString(Message));
-			SetTextColorByMode(*NewMessage);
+			NewMessage->SetText(FText::FromString(ChatMessage));
+			SetTextColorByMode(*NewMessage, ChatType);
 
-			MessageBorder->AddChild(NewMessage);
-
-			ChatVerticalBox->AddChild(MessageBorder);
+			// UI에 출력할거면 메인스레드에서 작업해야함
+			AsyncTask(ENamedThreads::GameThread, [this, MessageBorder, NewMessage]()
+				{
+					MessageBorder->AddChild(NewMessage);
+					ChatVerticalBox->AddChild(MessageBorder);
+					ChatScrollBox->ScrollToEnd();
+					RemoveOldestChatMessage();
+					FSlateApplication::Get().SetUserFocusToGameViewport(0); //를 호출하여 강제로 게임으로 포커스를 이동 이게 있어?
+				});
 		}
 	}
-	ChatScrollBox->ScrollToEnd();
-	RemoveOldestChatMessage();
 }
 
 void UChatWidget::ChatShortcutAction()

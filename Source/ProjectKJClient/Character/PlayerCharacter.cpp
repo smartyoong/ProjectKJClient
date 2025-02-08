@@ -259,3 +259,11 @@ void APlayerCharacter::SendMovePacket(FVector Location)
 	}
 }
 
+void APlayerCharacter::AddChatMessage(FString SenderNickName, FString Message, int32 ChatType)
+{
+	if (ChatWidget)
+	{
+		ChatWidget->AddChatMessage(SenderNickName, Message, ChatType);
+	}
+}
+

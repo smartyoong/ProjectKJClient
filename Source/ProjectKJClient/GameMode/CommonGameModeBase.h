@@ -81,4 +81,6 @@ public:
 	virtual void OnResponsePingCheck(FResponsePingCheckPacket Packet) {};
 	// 유저 도착시 다른 맵 유저들에게 최종위치로 이동시키도록 전달하는 함수
 	virtual void OnSendUserMoveArrived(FSendUserMoveArrivedPacket Packet) {};
+	// 채팅	패킷을 받았을 때 처리하는 함수
+	virtual void OnChatPacketReceived(FSendUserSayPacket Packet) {};
 };

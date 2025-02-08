@@ -144,6 +144,7 @@ public:
 	void SetSpeed(int32 NewSpeed) { Speed = NewSpeed; }
 	void PlayMovingAnim(bool NeedPlay) { PlayMovingAnimation = NeedPlay; };
 	void SendMovePacket(FVector Location);
+	void AddChatMessage(FString SenderNickName, FString Message, int32 ChatType);
 
 	UPROPERTY(EditDefaultsOnly, Category ="HUD")
 	TSubclassOf<class UMainHUDWidget> MainHUDWidgetClass;
