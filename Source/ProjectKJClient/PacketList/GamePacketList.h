@@ -30,7 +30,11 @@ enum class GamePacketListID
 	RESPONSE_PING_CHECK = 16,
     SEND_USER_MOVE_ARRIVED = 17,
 	SEND_USER_SAY = 18,
-	REQUEST_USER_SAY = 19
+	REQUEST_USER_SAY = 19,
+    SEND_LEVEL_UP = 20,
+    SEND_JOB_CHANGE = 21,
+    SEND_GENDER_CHANGE = 22,
+    SEND_PRESET_CHANGE = 23
 };
 
 enum class KickReason
@@ -311,4 +315,48 @@ struct FRequestUserSayPacket
 	FString AccountID;
 	UPROPERTY()
 	FString Message;
+};
+
+USTRUCT()
+struct FSendLevelUpPacket
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    int32 Level;
+    UPROPERTY()
+    int32 EXP;
+};
+
+USTRUCT()
+struct FSendJobChangePacket
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    int32 Job;
+    UPROPERTY()
+    int32 JobLevel;
+};
+
+USTRUCT()
+struct FSendGenderChangePacket
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    int32 GenderType;
+};
+
+USTRUCT()
+struct FSendPresetChangePacket
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FString AccountID;
+    UPROPERTY()
+    int32 PresetNumber;
 };
